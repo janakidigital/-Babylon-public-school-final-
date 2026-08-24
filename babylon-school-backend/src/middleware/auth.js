@@ -37,6 +37,21 @@ async function protect(req, res, next) {
 }
 
 
+async function optionalProtect(req, res, next) {
+    try {
+        const token = req.cookies?.token;
+        if (!token) return next();
+        req.user = jwt.verify(
+            token,
+            process.env.JWT_SECRET || process.env.JWT_secret
+        );
+    } catch {
+        req.user = undefined;
+    }
+    next();
+}
+
 module.exports = {
     protect,
+    optionalProtect,
 };

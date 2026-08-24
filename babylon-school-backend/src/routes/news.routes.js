@@ -13,7 +13,7 @@ const {
   togglePublishStatus,
 } = require("../controllers/news.controller");
 
-const { protect } = require("../middleware/auth");
+const { protect, optionalProtect } = require("../middleware/auth");
 const upload = require("../middleware/upload.middleware");
 
 // ======================================================
@@ -21,7 +21,7 @@ const upload = require("../middleware/upload.middleware");
 // ======================================================
 
 // Get all published and active news
-router.get("/", getNews);
+router.get("/", optionalProtect, getNews);
 
 // Get single published and active news
 router.get("/:id", getSingleNews);

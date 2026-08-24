@@ -7,18 +7,11 @@ const About = require("../models/about.model");
 // ======================================================
 const getAbout = async (req, res) => {
   try {
-    const about = await About.findOne({ isActive: true });
-
-    if (!about) {
-      return res.status(404).json({
-        success: false,
-        message: "About page content not found",
-      });
-    }
+    const about = await About.findOne({ isActive: true }) || await About.findOne();
 
     res.status(200).json({
       success: true,
-      data: about,
+      data: about || null,
     });
   } catch (error) {
     console.error("Get about error:", error);
@@ -84,28 +77,25 @@ const createAbout = async (req, res) => {
 // ======================================================
 const updateAbout = async (req, res) => {
   try {
-    const about = await About.findOne();
+    let about = await About.findOne();
+    const payload = req.body;
 
     if (!about) {
-      return res.status(404).json({
-        success: false,
-        message: "About page content not found",
+      about = await About.create({
+        introduction: { title: payload.introduction?.title || "About Babylon" },
+        ...payload,
+      });
+    } else {
+      about = await About.findByIdAndUpdate(about._id, payload, {
+        new: true,
+        runValidators: true,
       });
     }
 
-    const updatedAbout = await About.findByIdAndUpdate(
-      about._id,
-      req.body,
-      {
-        new: true,
-        runValidators: true,
-      }
-    );
-
     res.status(200).json({
       success: true,
-      message: "About page content updated successfully",
-      data: updatedAbout,
+      message: "About page content saved successfully",
+      data: about,
     });
   } catch (error) {
     console.error("Update about error:", error);

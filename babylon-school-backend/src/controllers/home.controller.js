@@ -7,18 +7,11 @@ const Home = require("../models/home.model");
 // ======================================================
 const getHome = async (req, res) => {
   try {
-    const home = await Home.findOne({ isActive: true });
-
-    if (!home) {
-      return res.status(404).json({
-        success: false,
-        message: "Homepage content not found",
-      });
-    }
+    const home = await Home.findOne({ isActive: true }) || await Home.findOne();
 
     res.status(200).json({
       success: true,
-      data: home,
+      data: home || null,
     });
   } catch (error) {
     console.error("Get home error:", error);
@@ -82,24 +75,25 @@ const createHome = async (req, res) => {
 // ======================================================
 const updateHome = async (req, res) => {
   try {
-    const home = await Home.findOne();
+    let home = await Home.findOne();
+    const payload = req.body;
 
     if (!home) {
-      return res.status(404).json({
-        success: false,
-        message: "Homepage content not found",
+      home = await Home.create({
+        hero: { title: payload.hero?.title || "Education for the Quest" },
+        ...payload,
+      });
+    } else {
+      home = await Home.findByIdAndUpdate(home._id, payload, {
+        new: true,
+        runValidators: true,
       });
     }
 
-    const updatedHome = await Home.findByIdAndUpdate(home._id, req.body, {
-      new: true,
-      runValidators: true,
-    });
-
     res.status(200).json({
       success: true,
-      message: "Homepage content updated successfully",
-      data: updatedHome,
+      message: "Homepage content saved successfully",
+      data: home,
     });
   } catch (error) {
     console.error("Update home error:", error);

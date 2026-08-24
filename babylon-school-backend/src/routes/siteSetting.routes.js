@@ -7,11 +7,13 @@ const {
 } = require("../controllers/siteSetting.controller");
 
 const router = express.Router();
+const { protect } = require("../middleware/auth");
+const upload = require("../middleware/upload.middleware");
 
 router.get("/", getSiteSettings);
 
-router.post("/", createSiteSettings);
+router.post("/", protect, upload.single("logo"), createSiteSettings);
 
-router.put("/", updateSiteSettings);
+router.put("/", protect, upload.single("logo"), updateSiteSettings);
 
 module.exports = router;

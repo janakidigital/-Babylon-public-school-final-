@@ -7,7 +7,8 @@ const Notice = require("../models/notice.model");
 // ======================================================
 const getNotices = async (req, res) => {
   try {
-    const notices = await Notice.find({
+    const isAdmin = req.user && ["admin", "superAdmin"].includes(req.user.role);
+    const notices = await Notice.find(isAdmin ? {} : {
       isActive: true,
       isPublished: true,
     }).sort({
@@ -116,8 +117,8 @@ const createNotice = async (req, res) => {
       content,
       category,
       attachment,
-      publishedAt,
-      isPublished,
+      publishedAt: publishedAt || new Date(),
+      isPublished: isPublished === undefined || isPublished === "" ? true : isPublished === true || isPublished === "true",
       isFeatured,
       isActive,
     });

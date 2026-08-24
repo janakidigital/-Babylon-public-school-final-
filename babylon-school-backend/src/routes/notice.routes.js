@@ -13,13 +13,13 @@ const {
   togglePublishStatus,
 } = require("../controllers/notice.controller");
 
-const { protect } = require("../middleware/auth");
+const { protect, optionalProtect } = require("../middleware/auth");
 
 // ======================================================
 // PUBLIC
 // ======================================================
 
-router.get("/", getNotices);
+router.get("/", optionalProtect, getNotices);
 
 router.get("/:id", getNotice);
 

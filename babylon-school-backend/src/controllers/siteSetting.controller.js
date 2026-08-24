@@ -1,20 +1,38 @@
 const SiteSetting = require("../models/siteSetting.model");
+const { uploadToCloudinary } = require("../services/storage.service");
 
-// Get site settings
+function parseSettingsBody(req) {
+    const body = { ...req.body };
+
+    if (typeof body.socialLinks === "string") {
+        try {
+            body.socialLinks = JSON.parse(body.socialLinks);
+        } catch {
+            body.socialLinks = {};
+        }
+    }
+
+    if (body.facebook || body.instagram || body.youtube) {
+        body.socialLinks = {
+            ...(body.socialLinks || {}),
+            facebook: body.facebook || "",
+            instagram: body.instagram || "",
+            youtube: body.youtube || "",
+        };
+        delete body.facebook;
+        delete body.instagram;
+        delete body.youtube;
+    }
+
+    return body;
+}
+
 const getSiteSettings = async (req, res) => {
     try {
         const settings = await SiteSetting.findOne();
-
-        if (!settings) {
-            return res.status(404).json({
-                success: false,
-                message: "Site settings not found"
-            });
-        }
-
         res.status(200).json({
             success: true,
-            data: settings
+            data: settings || null,
         });
     } catch (error) {
         res.status(500).json({
@@ -38,7 +56,12 @@ const createSiteSettings = async (req, res) => {
             });
         }
 
-        const settings = await SiteSetting.create(req.body);
+        const payload = parseSettingsBody(req);
+        if (req.file) {
+            const uploaded = await uploadToCloudinary(req.file.buffer, "babylon-school/settings");
+            payload.logo = uploaded.url;
+        }
+        const settings = await SiteSetting.create(payload);
 
         res.status(201).json({
             success: true,
@@ -58,28 +81,29 @@ const createSiteSettings = async (req, res) => {
 // Update site settings
 const updateSiteSettings = async (req, res) => {
     try {
-        const settings = await SiteSetting.findOne();
+        const payload = parseSettingsBody(req);
+        if (req.file) {
+            const uploaded = await uploadToCloudinary(req.file.buffer, "babylon-school/settings");
+            payload.logo = uploaded.url;
+        }
 
+        let settings = await SiteSetting.findOne();
         if (!settings) {
-            return res.status(404).json({
-                success: false,
-                message: "Site settings not found"
+            settings = await SiteSetting.create({
+                schoolName: payload.schoolName || "Babylon National School",
+                ...payload,
+            });
+        } else {
+            settings = await SiteSetting.findByIdAndUpdate(settings._id, payload, {
+                new: true,
+                runValidators: true,
             });
         }
 
-        const updatedSettings = await SiteSetting.findByIdAndUpdate(
-            settings._id,
-            req.body,
-            {
-                new: true,
-                runValidators: true
-            }
-        );
-
         res.status(200).json({
             success: true,
-            message: "Site settings updated successfully",
-            data: updatedSettings
+            message: "Site settings saved successfully",
+            data: settings
         });
     } catch (error) {
         res.status(500).json({
