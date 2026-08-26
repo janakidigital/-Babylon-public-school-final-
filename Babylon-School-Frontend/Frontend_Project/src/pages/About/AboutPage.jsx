@@ -13,7 +13,7 @@ export default function AboutPage() {
         title="A co-ed English medium school since 1996."
         image="banner/inner_banner_2.jpg"
       />
-      <AboutStory />
+      {/* <AboutStory /> */}
       <AboutPossibilities />
       <section className="statement">
         <div className="shell">

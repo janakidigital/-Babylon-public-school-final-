@@ -99,4 +99,43 @@ router.post(
 );
 
 
+
+
+// =====================================================
+// SUPER ADMIN
+// =====================================================
+
+// Create Admin
+router.post(
+    "/admin",
+    protect,
+    authorize("superAdmin"),
+    userController.createAdmin
+);
+
+// Get all admins
+router.get(
+    "/admins",
+    protect,
+    authorize("superAdmin"),
+    userController.getAllAdmins
+);
+
+// Update admin
+router.put(
+    "/:id",
+    protect,
+    authorize("superAdmin"),
+    userController.updateAdmin
+);
+
+// Delete admin
+router.delete(
+    "/:id",
+    protect,
+    authorize("superAdmin"),
+    userController.deleteAdmin
+);
+
+
 module.exports = router;

@@ -1,17 +1,52 @@
 const Notice = require("../models/notice.model");
+const { uploadToCloudinary } = require("../services/storage.service");
+
+// ======================================================
+// ALLOWED ATTACHMENT TYPES
+// ======================================================
+
+const ALLOWED_ATTACHMENT_TYPES = [
+  "application/pdf",
+  "image/jpeg",
+  "image/jpg",
+  "image/png",
+  "image/webp",
+];
+
+// ======================================================
+// GET ATTACHMENT TYPE
+// ======================================================
+
+const getAttachmentType = (mimetype) => {
+  if (mimetype === "application/pdf") {
+    return "pdf";
+  }
+
+  if (mimetype.startsWith("image/")) {
+    return "image";
+  }
+
+  return null;
+};
 
 // ======================================================
 // GET ALL NOTICES
-// GET /api/v1/notices
-// Public
 // ======================================================
+
 const getNotices = async (req, res) => {
   try {
-    const isAdmin = req.user && ["admin", "superAdmin"].includes(req.user.role);
-    const notices = await Notice.find(isAdmin ? {} : {
-      isActive: true,
-      isPublished: true,
-    }).sort({
+    const isAdmin =
+      req.user &&
+      ["admin", "superAdmin"].includes(req.user.role);
+
+    const notices = await Notice.find(
+      isAdmin
+        ? {}
+        : {
+            isActive: true,
+            isPublished: true,
+          }
+    ).sort({
       publishedAt: -1,
       createdAt: -1,
     });
@@ -34,9 +69,8 @@ const getNotices = async (req, res) => {
 
 // ======================================================
 // GET SINGLE NOTICE
-// GET /api/v1/notices/:id
-// Public
 // ======================================================
+
 const getNotice = async (req, res) => {
   try {
     const notice = await Notice.findOne({
@@ -76,9 +110,8 @@ const getNotice = async (req, res) => {
 
 // ======================================================
 // CREATE NOTICE
-// POST /api/v1/notices
-// Protected
 // ======================================================
+
 const createNotice = async (req, res) => {
   try {
     const {
@@ -87,12 +120,15 @@ const createNotice = async (req, res) => {
       shortDescription,
       content,
       category,
-      attachment,
       publishedAt,
       isPublished,
       isFeatured,
       isActive,
     } = req.body;
+
+    // --------------------------------------------------
+    // VALIDATION
+    // --------------------------------------------------
 
     if (!title || !slug || !content) {
       return res.status(400).json({
@@ -100,6 +136,10 @@ const createNotice = async (req, res) => {
         message: "Title, slug and content are required",
       });
     }
+
+    // --------------------------------------------------
+    // CHECK DUPLICATE SLUG
+    // --------------------------------------------------
 
     const existingNotice = await Notice.findOne({ slug });
 
@@ -110,17 +150,88 @@ const createNotice = async (req, res) => {
       });
     }
 
+    // --------------------------------------------------
+    // ATTACHMENT
+    // --------------------------------------------------
+
+    let attachmentUrl = null;
+    let attachmentType = null;
+    let attachmentName = null;
+
+    // --------------------------------------------------
+    // UPLOAD PDF / IMAGE
+    // --------------------------------------------------
+
+    if (req.file) {
+      console.log("Uploaded file:", {
+        name: req.file.originalname,
+        mimetype: req.file.mimetype,
+        size: req.file.size,
+      });
+
+      // Validate
+      if (!ALLOWED_ATTACHMENT_TYPES.includes(req.file.mimetype)) {
+        return res.status(400).json({
+          success: false,
+          message:
+            "Invalid attachment type. Only PDF, JPG, JPEG, PNG and WEBP files are allowed.",
+        });
+      }
+
+      attachmentType = getAttachmentType(req.file.mimetype);
+      attachmentName = req.file.originalname;
+
+      // Upload
+      const uploadedFile = await uploadToCloudinary(
+        req.file.buffer,
+        "babylon-school/notices",
+        req.file.mimetype
+      );
+
+      attachmentUrl = uploadedFile.url;
+
+      console.log("Attachment uploaded:", {
+        url: attachmentUrl,
+        type: attachmentType,
+        name: attachmentName,
+      });
+    }
+
+    // --------------------------------------------------
+    // CREATE NOTICE
+    // --------------------------------------------------
+
     const notice = await Notice.create({
       title,
       slug,
       shortDescription,
       content,
       category,
-      attachment,
+
+      attachment: attachmentUrl,
+      attachmentType,
+      attachmentName,
+
       publishedAt: publishedAt || new Date(),
-      isPublished: isPublished === undefined || isPublished === "" ? true : isPublished === true || isPublished === "true",
-      isFeatured,
-      isActive,
+
+      isPublished:
+        isPublished === undefined || isPublished === ""
+          ? true
+          : isPublished === true ||
+            isPublished === "true" ||
+            isPublished === "on",
+
+      isFeatured:
+        isFeatured === true ||
+        isFeatured === "true" ||
+        isFeatured === "on",
+
+      isActive:
+        isActive === undefined || isActive === ""
+          ? true
+          : isActive === true ||
+            isActive === "true" ||
+            isActive === "on",
     });
 
     res.status(201).json({
@@ -158,9 +269,8 @@ const createNotice = async (req, res) => {
 
 // ======================================================
 // UPDATE NOTICE
-// PUT /api/v1/notices/:id
-// Protected
 // ======================================================
+
 const updateNotice = async (req, res) => {
   try {
     const notice = await Notice.findById(req.params.id);
@@ -172,7 +282,14 @@ const updateNotice = async (req, res) => {
       });
     }
 
-    if (req.body.slug && req.body.slug !== notice.slug) {
+    // --------------------------------------------------
+    // CHECK DUPLICATE SLUG
+    // --------------------------------------------------
+
+    if (
+      req.body.slug &&
+      req.body.slug !== notice.slug
+    ) {
       const existingNotice = await Notice.findOne({
         slug: req.body.slug,
         _id: { $ne: req.params.id },
@@ -186,14 +303,90 @@ const updateNotice = async (req, res) => {
       }
     }
 
-    const updatedNotice = await Notice.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      {
-        new: true,
-        runValidators: true,
+    // --------------------------------------------------
+    // UPDATE PAYLOAD
+    // --------------------------------------------------
+
+    const payload = { ...req.body };
+
+    // --------------------------------------------------
+    // BOOLEAN VALUES
+    // --------------------------------------------------
+
+    if (payload.isPublished !== undefined) {
+      payload.isPublished =
+        payload.isPublished === true ||
+        payload.isPublished === "true" ||
+        payload.isPublished === "on";
+    }
+
+    if (payload.isFeatured !== undefined) {
+      payload.isFeatured =
+        payload.isFeatured === true ||
+        payload.isFeatured === "true" ||
+        payload.isFeatured === "on";
+    }
+
+    if (payload.isActive !== undefined) {
+      payload.isActive =
+        payload.isActive === true ||
+        payload.isActive === "true" ||
+        payload.isActive === "on";
+    }
+
+    // --------------------------------------------------
+    // NEW ATTACHMENT
+    // --------------------------------------------------
+
+    if (req.file) {
+      console.log("Uploaded new attachment:", {
+        name: req.file.originalname,
+        mimetype: req.file.mimetype,
+        size: req.file.size,
+      });
+
+      if (!ALLOWED_ATTACHMENT_TYPES.includes(req.file.mimetype)) {
+        return res.status(400).json({
+          success: false,
+          message:
+            "Invalid attachment type. Only PDF, JPG, JPEG, PNG and WEBP files are allowed.",
+        });
       }
-    );
+
+      const attachmentType = getAttachmentType(
+        req.file.mimetype
+      );
+
+      const uploadedFile = await uploadToCloudinary(
+        req.file.buffer,
+        "babylon-school/notices",
+        req.file.mimetype
+      );
+
+      payload.attachment = uploadedFile.url;
+      payload.attachmentType = attachmentType;
+      payload.attachmentName = req.file.originalname;
+
+      console.log("New attachment uploaded:", {
+        url: uploadedFile.url,
+        type: attachmentType,
+        name: req.file.originalname,
+      });
+    }
+
+    // --------------------------------------------------
+    // UPDATE
+    // --------------------------------------------------
+
+    const updatedNotice =
+      await Notice.findByIdAndUpdate(
+        req.params.id,
+        payload,
+        {
+          new: true,
+          runValidators: true,
+        }
+      );
 
     res.status(200).json({
       success: true,
@@ -237,9 +430,8 @@ const updateNotice = async (req, res) => {
 
 // ======================================================
 // DELETE NOTICE
-// DELETE /api/v1/notices/:id
-// Protected
 // ======================================================
+
 const deleteNotice = async (req, res) => {
   try {
     const notice = await Notice.findById(req.params.id);
@@ -277,9 +469,8 @@ const deleteNotice = async (req, res) => {
 
 // ======================================================
 // TOGGLE NOTICE STATUS
-// PATCH /api/v1/notices/:id/status
-// Protected
 // ======================================================
+
 const toggleNoticeStatus = async (req, res) => {
   try {
     const notice = await Notice.findById(req.params.id);
@@ -303,7 +494,10 @@ const toggleNoticeStatus = async (req, res) => {
       data: notice,
     });
   } catch (error) {
-    console.error("Toggle notice status error:", error);
+    console.error(
+      "Toggle notice status error:",
+      error
+    );
 
     if (error.name === "CastError") {
       return res.status(400).json({
@@ -322,9 +516,8 @@ const toggleNoticeStatus = async (req, res) => {
 
 // ======================================================
 // TOGGLE FEATURED STATUS
-// PATCH /api/v1/notices/:id/featured
-// Protected
 // ======================================================
+
 const toggleFeaturedStatus = async (req, res) => {
   try {
     const notice = await Notice.findById(req.params.id);
@@ -350,7 +543,10 @@ const toggleFeaturedStatus = async (req, res) => {
       data: notice,
     });
   } catch (error) {
-    console.error("Toggle featured status error:", error);
+    console.error(
+      "Toggle featured status error:",
+      error
+    );
 
     if (error.name === "CastError") {
       return res.status(400).json({
@@ -368,10 +564,9 @@ const toggleFeaturedStatus = async (req, res) => {
 };
 
 // ======================================================
-// PUBLISH / UNPUBLISH NOTICE
-// PATCH /api/v1/notices/:id/publish
-// Protected
+// TOGGLE PUBLISH STATUS
 // ======================================================
+
 const togglePublishStatus = async (req, res) => {
   try {
     const notice = await Notice.findById(req.params.id);
@@ -398,12 +593,17 @@ const togglePublishStatus = async (req, res) => {
     res.status(200).json({
       success: true,
       message: `Notice ${
-        notice.isPublished ? "published" : "unpublished"
+        notice.isPublished
+          ? "published"
+          : "unpublished"
       } successfully`,
       data: notice,
     });
   } catch (error) {
-    console.error("Toggle publish status error:", error);
+    console.error(
+      "Toggle publish status error:",
+      error
+    );
 
     if (error.name === "CastError") {
       return res.status(400).json({
@@ -419,6 +619,10 @@ const togglePublishStatus = async (req, res) => {
     });
   }
 };
+
+// ======================================================
+// EXPORTS
+// ======================================================
 
 module.exports = {
   getNotices,

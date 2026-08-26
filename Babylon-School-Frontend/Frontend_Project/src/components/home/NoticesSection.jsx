@@ -2,10 +2,12 @@ import { Link } from "react-router-dom";
 import { publicApi } from "../../services/api";
 import usePublicData from "../../hooks/usePublicData";
 import { formatDateParts } from "../../lib/format";
+import { mediaUrl } from "../../lib/media";          // ← make sure this exists
 import EmptyState from "../common/EmptyState";
 
 export default function NoticesSection({ limit }) {
   const { data, loading } = usePublicData(publicApi.notices, []);
+
   const items = (limit ? data.slice(0, limit) : data).map((notice) => {
     const date = formatDateParts(notice.publishedAt || notice.createdAt);
     return {
@@ -30,6 +32,7 @@ export default function NoticesSection({ limit }) {
           View all notices <b>&rarr;</b>
         </Link>
       </div>
+
       {loading ? (
         <p>Loading notices...</p>
       ) : items.length === 0 ? (
@@ -45,7 +48,26 @@ export default function NoticesSection({ limit }) {
                 <strong>{notice.day}</strong>
                 <span>{notice.month}</span>
               </div>
-              <h3>{notice.title}</h3>
+
+              <div className="notice-content">
+                <h3>{notice.title}</h3>
+
+                {/* Show attachment button if available */}
+                {notice.attachment && (
+                  <a
+                    href={mediaUrl(notice.attachment)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="notice-attachment"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {notice.attachment.toLowerCase().endsWith(".pdf")
+                      ? "📄 View PDF"
+                      : "🖼️ View Image"}
+                  </a>
+                )}
+              </div>
+
               <Link to={notice.href} aria-label={`Read ${notice.title}`}>
                 &rarr;
               </Link>

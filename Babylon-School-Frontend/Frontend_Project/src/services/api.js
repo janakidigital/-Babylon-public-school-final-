@@ -41,4 +41,5 @@ export const publicApi = {
     api("/career-applications/apply", { method: "POST", body }),
   contact: (body) => api("/contacts", { method: "POST", body }),
   admission: (body) => api("/admissions", { method: "POST", body }),
+  downloads: () => api("/downloads"),
 };

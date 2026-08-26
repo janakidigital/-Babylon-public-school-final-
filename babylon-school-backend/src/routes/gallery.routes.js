@@ -1,5 +1,4 @@
 const express = require("express");
-
 const router = express.Router();
 
 const {
@@ -15,35 +14,15 @@ const {
 const { protect } = require("../middleware/auth");
 const upload = require("../middleware/upload.middleware");
 
-// ======================================================
-// PUBLIC ROUTES
-// ======================================================
-
+// Public
 router.get("/", getGalleryItems);
-
 router.get("/:id", getGalleryItem);
 
-
-// ======================================================
-// PROTECTED ROUTES
-// ======================================================
-
-router.post("/", protect, upload.single("image"), createGalleryItem);
-
-router.put("/:id", protect, upload.single("image"), updateGalleryItem);
-
+// Protected
+router.post("/", protect, upload.array("image", 30), createGalleryItem);
+router.put("/:id", protect, upload.array("image", 30), updateGalleryItem);
 router.delete("/:id", protect, deleteGalleryItem);
-
-router.patch(
-  "/:id/status",
-  protect,
-  toggleGalleryStatus
-);
-
-router.patch(
-  "/:id/featured",
-  protect,
-  toggleFeaturedStatus
-);
+router.patch("/:id/status", protect, toggleGalleryStatus);
+router.patch("/:id/featured", protect, toggleFeaturedStatus);
 
 module.exports = router;

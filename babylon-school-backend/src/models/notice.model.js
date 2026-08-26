@@ -32,7 +32,21 @@ const noticeSchema = new mongoose.Schema(
       trim: true,
     },
 
+    // Cloudinary URL
     attachment: {
+      type: String,
+      trim: true,
+    },
+
+    // pdf / image
+    attachmentType: {
+      type: String,
+      enum: ["pdf", "image"],
+      default: null,
+    },
+
+    // Original filename
+    attachmentName: {
       type: String,
       trim: true,
     },

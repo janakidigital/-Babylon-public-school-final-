@@ -858,6 +858,176 @@ const createAdmin = async (req, res) => {
 
 
 // ==========================================
+// GET ALL ADMINS (SuperAdmin only)
+// ==========================================
+const getAllAdmins = async (req, res) => {
+    try {
+        const admins = await User.find({
+            role: { $in: ["admin", "superAdmin"] },
+        })
+            .select("-password")
+            .sort({ createdAt: -1 });
+
+        return res.status(200).json({
+            success: true,
+            data: admins,
+        });
+    } catch (error) {
+        console.error("getAllAdmins:", error);
+        return res.status(500).json({
+            success: false,
+            message: "Internal Server Error",
+        });
+    }
+};
+
+
+// ==========================================
+// UPDATE ADMIN (SuperAdmin only)
+// ==========================================
+const updateAdmin = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { name, email, password } = req.body;
+
+        const admin = await User.findById(id);
+
+        if (!admin) {
+            return res.status(404).json({
+                success: false,
+                message: "Admin not found",
+            });
+        }
+
+        // Only allow updating admin or superAdmin
+        if (!["admin", "superAdmin"].includes(admin.role)) {
+            return res.status(400).json({
+                success: false,
+                message: "This user is not an admin",
+            });
+        }
+
+        // Prevent SuperAdmin from accidentally demoting/deleting himself in wrong way
+        // (optional safety)
+
+        if (name) {
+            if (name.trim().length < 2) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Name must be at least 2 characters",
+                });
+            }
+            admin.name = name.trim();
+        }
+
+        if (email) {
+            const normalizedEmail = email.toLowerCase().trim();
+
+            const existingUser = await User.findOne({
+                email: normalizedEmail,
+                _id: { $ne: admin._id },
+            });
+
+            if (existingUser) {
+                return res.status(409).json({
+                    success: false,
+                    message: "Email already in use",
+                });
+            }
+
+            admin.email = normalizedEmail;
+        }
+
+        // Update password only if provided
+        if (password && password.trim()) {
+            if (password.length < 6) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Password must be at least 6 characters",
+                });
+            }
+            admin.password = await bcrypt.hash(password, 10);
+        }
+
+        await admin.save();
+
+        return res.status(200).json({
+            success: true,
+            message: "Admin updated successfully",
+            data: {
+                id: admin._id,
+                name: admin.name,
+                email: admin.email,
+                role: admin.role,
+                isActive: admin.isActive,
+            },
+        });
+    } catch (error) {
+        console.error("updateAdmin:", error);
+
+        if (error.code === 11000) {
+            return res.status(409).json({
+                success: false,
+                message: "Email already in use",
+            });
+        }
+
+        return res.status(500).json({
+            success: false,
+            message: "Internal Server Error",
+        });
+    }
+};
+
+
+// ==========================================
+// DELETE ADMIN (SuperAdmin only)
+// ==========================================
+const deleteAdmin = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const admin = await User.findById(id);
+
+        if (!admin) {
+            return res.status(404).json({
+                success: false,
+                message: "Admin not found",
+            });
+        }
+
+        // Only allow deleting admin role (not superAdmin for safety)
+        if (admin.role !== "admin") {
+            return res.status(400).json({
+                success: false,
+                message: "You can only delete users with role 'admin'",
+            });
+        }
+
+        // Prevent deleting yourself
+        if (admin._id.toString() === req.user.id) {
+            return res.status(400).json({
+                success: false,
+                message: "You cannot delete your own account",
+            });
+        }
+
+        await User.findByIdAndDelete(id);
+
+        return res.status(200).json({
+            success: true,
+            message: "Admin deleted successfully",
+        });
+    } catch (error) {
+        console.error("deleteAdmin:", error);
+        return res.status(500).json({
+            success: false,
+            message: "Internal Server Error",
+        });
+    }
+};
+
+// ==========================================
 // EXPORT CONTROLLERS
 // ==========================================
 
@@ -871,4 +1041,7 @@ module.exports = {
     uploadProfileImage,
     deleteProfileImage,
     createAdmin,
+    getAllAdmins,
+    updateAdmin,
+    deleteAdmin,
 };

@@ -40,7 +40,7 @@ export default function ProgramsSection() {
         ) : items.length === 0 ? (
           <EmptyState
             title="Programmes coming soon"
-            text="Academic programmes added in the admin panel will show here."
+            
           />
         ) : (
           <div className="program-grid">

@@ -15,6 +15,7 @@ export default function NoticesPage() {
     [id],
   );
 
+  // Listing page (no id)
   if (!id) {
     return (
       <>
@@ -28,10 +29,15 @@ export default function NoticesPage() {
     );
   }
 
+  // Loading
   if (loading) {
     return (
       <>
-        <PageBanner eyebrow="NOTICE" title="Loading..." image="banner/inner_banner_5.jpg" />
+        <PageBanner
+          eyebrow="NOTICE"
+          title="Loading..."
+          image="banner/inner_banner_5.jpg"
+        />
         <section className="shell listing-page">
           <p>Loading notice...</p>
         </section>
@@ -39,18 +45,23 @@ export default function NoticesPage() {
     );
   }
 
+  // Not found
   if (!notice) {
     return (
       <>
-        <PageBanner eyebrow="NOTICE" title="Notice not found." image="banner/inner_banner_5.jpg" />
+        <PageBanner
+          eyebrow="NOTICE"
+          title="Notice not found."
+          image="banner/inner_banner_5.jpg"
+        />
         <section className="shell listing-page">
           <EmptyState
             title="This notice is not available"
             text="It may have been unpublished. Browse the latest notices instead."
           />
-          <p>
+          <p style={{ marginTop: "20px" }}>
             <Link className="text-link" to="/notices">
-              Back to notices <b>&rarr;</b>
+              ← Back to notices
             </Link>
           </p>
         </section>
@@ -59,6 +70,17 @@ export default function NoticesPage() {
   }
 
   const date = formatDateParts(notice.publishedAt || notice.createdAt);
+
+  // Detect attachment type
+  const attachment = notice.attachment;
+  const isImage =
+    attachment && /\.(jpg|jpeg|png|webp|gif)$/i.test(attachment);
+  const isPdf =
+    attachment &&
+    (/\.pdf$/i.test(attachment) ||
+      attachment.includes("pdf") ||
+      attachment.includes("/raw/upload"));
+
   return (
     <>
       <PageBanner
@@ -66,14 +88,87 @@ export default function NoticesPage() {
         title={notice.title}
         image="banner/inner_banner_5.jpg"
       />
+
+      {/* Removed the image prop so the big photo no longer shows */}
       <ArticleLayout
-        image="banner/inner_banner_5.jpg"
         label={`${date.full}${notice.category ? ` · ${notice.category}` : ""}`}
         title={notice.title}
       >
+        {/* Back button */}
+        <p style={{ marginBottom: "28px" }}>
+          <Link className="text-link" to="/notices">
+            ← Back to all notices
+          </Link>
+        </p>
+
+        {/* Short description */}
         {notice.shortDescription && <p>{notice.shortDescription}</p>}
-        {(notice.content || "").split("\n").map((para, index) =>
-          para.trim() ? <p key={index}>{para}</p> : null,
+
+        {/* Main content */}
+        {(notice.content || "")
+          .split("\n")
+          .map((para, index) =>
+            para.trim() ? <p key={index}>{para}</p> : null,
+          )}
+
+        {/* ========== ATTACHMENT ========== */}
+        {attachment && (
+          <div className="notice-attachment-box">
+            <h3>Attachment</h3>
+
+            {isImage && (
+              <div>
+                <img
+                  src={attachment}
+                  alt={`Attachment for ${notice.title}`}
+                  style={{
+                    maxWidth: "100%",
+                    height: "auto",
+                    marginTop: "12px",
+                    border: "1px solid #e2e8f0",
+                  }}
+                />
+                <p style={{ marginTop: "14px" }}>
+                  <a
+                    href={attachment}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-link"
+                  >
+                    Open full image →
+                  </a>
+                </p>
+              </div>
+            )}
+
+            {isPdf && (
+              <div style={{ marginTop: "12px" }}>
+                <a
+                  href={attachment}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="button primary"
+                  style={{ display: "inline-flex" }}
+                >
+                  📄 View / Download PDF
+                </a>
+              </div>
+            )}
+
+            {!isImage && !isPdf && (
+              <div style={{ marginTop: "12px" }}>
+                <a
+                  href={attachment}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="button primary"
+                  style={{ display: "inline-flex" }}
+                >
+                  📎 View Attachment
+                </a>
+              </div>
+            )}
+          </div>
         )}
       </ArticleLayout>
     </>

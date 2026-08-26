@@ -10,7 +10,7 @@ export default function BlogPage() {
     <>
       <PageBanner
         eyebrow="SCHOOL STORIES"
-        title="News from the Babylon community."
+        title="News & Blog from the Babylon community."
         image="banner/inner_banner_1.jpg"
       />
       <section className="listing-page shell">

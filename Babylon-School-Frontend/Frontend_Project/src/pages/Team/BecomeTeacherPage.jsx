@@ -6,23 +6,24 @@ import usePublicData from "../../hooks/usePublicData";
 export default function BecomeTeacherPage() {
   const { data: vacancies, loading } = usePublicData(publicApi.careers, []);
   const [result, setResult] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
   async function submit(event) {
     event.preventDefault();
+    setSubmitting(true);
+    setResult("");
+
     const form = event.currentTarget;
-    const payload = Object.fromEntries(new FormData(form).entries());
+    const formData = new FormData(form); // Important: send as FormData
+
     try {
-      await publicApi.applyCareer({
-        name: payload.name,
-        email: payload.email,
-        phone: payload.phone,
-        careerTitle: payload.careerTitle,
-        coverLetter: payload.coverLetter,
-      });
-      setResult("Thank you. Your application has been sent.");
+      await publicApi.applyCareer(formData);
+      setResult("Thank you. Your application has been sent successfully.");
       form.reset();
     } catch (error) {
-      setResult(error.message);
+      setResult(error.message || "Something went wrong. Please try again.");
+    } finally {
+      setSubmitting(false);
     }
   }
 
@@ -34,9 +35,11 @@ export default function BecomeTeacherPage() {
         image="banner/instructor.jpg"
       />
 
+      {/* ===================== OPEN ROLES ===================== */}
       <section className="shell" style={{ padding: "4rem 0 2rem" }}>
         <p className="eyebrow">OPEN ROLES</p>
         <h2>Current Vacancies</h2>
+
         {loading ? (
           <p>Loading open roles...</p>
         ) : vacancies.length > 0 ? (
@@ -51,6 +54,7 @@ export default function BecomeTeacherPage() {
                 }}
               >
                 <h3 style={{ margin: "0 0 0.5rem" }}>{v.title}</h3>
+
                 <div
                   style={{
                     display: "flex",
@@ -71,10 +75,27 @@ export default function BecomeTeacherPage() {
                     <b>Location:</b> {v.location || "On-site"}
                   </span>
                 </div>
-                <p>{v.description}</p>
+
+                {/* Description with proper paragraphs */}
+                <div className="job-description">
+                  {(v.description || "")
+                    .split("\n")
+                    .filter((para) => para.trim() !== "")
+                    .map((para, index) => (
+                      <p key={index}>{para}</p>
+                    ))}
+                </div>
+
                 {v.closingDate && (
-                  <p style={{ fontSize: "0.85rem", color: "#d9534f" }}>
-                    <b>Apply by:</b> {new Date(v.closingDate).toLocaleDateString()}
+                  <p
+                    style={{
+                      fontSize: "0.85rem",
+                      color: "#d9534f",
+                      marginTop: "1rem",
+                    }}
+                  >
+                    <b>Apply by:</b>{" "}
+                    {new Date(v.closingDate).toLocaleDateString()}
                   </p>
                 )}
               </article>
@@ -88,6 +109,7 @@ export default function BecomeTeacherPage() {
         )}
       </section>
 
+      {/* ===================== APPLICATION FORM ===================== */}
       <section className="career-page shell" style={{ paddingTop: "2rem" }}>
         <div>
           <p className="eyebrow">JOIN OUR TEAM</p>
@@ -102,25 +124,35 @@ export default function BecomeTeacherPage() {
             <li>A purposeful role in a growing community</li>
           </ul>
         </div>
-        <form onSubmit={submit}>
+
+        <form onSubmit={submit} encType="multipart/form-data">
           <label>
             Full name
             <input name="name" required placeholder="Your name" />
           </label>
+
           <label>
             Email address
-            <input name="email" type="email" required placeholder="name@email.com" />
+            <input
+              name="email"
+              type="email"
+              required
+              placeholder="name@email.com"
+            />
           </label>
+
           <label>
             Phone
             <input name="phone" type="tel" placeholder="Your contact number" />
           </label>
+
           <label>
             Area of interest
             <select name="careerTitle" required defaultValue="">
               <option value="" disabled>
                 Select an area
               </option>
+
               {vacancies.length > 0 && (
                 <optgroup label="Open Roles">
                   {vacancies.map((v) => (
@@ -130,6 +162,7 @@ export default function BecomeTeacherPage() {
                   ))}
                 </optgroup>
               )}
+
               <optgroup label="General">
                 <option>Teaching</option>
                 <option>Administration</option>
@@ -137,13 +170,35 @@ export default function BecomeTeacherPage() {
               </optgroup>
             </select>
           </label>
+
           <label>
             Cover letter
-            <textarea name="coverLetter" rows="4" placeholder="Tell us about yourself" />
+            <textarea
+              name="coverLetter"
+              rows="4"
+              placeholder="Tell us about yourself"
+            />
           </label>
-          <button className="button primary">
-            Submit application <span>&rarr;</span>
+
+          {/* ========== CV / RESUME UPLOAD ========== */}
+          <label>
+            Upload CV / Resume (PDF or Word)
+            <input
+              name="resume"
+              type="file"
+              accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+              required
+            />
+            <small style={{ display: "block", marginTop: "6px", color: "#666" }}>
+              Accepted formats: PDF, DOC, DOCX (Max 5MB recommended)
+            </small>
+          </label>
+
+          <button className="button primary" disabled={submitting}>
+            {submitting ? "Submitting..." : "Submit application"}{" "}
+            <span>&rarr;</span>
           </button>
+
           {result && <p className="form-success">{result}</p>}
         </form>
       </section>

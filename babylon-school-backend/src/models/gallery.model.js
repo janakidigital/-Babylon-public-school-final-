@@ -7,38 +7,32 @@ const gallerySchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
-
     description: {
       type: String,
       trim: true,
     },
-
-    image: {
+    coverImage: {
       type: String,
-      required: true,
       trim: true,
     },
-
+    images: [
+      {
+        url: { type: String, required: true },
+        caption: { type: String, trim: true, default: "" },
+      },
+    ],
     category: {
       type: String,
       trim: true,
     },
-
-    album: {
-      type: String,
-      trim: true,
-    },
-
     displayOrder: {
       type: Number,
       default: 0,
     },
-
     isFeatured: {
       type: Boolean,
       default: false,
     },
-
     isActive: {
       type: Boolean,
       default: true,

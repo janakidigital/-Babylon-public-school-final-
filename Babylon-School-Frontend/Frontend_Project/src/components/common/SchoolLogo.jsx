@@ -1,25 +1,17 @@
 import { Link } from "react-router-dom";
-import { useSite } from "../../context/SiteContext";
-import { mediaUrl } from "../../lib/media";
+import schoolLogo from "../../assets/school logo.png";
 
 export default function SchoolLogo({ footer = false }) {
-  const { settings } = useSite();
-  const name = settings.schoolName || "Babylon National School";
   return (
     <Link
-      className={`logo${footer ? " footer-logo" : ""}`}
       to="/"
-      aria-label={`${name} home`}
+      aria-label="Babylon National School home"
+      className={footer ? "school-logo footer-school-logo" : "school-logo"}
     >
-      {settings.logo ? (
-        <img className="logo-image" src={mediaUrl(settings.logo)} alt={name} />
-      ) : (
-        <span className="crest">&#10022;</span>
-      )}
-      <span>
-        <b>BABYLON</b>
-        <small>NATIONAL SCHOOL</small>
-      </span>
+      <img
+        src={schoolLogo}
+        alt="Babylon National School"
+      />
     </Link>
   );
 }

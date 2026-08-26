@@ -25,7 +25,6 @@ export default function HighlightsSection() {
         ) : stats.length === 0 ? (
           <EmptyState
             title="Achievements will appear here"
-            text="Add achievements from the admin dashboard to show them on the site."
           />
         ) : (
           <div className="highlight-numbers">

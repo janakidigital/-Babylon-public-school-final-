@@ -21,6 +21,7 @@ const careerApplicationRoutes = require("./routes/careerApplication.routes");
 const contactRoutes = require("./routes/contact.routes");
 const admissionRoutes = require("./routes/admission.routes");
 const userRoutes = require("./routes/user.routes");
+const downloadRoutes = require("./routes/download.routes");
 const errorHandler = require("./middleware/error.middleware");
 
 
@@ -33,9 +34,9 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+
 // Routes
 app.use("/api/v1/settings", siteSettingRoutes);
-
 app.use("/api/v1/home", homeRoutes);
 app.use("/api/v1/about", aboutRoutes);
 app.use("/api/v1/programs", programRoutes);
@@ -53,6 +54,7 @@ app.use("/api/v1/search", searchRoutes);
 app.use("/api/v1/contacts", contactRoutes);
 app.use("/api/v1/admissions", admissionRoutes);
 app.use("/api/v1/users", userRoutes);
+app.use("/api/v1/downloads", downloadRoutes);
 
 // Career applications admin + public application submission
 app.use("/api/v1/career-applications", careerApplicationRoutes);

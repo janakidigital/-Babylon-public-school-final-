@@ -5,6 +5,7 @@ const admissionSchema = new mongoose.Schema(
     // ==========================================
     // Student Information
     // ==========================================
+
     name: {
       type: String,
       required: true,
@@ -41,6 +42,7 @@ const admissionSchema = new mongoose.Schema(
     // ==========================================
     // Parent / Guardian Information
     // ==========================================
+
     parentName: {
       type: String,
       required: true,
@@ -56,6 +58,7 @@ const admissionSchema = new mongoose.Schema(
     // ==========================================
     // Academic Information
     // ==========================================
+
     program: {
       type: String,
       required: true,
@@ -70,6 +73,7 @@ const admissionSchema = new mongoose.Schema(
     // ==========================================
     // Additional Message
     // ==========================================
+
     message: {
       type: String,
       trim: true,
@@ -78,6 +82,7 @@ const admissionSchema = new mongoose.Schema(
     // ==========================================
     // Application Status
     // ==========================================
+
     status: {
       type: String,
       enum: [
@@ -92,6 +97,7 @@ const admissionSchema = new mongoose.Schema(
     // ==========================================
     // Admin Note
     // ==========================================
+
     adminNote: {
       type: String,
       trim: true,

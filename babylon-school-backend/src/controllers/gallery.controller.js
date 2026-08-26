@@ -2,15 +2,11 @@ const Gallery = require("../models/gallery.model");
 const { uploadToCloudinary } = require("../services/storage.service");
 
 // ======================================================
-// GET ALL GALLERY ITEMS
-// GET /api/v1/gallery
-// Public
+// GET ALL ALBUMS
 // ======================================================
 const getGalleryItems = async (req, res) => {
   try {
-    const gallery = await Gallery.find({
-      isActive: true,
-    }).sort({
+    const gallery = await Gallery.find({ isActive: true }).sort({
       displayOrder: 1,
       createdAt: -1,
     });
@@ -22,7 +18,6 @@ const getGalleryItems = async (req, res) => {
     });
   } catch (error) {
     console.error("Get gallery error:", error);
-
     res.status(500).json({
       success: false,
       message: "Server error",
@@ -32,38 +27,34 @@ const getGalleryItems = async (req, res) => {
 };
 
 // ======================================================
-// GET SINGLE GALLERY ITEM
-// GET /api/v1/gallery/:id
-// Public
+// GET SINGLE ALBUM
 // ======================================================
 const getGalleryItem = async (req, res) => {
   try {
-    const galleryItem = await Gallery.findOne({
+    const album = await Gallery.findOne({
       _id: req.params.id,
       isActive: true,
     });
 
-    if (!galleryItem) {
+    if (!album) {
       return res.status(404).json({
         success: false,
-        message: "Gallery item not found",
+        message: "Album not found",
       });
     }
 
     res.status(200).json({
       success: true,
-      data: galleryItem,
+      data: album,
     });
   } catch (error) {
     console.error("Get gallery item error:", error);
-
     if (error.name === "CastError") {
       return res.status(400).json({
         success: false,
-        message: "Invalid gallery item ID",
+        message: "Invalid album ID",
       });
     }
-
     res.status(500).json({
       success: false,
       message: "Server error",
@@ -73,9 +64,7 @@ const getGalleryItem = async (req, res) => {
 };
 
 // ======================================================
-// CREATE GALLERY ITEM
-// POST /api/v1/gallery
-// Protected
+// CREATE ALBUM (with multiple images)
 // ======================================================
 const createGalleryItem = async (req, res) => {
   try {
@@ -83,57 +72,66 @@ const createGalleryItem = async (req, res) => {
       title,
       description,
       category,
-      album,
       displayOrder,
       isFeatured,
       isActive,
     } = req.body;
 
-    let imageUrl;
+    const files = req.files || [];
 
-    if (req.file) {
-      const uploadedImage = await uploadToCloudinary(
-        req.file.buffer,
-        "babylon-school/gallery"
-      );
-
-      imageUrl = uploadedImage.url;
-    }
-
-    if (!title || !req.file) {
+    if (!title) {
       return res.status(400).json({
         success: false,
-        message:
-          "Title and image file are required",
+        message: "Album title is required",
       });
     }
 
-    const galleryItem = await Gallery.create({
+    if (files.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Please upload at least one image",
+      });
+    }
+
+    // Upload all images to Cloudinary
+    const uploaded = await Promise.all(
+      files.map((file) =>
+        uploadToCloudinary(file.buffer, "babylon-school/gallery")
+      )
+    );
+
+    const images = uploaded.map((img) => ({
+      url: img.url,
+      caption: "",
+    }));
+
+    const album = await Gallery.create({
       title,
       description,
-      image: imageUrl,
+      coverImage: images[0]?.url || "",
+      images,
       category,
-      album,
-      displayOrder,
-      isFeatured,
-      isActive,
+      displayOrder: displayOrder || 0,
+      isFeatured: isFeatured === true || isFeatured === "true",
+      isActive:
+        isActive === undefined || isActive === ""
+          ? true
+          : isActive === true || isActive === "true",
     });
 
     res.status(201).json({
       success: true,
-      message: "Gallery item created successfully",
-      data: galleryItem,
+      message: `Album created with ${images.length} images`,
+      data: album,
     });
   } catch (error) {
-    console.error("Create gallery item error:", error);
+    console.error("Create gallery error:", error);
 
     if (error.name === "ValidationError") {
       return res.status(400).json({
         success: false,
         message: "Validation error",
-        errors: Object.values(error.errors).map(
-          (err) => err.message
-        ),
+        errors: Object.values(error.errors).map((err) => err.message),
       });
     }
 
@@ -146,68 +144,83 @@ const createGalleryItem = async (req, res) => {
 };
 
 // ======================================================
-// UPDATE GALLERY ITEM
-// PUT /api/v1/gallery/:id
-// Protected
+// UPDATE ALBUM
 // ======================================================
 const updateGalleryItem = async (req, res) => {
   try {
-    const galleryItem = await Gallery.findById(req.params.id);
+    const album = await Gallery.findById(req.params.id);
 
-    if (!galleryItem) {
+    if (!album) {
       return res.status(404).json({
         success: false,
-        message: "Gallery item not found",
+        message: "Album not found",
       });
     }
 
-    const payload = {
-      ...req.body,
-    };
+    const payload = { ...req.body };
 
-    delete payload.image;
-
-    if (req.file) {
-      const uploadedImage = await uploadToCloudinary(
-        req.file.buffer,
-        "babylon-school/gallery"
-      );
-
-      payload.image = uploadedImage.url;
+    // 1. Handle existing images (after user removed some in admin)
+    if (req.body.existingImages) {
+      try {
+        const existing = JSON.parse(req.body.existingImages);
+        payload.images = existing;
+      } catch (e) {
+        // if parse fails, keep original images
+        payload.images = album.images || [];
+      }
+    } else {
+      // if no existingImages sent, keep current ones
+      payload.images = album.images || [];
     }
 
-    const updatedGalleryItem =
-      await Gallery.findByIdAndUpdate(
-        req.params.id,
-        payload,
-        {
-          new: true,
-          runValidators: true,
-        }
+    // 2. If new images are uploaded → add them
+    if (req.files && req.files.length > 0) {
+      const uploaded = await Promise.all(
+        req.files.map((file) =>
+          uploadToCloudinary(file.buffer, "babylon-school/gallery")
+        )
       );
+
+      const newImages = uploaded.map((img) => ({
+        url: img.url,
+        caption: "",
+      }));
+
+      payload.images = [...payload.images, ...newImages];
+    }
+
+    // 3. Update cover image
+    if (payload.images && payload.images.length > 0) {
+      payload.coverImage = payload.images[0].url;
+    } else {
+      payload.coverImage = "";
+    }
+
+    // Clean fields that should not be saved
+    delete payload.existingImages;
+    delete payload.image;
+
+    const updatedAlbum = await Gallery.findByIdAndUpdate(
+      req.params.id,
+      payload,
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
 
     res.status(200).json({
       success: true,
-      message: "Gallery item updated successfully",
-      data: updatedGalleryItem,
+      message: "Album updated successfully",
+      data: updatedAlbum,
     });
   } catch (error) {
-    console.error("Update gallery item error:", error);
+    console.error("Update gallery error:", error);
 
     if (error.name === "CastError") {
       return res.status(400).json({
         success: false,
-        message: "Invalid gallery item ID",
-      });
-    }
-
-    if (error.name === "ValidationError") {
-      return res.status(400).json({
-        success: false,
-        message: "Validation error",
-        errors: Object.values(error.errors).map(
-          (err) => err.message
-        ),
+        message: "Invalid album ID",
       });
     }
 
@@ -220,18 +233,16 @@ const updateGalleryItem = async (req, res) => {
 };
 
 // ======================================================
-// DELETE GALLERY ITEM
-// DELETE /api/v1/gallery/:id
-// Protected
+// DELETE ALBUM
 // ======================================================
 const deleteGalleryItem = async (req, res) => {
   try {
-    const galleryItem = await Gallery.findById(req.params.id);
+    const album = await Gallery.findById(req.params.id);
 
-    if (!galleryItem) {
+    if (!album) {
       return res.status(404).json({
         success: false,
-        message: "Gallery item not found",
+        message: "Album not found",
       });
     }
 
@@ -239,15 +250,15 @@ const deleteGalleryItem = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: "Gallery item deleted successfully",
+      message: "Album deleted successfully",
     });
   } catch (error) {
-    console.error("Delete gallery item error:", error);
+    console.error("Delete gallery error:", error);
 
     if (error.name === "CastError") {
       return res.status(400).json({
         success: false,
-        message: "Invalid gallery item ID",
+        message: "Invalid album ID",
       });
     }
 
@@ -260,44 +271,31 @@ const deleteGalleryItem = async (req, res) => {
 };
 
 // ======================================================
-// TOGGLE GALLERY STATUS
-// PATCH /api/v1/gallery/:id/status
-// Protected
+// TOGGLE STATUS
 // ======================================================
 const toggleGalleryStatus = async (req, res) => {
   try {
-    const galleryItem = await Gallery.findById(req.params.id);
+    const album = await Gallery.findById(req.params.id);
 
-    if (!galleryItem) {
+    if (!album) {
       return res.status(404).json({
         success: false,
-        message: "Gallery item not found",
+        message: "Album not found",
       });
     }
 
-    galleryItem.isActive = !galleryItem.isActive;
-
-    await galleryItem.save();
+    album.isActive = !album.isActive;
+    await album.save();
 
     res.status(200).json({
       success: true,
-      message: `Gallery item ${
-        galleryItem.isActive
-          ? "activated"
-          : "deactivated"
+      message: `Album ${
+        album.isActive ? "activated" : "deactivated"
       } successfully`,
-      data: galleryItem,
+      data: album,
     });
   } catch (error) {
     console.error("Toggle gallery status error:", error);
-
-    if (error.name === "CastError") {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid gallery item ID",
-      });
-    }
-
     res.status(500).json({
       success: false,
       message: "Server error",
@@ -307,47 +305,31 @@ const toggleGalleryStatus = async (req, res) => {
 };
 
 // ======================================================
-// TOGGLE FEATURED STATUS
-// PATCH /api/v1/gallery/:id/featured
-// Protected
+// TOGGLE FEATURED
 // ======================================================
 const toggleFeaturedStatus = async (req, res) => {
   try {
-    const galleryItem = await Gallery.findById(req.params.id);
+    const album = await Gallery.findById(req.params.id);
 
-    if (!galleryItem) {
+    if (!album) {
       return res.status(404).json({
         success: false,
-        message: "Gallery item not found",
+        message: "Album not found",
       });
     }
 
-    galleryItem.isFeatured = !galleryItem.isFeatured;
-
-    await galleryItem.save();
+    album.isFeatured = !album.isFeatured;
+    await album.save();
 
     res.status(200).json({
       success: true,
-      message: `Gallery item ${
-        galleryItem.isFeatured
-          ? "marked as featured"
-          : "removed from featured"
+      message: `Album ${
+        album.isFeatured ? "marked as featured" : "removed from featured"
       } successfully`,
-      data: galleryItem,
+      data: album,
     });
   } catch (error) {
-    console.error(
-      "Toggle gallery featured error:",
-      error
-    );
-
-    if (error.name === "CastError") {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid gallery item ID",
-      });
-    }
-
+    console.error("Toggle featured error:", error);
     res.status(500).json({
       success: false,
       message: "Server error",

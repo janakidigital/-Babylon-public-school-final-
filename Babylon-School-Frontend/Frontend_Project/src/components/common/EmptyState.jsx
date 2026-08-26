@@ -1,6 +1,6 @@
 export default function EmptyState({
   title = "Nothing published yet",
-  text = "This section is managed from the school admin panel. Content will appear here as soon as it is added.",
+  text = "Comming Soon",
 }) {
   return (
     <div className="empty-state">

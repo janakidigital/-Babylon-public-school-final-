@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { publicApi } from "../../services/api";
 import { mediaUrl } from "../../lib/media";
 import usePublicData from "../../hooks/usePublicData";
@@ -5,43 +6,95 @@ import EmptyState from "../common/EmptyState";
 
 export default function TestimonialsSection() {
   const { data, loading } = usePublicData(publicApi.testimonials, []);
+  const [current, setCurrent] = useState(0);
+
+  // Reset to first slide when data changes
+  useEffect(() => {
+    setCurrent(0);
+  }, [data]);
+
+  const total = data.length;
+
+  const goTo = (index) => {
+    if (total === 0) return;
+    setCurrent((index + total) % total);
+  };
+
+  const prev = () => goTo(current - 1);
+  const next = () => goTo(current + 1);
+
   return (
     <section className="testimonials shell">
       <div className="center-heading">
         <p className="eyebrow">OUR COMMUNITY</p>
-        <h2>What parents say</h2>
+        <h2>What parents & students say</h2>
       </div>
+
       {loading ? (
-        <p>Loading testimonials...</p>
-      ) : data.length === 0 ? (
-        <EmptyState
-          title="No testimonials yet"
-          text="Parent and student voices added in admin will appear here."
-        />
+        <p className="testimonials-loading">Loading testimonials...</p>
+      ) : total === 0 ? (
+        <EmptyState title="No testimonials yet" />
       ) : (
-        <div className="testimonial-grid">
-          {data.map((item) => (
-            <blockquote key={item._id || item.name}>
-              “{item.message}”
-              <div className="testimonial-footer" style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                {item.image && (
-                  <img 
-                    src={mediaUrl(item.image)} 
-                    alt={item.name} 
-                    style={{ width: '50px', height: '50px', borderRadius: '50%', objectFit: 'cover' }}
+        <div className="testimonial-slider">
+          {/* Current testimonial */}
+          <div className="testimonial-slide">
+            <blockquote key={data[current]._id || data[current].name}>
+              <p className="testimonial-message">“{data[current].message}”</p>
+
+              <div className="testimonial-footer">
+                {data[current].image && (
+                  <img
+                    src={mediaUrl(data[current].image)}
+                    alt={data[current].name}
+                    className="testimonial-avatar"
                   />
                 )}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                  <span>{item.name}</span>
-                  {item.designation && (
-                    <span style={{ fontWeight: 'normal', color: 'var(--muted)', textTransform: 'capitalize' }}>
-                      {item.designation}
+                <div className="testimonial-meta">
+                  <span className="testimonial-name">{data[current].name}</span>
+                  {data[current].designation && (
+                    <span className="testimonial-role">
+                      {data[current].designation}
                     </span>
                   )}
                 </div>
               </div>
             </blockquote>
-          ))}
+          </div>
+
+          {/* Navigation */}
+          {total > 1 && (
+            <div className="testimonial-nav">
+              <button
+                type="button"
+                className="testimonial-btn prev"
+                onClick={prev}
+                aria-label="Previous testimonial"
+              >
+                ‹
+              </button>
+
+              <div className="testimonial-dots">
+                {data.map((_, index) => (
+                  <button
+                    key={index}
+                    type="button"
+                    className={`dot ${index === current ? "active" : ""}`}
+                    onClick={() => goTo(index)}
+                    aria-label={`Go to testimonial ${index + 1}`}
+                  />
+                ))}
+              </div>
+
+              <button
+                type="button"
+                className="testimonial-btn next"
+                onClick={next}
+                aria-label="Next testimonial"
+              >
+                ›
+              </button>
+            </div>
+          )}
         </div>
       )}
     </section>
