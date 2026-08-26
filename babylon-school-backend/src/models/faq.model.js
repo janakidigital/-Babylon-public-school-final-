@@ -2,11 +2,32 @@ const mongoose = require("mongoose");
 
 const faqSchema = new mongoose.Schema(
   {
-    question: { type: String, required: true, trim: true },
-    answer: { type: String, trim: true },
-    category: { type: String, trim: true },
-    displayOrder: { type: Number, default: 0 },
-    isActive: { type: Boolean, default: true },
+    question: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+
+    answer: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+
+    category: {
+      type: String,
+      trim: true,
+    },
+
+    displayOrder: {
+      type: Number,
+      default: 0,
+    },
+
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
   },
   { timestamps: true }
 );

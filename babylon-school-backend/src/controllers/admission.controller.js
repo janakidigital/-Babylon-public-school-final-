@@ -67,6 +67,7 @@ const getAdmission = async (req, res) => {
   }
 };
 
+
 // ======================================================
 // SUBMIT ADMISSION
 // POST /api/v1/admissions
@@ -80,7 +81,8 @@ const submitAdmission = async (req, res) => {
       phone,
       dateOfBirth,
       gender,
-      address,
+      temporaryAddress,      // ← added
+      permanentAddress,      // ← added
       parentName,
       parentPhone,
       program,
@@ -118,6 +120,7 @@ const submitAdmission = async (req, res) => {
     // Gender validation
     if (
       gender !== undefined &&
+      gender !== "" &&
       !["male", "female", "other"].includes(gender)
     ) {
       return res.status(400).json({
@@ -133,7 +136,8 @@ const submitAdmission = async (req, res) => {
       phone,
       dateOfBirth,
       gender,
-      address,
+      temporaryAddress,     // ← added
+      permanentAddress,     // ← added
       parentName,
       parentPhone,
       program,

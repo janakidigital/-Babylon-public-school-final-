@@ -11,25 +11,35 @@ const steps = [
 
 export default function AdmissionsPage() {
   const [submitted, setSubmitted] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
   const { data: programs } = usePublicData(publicApi.programs, []);
 
   async function submit(event) {
     event.preventDefault();
-    setSubmitted("");
 
-    const form = new FormData(event.currentTarget);
+    // Save the form reference BEFORE the async request
+    const formElement = event.currentTarget;
+
+    setSubmitted("");
+    setSubmitting(true);
+
+    const form = new FormData(formElement);
     const payload = Object.fromEntries(form.entries());
 
     try {
       await publicApi.admission(payload);
 
       setSubmitted(
-        "Thank you. Your admission enquiry has been submitted. Our admissions team will contact you soon."
+        "Thank you. Your admission enquiry has been submitted. Our admissions team will contact you soon.",
       );
 
-      event.currentTarget.reset();
+      // Reset using the saved form reference
+      formElement.reset();
     } catch (error) {
       setSubmitted(error.message || "Something went wrong. Please try again.");
+    } finally {
+      setSubmitting(false);
     }
   }
 
@@ -42,6 +52,10 @@ export default function AdmissionsPage() {
       />
 
       <section className="admissions-page shell">
+        {/* ==========================================
+            LEFT SIDE - ADMISSION INFORMATION
+        ========================================== */}
+
         <div>
           <p className="eyebrow">ADMISSION PROCESS</p>
 
@@ -59,15 +73,20 @@ export default function AdmissionsPage() {
           </ol>
         </div>
 
+        {/* ==========================================
+            RIGHT SIDE - ADMISSION FORM
+        ========================================== */}
+
         <form onSubmit={submit}>
           {/* ==========================================
-              Parent / Guardian Information
+              PARENT / GUARDIAN INFORMATION
           ========================================== */}
 
           <label>
             Parent / Guardian Name
             <input
               name="parentName"
+              type="text"
               required
               placeholder="Parent / guardian full name"
             />
@@ -84,13 +103,14 @@ export default function AdmissionsPage() {
           </label>
 
           {/* ==========================================
-              Student Information
+              STUDENT INFORMATION
           ========================================== */}
 
           <label>
             Student Name
             <input
               name="name"
+              type="text"
               required
               placeholder="Student's full name"
             />
@@ -118,10 +138,7 @@ export default function AdmissionsPage() {
 
           <label>
             Date of Birth
-            <input
-              name="dateOfBirth"
-              type="date"
-            />
+            <input name="dateOfBirth" type="date" />
           </label>
 
           <label>
@@ -130,23 +147,35 @@ export default function AdmissionsPage() {
               <option value="" disabled>
                 Select gender
               </option>
+
               <option value="male">Male</option>
+
               <option value="female">Female</option>
+
               <option value="other">Other</option>
             </select>
           </label>
 
           <label>
-            Address
+            Temporary Address
             <textarea
-              name="address"
-              placeholder="Current address"
+              name="temporaryAddress"
+              placeholder="Temporary / current address"
+              rows="3"
+            />
+          </label>
+
+          <label>
+            Permanent Address
+            <textarea
+              name="permanentAddress"
+              placeholder="Permanent address"
               rows="3"
             />
           </label>
 
           {/* ==========================================
-              Academic Information
+              ACADEMIC INFORMATION
           ========================================== */}
 
           <label>
@@ -162,13 +191,14 @@ export default function AdmissionsPage() {
                 </option>
               ))}
 
+              {/* Fallback programmes */}
               {programs.length === 0 && (
                 <>
                   <option value="Play Group (PG)">Play Group (PG)</option>
+
                   <option value="Basic Level">Basic Level</option>
-                  <option value="Secondary Level">
-                    Secondary Level
-                  </option>
+
+                  <option value="Secondary Level">Secondary Level</option>
                 </>
               )}
             </select>
@@ -178,12 +208,13 @@ export default function AdmissionsPage() {
             Previous School
             <input
               name="previousSchool"
+              type="text"
               placeholder="Name of previous school"
             />
           </label>
 
           {/* ==========================================
-              Additional Message
+              ADDITIONAL MESSAGE
           ========================================== */}
 
           <label>
@@ -195,15 +226,25 @@ export default function AdmissionsPage() {
             />
           </label>
 
-          <button className="button primary" type="submit">
-            Request information <span>&rarr;</span>
+          {/* ==========================================
+              SUBMIT BUTTON
+          ========================================== */}
+
+          <button
+            className="button primary"
+            type="submit"
+            disabled={submitting}
+          >
+            {submitting ? "Submitting..." : "Request information"}
+
+            {!submitting && <span>&rarr;</span>}
           </button>
 
-          {submitted && (
-            <p className="form-success">
-              {submitted}
-            </p>
-          )}
+          {/* ==========================================
+              SUCCESS / ERROR MESSAGE
+          ========================================== */}
+
+          {submitted && <p className="form-success">{submitted}</p>}
         </form>
       </section>
     </>

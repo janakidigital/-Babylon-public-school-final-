@@ -34,7 +34,12 @@ const admissionSchema = new mongoose.Schema(
       enum: ["male", "female", "other"],
     },
 
-    address: {
+    temporaryAddress: {
+      type: String,
+      trim: true,
+    },
+
+    permanentAddress: {
       type: String,
       trim: true,
     },
@@ -85,12 +90,7 @@ const admissionSchema = new mongoose.Schema(
 
     status: {
       type: String,
-      enum: [
-        "pending",
-        "reviewing",
-        "approved",
-        "rejected",
-      ],
+      enum: ["pending", "reviewing", "approved", "rejected"],
       default: "pending",
     },
 
@@ -105,10 +105,7 @@ const admissionSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
-module.exports = mongoose.model(
-  "Admission",
-  admissionSchema
-);
+module.exports = mongoose.model("Admission", admissionSchema);
