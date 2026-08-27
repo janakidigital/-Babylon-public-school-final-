@@ -42,5 +42,5 @@ export const publicApi = {
   contact: (body) => api("/contacts", { method: "POST", body }),
   admission: (body) => api("/admissions", { method: "POST", body }),
   downloads: () => api("/downloads"),
-  posters: () => api("/posters"),          // ← ADD THIS LINE
+  posters: () => api("/posters"), // ← ADD THIS LINE
 };
