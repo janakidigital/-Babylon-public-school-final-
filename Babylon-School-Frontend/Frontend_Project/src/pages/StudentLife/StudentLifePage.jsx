@@ -1,5 +1,5 @@
 import PageBanner from "../../components/common/PageBanner";
-import StudentLifeSection from "../../components/home/StudentLifeSection";
+// import StudentLifeSection from "../../components/home/StudentLifeSection";
 import { assetPath } from "../../data/content";
 
 const activities = [

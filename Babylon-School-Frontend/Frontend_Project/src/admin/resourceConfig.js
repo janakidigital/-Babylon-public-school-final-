@@ -68,12 +68,11 @@ export const resources = {
     label: "Gallery Albums",
     endpoint: "/gallery",
     image: true,
-    multiple: true, // ← multiple images support
+    multiple: true,
     fields: [
       ["title", "Title"],
       ["description", "Description", "textarea"],
       ["category", "Category"],
-    
     ],
   },
 
@@ -163,7 +162,20 @@ export const resources = {
       ["title", "Document Title"],
       ["description", "Description", "textarea"],
       ["category", "Category"],
-      ["isActive", "Active", "checkbox"]
+      ["isActive", "Active", "checkbox"],
+    ],
+  },
+
+  // ===== NEW: Multiple Posters =====
+  posters: {
+    label: "Posters",
+    endpoint: "/posters",
+    image: true,
+    fields: [
+      ["title", "Title (optional)"],
+      ["link", "Link (optional)"],
+      ["isActive", "Show on website", "checkbox"],
+      ["displayOrder", "Display order", "number"],
     ],
   },
 };

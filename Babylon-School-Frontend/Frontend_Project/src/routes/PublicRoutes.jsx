@@ -7,7 +7,6 @@ import AboutPage from '../pages/About/AboutPage';
 import AcademicsPage from '../pages/Academics/AcademicsPage';
 import CoursesPage from '../pages/Academics/CoursesPage';
 import CourseDetailsPage from '../pages/Academics/CourseDetailsPage';
-import StudentLifePage from '../pages/StudentLife/StudentLifePage';
 import EventsPage from '../pages/Events/EventsPage';
 import EventDetailsPage from '../pages/Events/EventDetailsPage';
 import NoticesPage from '../pages/Notices/NoticesPage';
@@ -55,7 +54,6 @@ export default function PublicRoutes() {
         <Route path="/academics" element={<AcademicsPage />} />
         <Route path="/courses" element={<CoursesPage />} />
         <Route path="/course-details/:id" element={<CourseDetailsPage />} />
-        <Route path="/student-life" element={<StudentLifePage />} />
         <Route path="/events" element={<EventsPage />} />
         <Route path="/event-details/:id" element={<EventDetailsPage />} />
         <Route path="/notices" element={<NoticesPage />} />

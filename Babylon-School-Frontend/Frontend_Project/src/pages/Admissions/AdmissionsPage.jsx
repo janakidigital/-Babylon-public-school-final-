@@ -2,6 +2,7 @@ import { useState } from "react";
 import PageBanner from "../../components/common/PageBanner";
 import { publicApi } from "../../services/api";
 import usePublicData from "../../hooks/usePublicData";
+import "../Admissions/AdmissionsPage.css";
 
 const steps = [
   "Share your enquiry",
@@ -11,6 +12,7 @@ const steps = [
 
 export default function AdmissionsPage() {
   const [submitted, setSubmitted] = useState("");
+  const [isError, setIsError] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
   const { data: programs } = usePublicData(publicApi.programs, []);
@@ -18,10 +20,10 @@ export default function AdmissionsPage() {
   async function submit(event) {
     event.preventDefault();
 
-    // Save the form reference BEFORE the async request
     const formElement = event.currentTarget;
 
     setSubmitted("");
+    setIsError(false);
     setSubmitting(true);
 
     const form = new FormData(formElement);
@@ -33,11 +35,11 @@ export default function AdmissionsPage() {
       setSubmitted(
         "Thank you. Your admission enquiry has been submitted. Our admissions team will contact you soon.",
       );
-
-      // Reset using the saved form reference
+      setIsError(false);
       formElement.reset();
     } catch (error) {
       setSubmitted(error.message || "Something went wrong. Please try again.");
+      setIsError(true);
     } finally {
       setSubmitting(false);
     }
@@ -52,183 +54,188 @@ export default function AdmissionsPage() {
       />
 
       <section className="admissions-page shell">
-        {/* ==========================================
-            LEFT SIDE - ADMISSION INFORMATION
-        ========================================== */}
-
-        <div>
+        {/* LEFT — process */}
+        <div className="admissions-info">
           <p className="eyebrow">ADMISSION PROCESS</p>
 
           <h2>A welcoming start for every family.</h2>
 
-          <p>
+          <p className="admissions-lead">
             Admissions are open from PG to secondary. Our team makes the process
             easy, clear and personal for families in Kathmandu and beyond.
           </p>
 
-          <ol>
+          <ol className="admissions-steps">
             {steps.map((step) => (
               <li key={step}>{step}</li>
             ))}
           </ol>
+
+          <div className="admissions-note">
+            <p>
+              <strong>Need help?</strong> Call our admissions office or leave a
+              message in the form — we typically respond within 1–2 working days.
+            </p>
+          </div>
         </div>
 
-        {/* ==========================================
-            RIGHT SIDE - ADMISSION FORM
-        ========================================== */}
+        {/* RIGHT — form */}
+        <form className="admissions-form" onSubmit={submit} noValidate>
+          <div className="admissions-form-header">
+            <h3>Admission enquiry</h3>
+            <p>Fill in the details below and our team will get back to you.</p>
+          </div>
 
-        <form onSubmit={submit}>
-          {/* ==========================================
-              PARENT / GUARDIAN INFORMATION
-          ========================================== */}
+          {/* Parent / Guardian */}
+          <fieldset className="admissions-fieldset">
+            <legend>Parent / Guardian</legend>
+            <div className="admissions-fields">
+              <label className="full-width">
+                Parent / Guardian Name
+                <input
+                  name="parentName"
+                  type="text"
+                  required
+                  autoComplete="name"
+                  placeholder="Full name"
+                />
+              </label>
 
-          <label>
-            Parent / Guardian Name
-            <input
-              name="parentName"
-              type="text"
-              required
-              placeholder="Parent / guardian full name"
-            />
-          </label>
+              <label className="full-width">
+                Parent / Guardian Phone
+                <input
+                  name="parentPhone"
+                  type="tel"
+                  required
+                  autoComplete="tel"
+                  placeholder="Contact number"
+                />
+              </label>
+            </div>
+          </fieldset>
 
-          <label>
-            Parent / Guardian Phone
-            <input
-              name="parentPhone"
-              type="tel"
-              required
-              placeholder="Parent / guardian contact number"
-            />
-          </label>
+          {/* Student */}
+          <fieldset className="admissions-fieldset">
+            <legend>Student details</legend>
+            <div className="admissions-fields">
+              <label className="full-width">
+                Student Name
+                <input
+                  name="name"
+                  type="text"
+                  required
+                  placeholder="Student's full name"
+                />
+              </label>
 
-          {/* ==========================================
-              STUDENT INFORMATION
-          ========================================== */}
+              <label>
+                Student Email
+                <input
+                  name="email"
+                  type="email"
+                  required
+                  autoComplete="email"
+                  placeholder="student@email.com"
+                />
+              </label>
 
-          <label>
-            Student Name
-            <input
-              name="name"
-              type="text"
-              required
-              placeholder="Student's full name"
-            />
-          </label>
+              <label>
+                Student Phone
+                <input
+                  name="phone"
+                  type="tel"
+                  required
+                  placeholder="Contact number"
+                />
+              </label>
 
-          <label>
-            Student Email
-            <input
-              name="email"
-              type="email"
-              required
-              placeholder="student@email.com"
-            />
-          </label>
+              <label>
+                Date of Birth
+                <input name="dateOfBirth" type="date" />
+              </label>
 
-          <label>
-            Student Phone
-            <input
-              name="phone"
-              type="tel"
-              required
-              placeholder="Student's contact number"
-            />
-          </label>
+              <label>
+                Gender
+                <select name="gender" defaultValue="">
+                  <option value="" disabled>
+                    Select gender
+                  </option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                  <option value="other">Other</option>
+                </select>
+              </label>
 
-          <label>
-            Date of Birth
-            <input name="dateOfBirth" type="date" />
-          </label>
+              <label className="full-width">
+                Temporary Address
+                <textarea
+                  name="temporaryAddress"
+                  placeholder="Current / temporary address"
+                  rows={2}
+                />
+              </label>
 
-          <label>
-            Gender
-            <select name="gender" defaultValue="">
-              <option value="" disabled>
-                Select gender
-              </option>
+              <label className="full-width">
+                Permanent Address
+                <textarea
+                  name="permanentAddress"
+                  placeholder="Permanent address"
+                  rows={2}
+                />
+              </label>
+            </div>
+          </fieldset>
 
-              <option value="male">Male</option>
+          {/* Academic */}
+          <fieldset className="admissions-fieldset">
+            <legend>Academic information</legend>
+            <div className="admissions-fields">
+              <label className="full-width">
+                Programme
+                <select name="program" required defaultValue="">
+                  <option value="" disabled>
+                    Select programme
+                  </option>
+                  {programs.map((program) => (
+                    <option key={program._id} value={program.title}>
+                      {program.title}
+                    </option>
+                  ))}
+                  {programs.length === 0 && (
+                    <>
+                      <option value="Play Group (PG)">Play Group (PG)</option>
+                      <option value="Basic Level">Basic Level</option>
+                      <option value="Secondary Level">Secondary Level</option>
+                    </>
+                  )}
+                </select>
+              </label>
 
-              <option value="female">Female</option>
+              <label className="full-width">
+                Previous School
+                <input
+                  name="previousSchool"
+                  type="text"
+                  placeholder="Name of previous school (if any)"
+                />
+              </label>
+            </div>
+          </fieldset>
 
-              <option value="other">Other</option>
-            </select>
-          </label>
-
-          <label>
-            Temporary Address
-            <textarea
-              name="temporaryAddress"
-              placeholder="Temporary / current address"
-              rows="3"
-            />
-          </label>
-
-          <label>
-            Permanent Address
-            <textarea
-              name="permanentAddress"
-              placeholder="Permanent address"
-              rows="3"
-            />
-          </label>
-
-          {/* ==========================================
-              ACADEMIC INFORMATION
-          ========================================== */}
-
-          <label>
-            Programme
-            <select name="program" required defaultValue="">
-              <option value="" disabled>
-                Select programme
-              </option>
-
-              {programs.map((program) => (
-                <option key={program._id} value={program.title}>
-                  {program.title}
-                </option>
-              ))}
-
-              {/* Fallback programmes */}
-              {programs.length === 0 && (
-                <>
-                  <option value="Play Group (PG)">Play Group (PG)</option>
-
-                  <option value="Basic Level">Basic Level</option>
-
-                  <option value="Secondary Level">Secondary Level</option>
-                </>
-              )}
-            </select>
-          </label>
-
-          <label>
-            Previous School
-            <input
-              name="previousSchool"
-              type="text"
-              placeholder="Name of previous school"
-            />
-          </label>
-
-          {/* ==========================================
-              ADDITIONAL MESSAGE
-          ========================================== */}
-
-          <label>
-            Message
-            <textarea
-              name="message"
-              placeholder="Any additional information or questions..."
-              rows="5"
-            />
-          </label>
-
-          {/* ==========================================
-              SUBMIT BUTTON
-          ========================================== */}
+          {/* Message */}
+          <fieldset className="admissions-fieldset">
+            <legend>Additional information</legend>
+            <div className="admissions-fields">
+              <label className="full-width">
+                Message
+                <textarea
+                  name="message"
+                  placeholder="Any questions or extra details..."
+                  rows={4}
+                />
+              </label>
+            </div>
+          </fieldset>
 
           <button
             className="button primary"
@@ -236,15 +243,14 @@ export default function AdmissionsPage() {
             disabled={submitting}
           >
             {submitting ? "Submitting..." : "Request information"}
-
             {!submitting && <span>&rarr;</span>}
           </button>
 
-          {/* ==========================================
-              SUCCESS / ERROR MESSAGE
-          ========================================== */}
-
-          {submitted && <p className="form-success">{submitted}</p>}
+          {submitted && (
+            <p className={isError ? "form-error" : "form-success"}>
+              {submitted}
+            </p>
+          )}
         </form>
       </section>
     </>

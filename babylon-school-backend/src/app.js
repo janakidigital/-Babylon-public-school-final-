@@ -23,7 +23,7 @@ const admissionRoutes = require("./routes/admission.routes");
 const userRoutes = require("./routes/user.routes");
 const downloadRoutes = require("./routes/download.routes");
 const errorHandler = require("./middleware/error.middleware");
-
+const posterRoutes = require("./routes/poster.routes");
 
 const app = express();
 
@@ -55,10 +55,9 @@ app.use("/api/v1/contacts", contactRoutes);
 app.use("/api/v1/admissions", admissionRoutes);
 app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/downloads", downloadRoutes);
-
 // Career applications admin + public application submission
 app.use("/api/v1/career-applications", careerApplicationRoutes);
-
+app.use("/api/v1/posters", posterRoutes);
 // Error handler (centralized)
 app.use(errorHandler);
 

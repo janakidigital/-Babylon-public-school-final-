@@ -16,9 +16,9 @@ export default function StudentLifeSection() {
             Beyond the classroom, students grow through sport, arts, scouting,
             music, dance and service — a home away from home in Shantinagar.
           </p>
-          <Link className="button light-button" to="/student-life">
+          {/* <Link className="button light-button" to="/student-life">
             Explore student life <span>&rarr;</span>
-          </Link>
+          </Link> */}
         </div>
         <div className="life-photo">
           <img

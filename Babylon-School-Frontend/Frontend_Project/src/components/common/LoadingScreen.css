@@ -1,0 +1,36 @@
+.loading-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 40px 16px;
+}
+
+.loading-screen--full {
+  min-height: 100vh;
+  width: 100%;
+  background: #f1f5f9;
+}
+
+.loading-screen__spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid #e2e8f0;
+  border-top-color: #063b78;
+  border-radius: 50%;
+  animation: loading-spin 0.7s linear infinite;
+}
+
+.loading-screen__message {
+  margin: 0;
+  font-size: 14px;
+  color: #64748b;
+  font-family: "DM Sans", system-ui, sans-serif;
+}
+
+@keyframes loading-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

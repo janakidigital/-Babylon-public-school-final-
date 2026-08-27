@@ -1,9 +1,9 @@
 const express = require("express");
 
 const {
-    getSiteSettings,
-    createSiteSettings,
-    updateSiteSettings
+  getSiteSettings,
+  createSiteSettings,
+  updateSiteSettings,
 } = require("../controllers/siteSetting.controller");
 
 const router = express.Router();

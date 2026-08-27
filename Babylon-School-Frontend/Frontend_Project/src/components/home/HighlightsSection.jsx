@@ -17,7 +17,7 @@ export default function HighlightsSection() {
     <section className="highlights">
       <div className="shell">
         <div>
-          <p className="eyebrow light">OUR ACHIEVEMENTS</p>
+          {/* <p className="eyebrow light">OUR ACHIEVEMENTS</p> */}
           <h2>Growing with purpose and pride.</h2>
         </div>
         {loading ? (
