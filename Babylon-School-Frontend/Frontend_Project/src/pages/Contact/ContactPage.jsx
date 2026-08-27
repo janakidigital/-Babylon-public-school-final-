@@ -2,6 +2,7 @@ import { useState } from "react";
 import PageBanner from "../../components/common/PageBanner";
 import { publicApi } from "../../services/api";
 import { useSite } from "../../context/SiteContext";
+import toast from "react-hot-toast";
 
 export default function ContactPage() {
   const { settings } = useSite();
@@ -15,9 +16,11 @@ export default function ContactPage() {
       await publicApi.contact(
         Object.fromEntries(new FormData(form).entries()),
       );
+      toast.success("Thank you. Your message has been sent.");
       setResult("Thank you. Your message has been sent.");
       form.reset();
     } catch (error) {
+      toast.error(error.message);
       setResult(error.message);
     }
   }

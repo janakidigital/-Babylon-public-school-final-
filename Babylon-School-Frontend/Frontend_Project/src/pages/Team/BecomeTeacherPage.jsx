@@ -2,6 +2,7 @@ import { useState } from "react";
 import PageBanner from "../../components/common/PageBanner";
 import { publicApi } from "../../services/api";
 import usePublicData from "../../hooks/usePublicData";
+import toast from "react-hot-toast";
 
 export default function BecomeTeacherPage() {
   const { data: vacancies, loading } = usePublicData(publicApi.careers, []);
@@ -18,9 +19,11 @@ export default function BecomeTeacherPage() {
 
     try {
       await publicApi.applyCareer(formData);
+      toast.success("Thank you. Your application has been sent successfully.");
       setResult("Thank you. Your application has been sent successfully.");
       form.reset();
     } catch (error) {
+      toast.error(error.message || "Something went wrong. Please try again.");
       setResult(error.message || "Something went wrong. Please try again.");
     } finally {
       setSubmitting(false);

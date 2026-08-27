@@ -41,15 +41,21 @@ const primaryNav = [
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [openDropdown, setOpenDropdown] = useState(null); // for mobile
+  const [openDropdown, setOpenDropdown] = useState(null);
   const { settings } = useSite();
 
   const toggleDropdown = (label) => {
-    setOpenDropdown(openDropdown === label ? null : label);
+    setOpenDropdown((prev) => (prev === label ? null : label));
+  };
+
+  const closeMenu = () => {
+    setMenuOpen(false);
+    setOpenDropdown(null);
   };
 
   return (
     <>
+      {/* Top Strip */}
       <div className="top-strip">
         <div className="shell top-strip-inner">
           <span>{settings.address || "Shantinagar, Kathmandu, Nepal"}</span>
@@ -66,10 +72,12 @@ export default function Header() {
         </div>
       </div>
 
+      {/* Main Header */}
       <header className="header">
         <div className="shell header-inner">
           <SchoolLogo />
 
+          {/* Mobile Toggle Button */}
           <button
             className="mobile-toggle"
             onClick={() => {
@@ -79,9 +87,10 @@ export default function Header() {
             aria-expanded={menuOpen}
             aria-label="Toggle menu"
           >
-            &#9776;
+            {menuOpen ? "✕" : "☰"}
           </button>
 
+          {/* Navigation */}
           <nav className={menuOpen ? "nav open" : "nav"}>
             {primaryNav.map((item) =>
               item.children ? (
@@ -91,28 +100,35 @@ export default function Header() {
                     openDropdown === item.label ? "open" : ""
                   }`}
                 >
-                  {/* Desktop: hover works via CSS. Mobile: click to open */}
                   <button
+                    type="button"
                     className="nav-link dropdown-toggle"
-                    onClick={() => toggleDropdown(item.label)}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      toggleDropdown(item.label);
+                    }}
                     aria-expanded={openDropdown === item.label}
                   >
-                    {item.label}
-                    <span className="arrow">▾</span>
+                    <span>{item.label}</span>
+                    <span className="arrow">
+                      {openDropdown === item.label ? "▴" : "▾"}
+                    </span>
                   </button>
 
-                  <div className="dropdown-menu">
+                  <div
+                    className={`dropdown-menu ${
+                      openDropdown === item.label ? "show" : ""
+                    }`}
+                  >
                     {item.children.map((child) => (
                       <NavLink
                         key={child.link}
                         to={child.link}
                         className={({ isActive }) =>
-                          isActive ? "active" : ""
+                          isActive ? "dropdown-link active" : "dropdown-link"
                         }
-                        onClick={() => {
-                          setMenuOpen(false);
-                          setOpenDropdown(null);
-                        }}
+                        onClick={closeMenu}
                       >
                         {child.label}
                       </NavLink>
@@ -123,19 +139,21 @@ export default function Header() {
                 <NavLink
                   key={item.label}
                   to={item.link}
-                  className={({ isActive }) => (isActive ? "active" : "")}
-                  onClick={() => setMenuOpen(false)}
+                  className={({ isActive }) =>
+                    isActive ? "nav-link active" : "nav-link"
+                  }
+                  onClick={closeMenu}
                 >
                   {item.label}
                 </NavLink>
               )
             )}
 
-            {/* Admin link - mobile only */}
+            {/* Admin Login - Mobile Only */}
             <Link
               to="/admin"
               className="admin-login-btn mobile-admin"
-              onClick={() => setMenuOpen(false)}
+              onClick={closeMenu}
             >
               🔒 Login
             </Link>

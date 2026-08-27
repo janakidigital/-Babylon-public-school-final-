@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import toast from "react-hot-toast";
 import { useNavigate, useLocation } from "react-router-dom";
 import { api } from "../services/api";
 import { slugify } from "../lib/media";
@@ -102,6 +103,7 @@ function ResourceEditor({ resourceKey, onBack }) {
       setItems(response.data || []);
     } catch (err) {
       setMessage(err.message);
+      toast.error(err.message || "An error occurred");
     } finally {
       setLoading(false);
     }
@@ -157,10 +159,12 @@ function ResourceEditor({ resourceKey, onBack }) {
 
       setEditing(null);
       setMessage(`${config.label} saved successfully.`);
+      toast.success(`${config.label} saved successfully.`);
       window.dispatchEvent(new CustomEvent("site-data-updated"));
       load();
     } catch (err) {
       setMessage(err.message);
+      toast.error(err.message || "An error occurred");
     }
   }
 
@@ -169,10 +173,12 @@ function ResourceEditor({ resourceKey, onBack }) {
     try {
       await api(`${config.endpoint}/${id}`, { method: "DELETE" });
       setMessage("Item deleted.");
+      toast.success("Item deleted.");
       window.dispatchEvent(new CustomEvent("site-data-updated"));
       load();
     } catch (err) {
       setMessage(err.message);
+      toast.error(err.message || "An error occurred");
     }
   }
 
@@ -470,6 +476,7 @@ function SingletonEditor({ singletonKey, onBack }) {
       setData(response.data || {});
     } catch (err) {
       setMessage(err.message);
+      toast.error(err.message || "An error occurred");
     } finally {
       setLoading(false);
     }
@@ -502,10 +509,12 @@ function SingletonEditor({ singletonKey, onBack }) {
     try {
       await api(config.endpoint, { method: "PUT", body });
       setMessage(`${config.label} saved successfully.`);
+      toast.success(`${config.label} saved successfully.`);
       window.dispatchEvent(new CustomEvent("site-data-updated"));
       load();
     } catch (err) {
       setMessage(err.message);
+      toast.error(err.message || "An error occurred");
     }
   }
 
@@ -617,9 +626,11 @@ function Inbox({ endpoint, title, fields, onBack }) {
     try {
       await api(`${endpoint}/${id}`, { method: "DELETE" });
       setMessage("Application deleted successfully.");
+      toast.success("Application deleted successfully.");
       load();
     } catch (err) {
       setMessage(err.message || "Failed to delete application.");
+      toast.error(err.message || "Failed to delete application." || "An error occurred");
     }
   }
 
@@ -699,6 +710,7 @@ function AdmissionsInbox({ onBack }) {
       setItems(response.data || []);
     } catch (err) {
       setMessage(err.message || "Failed to load admission applications.");
+      toast.error(err.message || "Failed to load admission applications." || "An error occurred");
     } finally {
       setLoading(false);
     }
@@ -719,10 +731,12 @@ function AdmissionsInbox({ onBack }) {
     try {
       await api(`/admissions/${editing._id}`, { method: "PUT", body });
       setMessage("Admission application updated successfully.");
+      toast.success("Admission application updated successfully.");
       setEditing(null);
       load();
     } catch (err) {
       setMessage(err.message || "Failed to update admission application.");
+      toast.error(err.message || "Failed to update admission application." || "An error occurred");
     }
   }
 
@@ -737,9 +751,11 @@ function AdmissionsInbox({ onBack }) {
     try {
       await api(`/admissions/${id}`, { method: "DELETE" });
       setMessage("Admission application deleted successfully.");
+      toast.success("Admission application deleted successfully.");
       load();
     } catch (err) {
       setMessage(err.message || "Failed to delete admission application.");
+      toast.error(err.message || "Failed to delete admission application." || "An error occurred");
     }
   }
 
@@ -974,6 +990,7 @@ function AdminUsers({ onBack }) {
       setAdmins(response.data || []);
     } catch (err) {
       setMessage(err.message || "Failed to load admins");
+      toast.error(err.message || "Failed to load admins" || "An error occurred");
     } finally {
       setLoading(false);
     }
@@ -999,6 +1016,7 @@ function AdminUsers({ onBack }) {
       if (editing?._id) {
         await api(`/users/${editing._id}`, { method: "PUT", body });
         setMessage("Admin updated successfully.");
+      toast.success("Admin updated successfully.");
       } else {
         await api("/users/admin", {
           method: "POST",
@@ -1009,6 +1027,7 @@ function AdminUsers({ onBack }) {
           },
         });
         setMessage("Admin created successfully.");
+      toast.success("Admin created successfully.");
       }
       setEditing(null);
       load();
@@ -1022,9 +1041,11 @@ function AdminUsers({ onBack }) {
     try {
       await api(`/users/${id}`, { method: "DELETE" });
       setMessage("Admin deleted successfully.");
+      toast.success("Admin deleted successfully.");
       load();
     } catch (err) {
       setMessage(err.message || "Failed to delete admin");
+      toast.error(err.message || "Failed to delete admin" || "An error occurred");
     }
   }
 

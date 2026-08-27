@@ -4,6 +4,7 @@ import "./App.css";
 import LoadingScreen from "./components/common/LoadingScreen";
 import "./components/common/LoadingScreen.css";
 import PosterPopup from "./components/common/PosterPopup";
+import { Toaster } from "react-hot-toast";
 
 export default function App() {
   const [ready, setReady] = useState(false);
@@ -19,6 +20,7 @@ export default function App() {
 
   return (
     <>
+      <Toaster position="top-right" />
       <AppRoutes />
       <PosterPopup />
     </>

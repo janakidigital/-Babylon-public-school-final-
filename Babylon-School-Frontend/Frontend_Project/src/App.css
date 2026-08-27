@@ -1648,7 +1648,6 @@ footer {
   background: #1a365d;
 }
 
-
 /* =========================================
    FACILITIES
 ========================================= */
@@ -1926,6 +1925,73 @@ footer {
 }
 
 /* =========================================
+   DROPDOWN (UPDATED)
+========================================= */
+
+.nav-item.has-dropdown {
+  position: relative;
+}
+
+.nav-item .dropdown-toggle {
+  background: none;
+  border: none;
+  color: inherit;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+}
+
+.nav-item .arrow {
+  font-size: 0.75em;
+  transition: transform 0.2s ease;
+}
+
+.nav-item.open .arrow {
+  transform: rotate(180deg);
+}
+
+/* Desktop dropdown */
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  min-width: 220px;
+  background: #fff;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+  border-radius: 8px;
+  padding: 8px 0;
+  z-index: 200;
+}
+
+.nav-item.has-dropdown:hover .dropdown-menu {
+  display: block;
+}
+
+.dropdown-menu a,
+.dropdown-menu .dropdown-link {
+  display: block;
+  padding: 11px 20px;
+  color: #333;
+  text-decoration: none;
+  font-size: 14.5px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.dropdown-menu a:hover,
+.dropdown-menu a.active,
+.dropdown-menu .dropdown-link:hover,
+.dropdown-menu .dropdown-link.active {
+  background: #f0f4ff;
+  color: var(--red);
+}
+
+/* =========================================
    TABLET (max-width: 900px)
 ========================================= */
 
@@ -2004,6 +2070,50 @@ footer {
     color: var(--blue);
     order: 2;
     padding: 6px;
+  }
+
+  /* Mobile Dropdown */
+  .nav-item.has-dropdown {
+    width: 100%;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  .nav-item .dropdown-toggle {
+    width: 100%;
+    justify-content: space-between;
+    padding: 13px 0;
+    text-align: left;
+  }
+
+  .nav-item.has-dropdown:hover .dropdown-menu {
+    display: none;
+  }
+
+  .dropdown-menu {
+    display: none;
+    position: static;
+    box-shadow: none;
+    background: #f8f9fb;
+    border-radius: 0;
+    padding: 0;
+    min-width: 100%;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+  }
+
+  .nav-item.open .dropdown-menu,
+  .dropdown-menu.show {
+    display: block;
+    max-height: 400px;
+    padding: 6px 0 10px;
+  }
+
+  .dropdown-menu a,
+  .dropdown-menu .dropdown-link {
+    padding: 11px 20px 11px 28px;
+    font-size: 14.5px;
+    border-bottom: none;
   }
 
   .hero {
@@ -2223,7 +2333,8 @@ footer {
 
 /* Custom UI Fixes */
 @media (max-width: 768px) {
-  .program-grid, .facility-grid {
+  .program-grid,
+  .facility-grid {
     grid-template-columns: 1fr 1fr !important;
   }
 }
@@ -2240,92 +2351,6 @@ footer {
   font-size: 14px;
   text-decoration: none;
 }
-
-
-
-
-
-
-/* ===== Dropdown support ===== */
-.nav-item.has-dropdown {
-  position: relative;
-}
-
-.nav-item .dropdown-toggle {
-  background: none;
-  border: none;
-  color: inherit;
-  font: inherit;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  padding: 0; /* match your existing nav link padding if needed */
-}
-
-.nav-item .arrow {
-  font-size: 0.7em;
-  transition: transform 0.2s;
-}
-
-.nav-item.open .arrow {
-  transform: rotate(180deg);
-}
-
-/* Desktop dropdown */
-.dropdown-menu {
-  display: none;
-  position: absolute;
-  top: 100%;
-  left: 0;
-  min-width: 200px;
-  background: #fff;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
-  border-radius: 8px;
-  padding: 8px 0;
-  z-index: 100;
-}
-
-.nav-item.has-dropdown:hover .dropdown-menu {
-  display: block;
-}
-
-.dropdown-menu a {
-  display: block;
-  padding: 10px 18px;
-  color: #333;
-  text-decoration: none;
-  white-space: nowrap;
-}
-
-.dropdown-menu a:hover,
-.dropdown-menu a.active {
-  background: #f0f4ff;
-  color: #1a56db;
-}
-
-/* Mobile behaviour */
-@media (max-width: 992px) {
-  .nav-item.has-dropdown:hover .dropdown-menu {
-    display: none; /* disable hover on mobile */
-  }
-
-  .nav-item.open .dropdown-menu {
-    display: block;
-    position: static;
-    box-shadow: none;
-    background: transparent;
-    padding-left: 16px;
-  }
-
-  .nav-item .dropdown-toggle {
-    width: 100%;
-    justify-content: space-between;
-  }
-}
-
-
-
 
 .poster-overlay {
   position: fixed;

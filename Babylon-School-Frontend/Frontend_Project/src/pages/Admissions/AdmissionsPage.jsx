@@ -3,6 +3,7 @@ import PageBanner from "../../components/common/PageBanner";
 import { publicApi } from "../../services/api";
 import usePublicData from "../../hooks/usePublicData";
 import "../Admissions/AdmissionsPage.css";
+import toast from "react-hot-toast";
 
 const steps = [
   "Share your enquiry",
@@ -32,12 +33,14 @@ export default function AdmissionsPage() {
     try {
       await publicApi.admission(payload);
 
+      toast.success("Thank you. Your admission enquiry has been submitted.");
       setSubmitted(
         "Thank you. Your admission enquiry has been submitted. Our admissions team will contact you soon.",
       );
       setIsError(false);
       formElement.reset();
     } catch (error) {
+      toast.error(error.message || "Something went wrong. Please try again.");
       setSubmitted(error.message || "Something went wrong. Please try again.");
       setIsError(true);
     } finally {
