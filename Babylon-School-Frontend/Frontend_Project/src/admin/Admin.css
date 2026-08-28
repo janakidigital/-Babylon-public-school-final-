@@ -1059,3 +1059,111 @@
     display: none;
   }
 }
+
+/* =========================================
+   SINGLETON / SITE SETTINGS – Card Style
+   (matches Admissions look)
+========================================= */
+
+.singleton-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  max-width: 820px;
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin-bottom: 0;
+}
+
+.admin-card {
+  background: var(--admin-card);
+  border: 1px solid var(--admin-line);
+  border-radius: 14px;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
+  overflow: hidden;
+}
+
+.admin-card-header {
+  background: #f8fafc;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--admin-line);
+}
+
+.admin-card-header h3 {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--admin-ink);
+  text-transform: capitalize;
+}
+
+.admin-card-body {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.admin-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.admin-field-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #2d3748;
+}
+
+.admin-field input,
+.admin-field textarea {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1.5px solid var(--admin-line);
+  border-radius: 8px;
+  font: 15px var(--admin-sans);
+  background: #fff;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.admin-field input:focus,
+.admin-field textarea:focus {
+  outline: none;
+  border-color: var(--admin-blue);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+}
+
+.admin-field textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.admin-form-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 0.25rem;
+}
+
+/* Make sure the old grid form styles don't break the new card layout */
+.singleton-form.admin-form {
+  grid-template-columns: 1fr;
+}
+
+.singleton-form .admin-form-actions {
+  grid-column: 1;
+  border-top: none;
+  padding-top: 0;
+}
+
+/* Mobile adjustments */
+@media (max-width: 640px) {
+  .admin-card-body {
+    padding: 1.15rem;
+  }
+
+  .admin-card-header {
+    padding: 0.9rem 1.15rem;
+  }
+}

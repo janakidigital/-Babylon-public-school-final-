@@ -28,22 +28,28 @@ export default function AboutStats() {
         <div className="center-heading">
           <p className="eyebrow light">OUR PHILOSOPHY</p>
           <h2>Learning with purpose, growing with confidence.</h2>
-          <p>{philosophy.description}</p>
         </div>
 
-        <div className="stats-grid philosophy-grid">
-          <div>
-            <strong>Our Approach</strong>
-            <ul>
+        {/* New elegant card for the description */}
+        <div className="philosophy-card">
+          <p className="philosophy-quote">
+            {philosophy.description}
+          </p>
+        </div>
+
+        <div className="philosophy-grid">
+          <div className="philosophy-column">
+            <h3>Our Approach</h3>
+            <ul className="philosophy-list">
               {philosophy.approach.map((item) => (
                 <li key={item}>{item}</li>
               ))}
             </ul>
           </div>
 
-          <div>
-            <strong>Our Guiding Principles</strong>
-            <ul>
+          <div className="philosophy-column">
+            <h3>Our Guiding Principles</h3>
+            <ul className="philosophy-list">
               {philosophy.principles.map((item) => (
                 <li key={item}>{item}</li>
               ))}

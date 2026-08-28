@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useSite } from "../../context/SiteContext";
 
 const DEFAULT_VISION =
@@ -27,15 +28,38 @@ function getText(value, fallback) {
   return fallback;
 }
 
-function renderContent(text) {
-  if (Array.isArray(text)) {
-    return (
+function GoalsList({ goals }) {
+  const [expanded, setExpanded] = useState(false);
+  const INITIAL_COUNT = 5; // show first 5 items
+
+  const visibleGoals = expanded ? goals : goals.slice(0, INITIAL_COUNT);
+  const hasMore = goals.length > INITIAL_COUNT;
+
+  return (
+    <>
       <ul className="possibility-list">
-        {text.map((item, index) => (
+        {visibleGoals.map((item, index) => (
           <li key={index}>{item}</li>
         ))}
       </ul>
-    );
+
+      {hasMore && (
+        <button
+          type="button"
+          className="show-more-btn"
+          onClick={() => setExpanded((prev) => !prev)}
+          aria-expanded={expanded}
+        >
+          {expanded ? "Show less" : `Show more (${goals.length - INITIAL_COUNT} more)`}
+        </button>
+      )}
+    </>
+  );
+}
+
+function renderContent(text) {
+  if (Array.isArray(text)) {
+    return <GoalsList goals={text} />;
   }
   return <p>{text}</p>;
 }

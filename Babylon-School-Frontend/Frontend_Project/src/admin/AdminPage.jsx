@@ -467,11 +467,16 @@ function ResourceEditor({ resourceKey, onBack }) {
    SINGLETON EDITOR
 ========================================================= */
 
+/* =========================================================
+   SINGLETON EDITOR (Card style – like Admissions)
+========================================================= */
+
 function SingletonEditor({ singletonKey, onBack }) {
   const config = singletons[singletonKey];
   const [data, setData] = useState(null);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
 
   const load = async () => {
     setLoading(true);
@@ -493,6 +498,7 @@ function SingletonEditor({ singletonKey, onBack }) {
   async function save(event) {
     event.preventDefault();
     setMessage("");
+    setSaving(true);
 
     const form = event.currentTarget;
     const formData = new FormData(form);
@@ -519,6 +525,8 @@ function SingletonEditor({ singletonKey, onBack }) {
     } catch (err) {
       setMessage(err.message);
       toast.error(err.message || "An error occurred");
+    } finally {
+      setSaving(false);
     }
   }
 
@@ -529,7 +537,7 @@ function SingletonEditor({ singletonKey, onBack }) {
           ← Dashboard
         </button>
         <div>
-          <p className="eyebrow">CONTENT EDITOR</p>
+          <p className="eyebrow">SITE SETTINGS</p>
           <h2>{config.label}</h2>
         </div>
       </div>
@@ -539,61 +547,67 @@ function SingletonEditor({ singletonKey, onBack }) {
       {loading ? (
         <p>Loading {config.label.toLowerCase()}...</p>
       ) : (
-        <form className="admin-form" onSubmit={save}>
+        <form className="admin-form singleton-form" onSubmit={save}>
           {Object.entries(config.schema).map(([section, fields]) => (
-            <fieldset key={section} className="admin-fieldset">
-              <legend>{section === "root" ? "General" : section}</legend>
-              {fields.map(([key, label, type = "text"]) => {
-                if (type === "checkbox") {
+            <div key={section} className="admin-card">
+              <div className="admin-card-header">
+                <h3>{section === "root" ? "General Settings" : section}</h3>
+              </div>
+
+              <div className="admin-card-body">
+                {fields.map(([key, label, type = "text"]) => {
+                  if (type === "checkbox") {
+                    return (
+                      <label key={key} className="admin-checkbox">
+                        <input
+                          name={`${section}.${key}`}
+                          type="checkbox"
+                          defaultChecked={
+                            section === "root"
+                              ? data?.[key] === true || data?.[key] === "true"
+                              : data?.[section]?.[key] === true ||
+                                data?.[section]?.[key] === "true"
+                          }
+                        />
+                        <span>{label}</span>
+                      </label>
+                    );
+                  }
+
                   return (
-                    <label key={key} className="admin-checkbox">
-                      <input
-                        name={`${section}.${key}`}
-                        type="checkbox"
-                        defaultChecked={
-                          section === "root"
-                            ? data?.[key] === true || data?.[key] === "true"
-                            : data?.[section]?.[key] === true ||
-                              data?.[section]?.[key] === "true"
-                        }
-                      />
-                      <span>{label}</span>
+                    <label key={key} className="admin-field">
+                      <span className="admin-field-label">{label}</span>
+                      {type === "textarea" ? (
+                        <textarea
+                          name={`${section}.${key}`}
+                          rows={5}
+                          defaultValue={
+                            section === "root"
+                              ? data?.[key] || ""
+                              : data?.[section]?.[key] || ""
+                          }
+                        />
+                      ) : (
+                        <input
+                          name={`${section}.${key}`}
+                          type={type}
+                          defaultValue={
+                            section === "root"
+                              ? data?.[key] || ""
+                              : data?.[section]?.[key] || ""
+                          }
+                        />
+                      )}
                     </label>
                   );
-                }
-
-                return (
-                  <label key={key}>
-                    {label}
-                    {type === "textarea" ? (
-                      <textarea
-                        name={`${section}.${key}`}
-                        defaultValue={
-                          section === "root"
-                            ? data?.[key] || ""
-                            : data?.[section]?.[key] || ""
-                        }
-                      />
-                    ) : (
-                      <input
-                        name={`${section}.${key}`}
-                        type={type}
-                        defaultValue={
-                          section === "root"
-                            ? data?.[key] || ""
-                            : data?.[section]?.[key] || ""
-                        }
-                      />
-                    )}
-                  </label>
-                );
-              })}
-            </fieldset>
+                })}
+              </div>
+            </div>
           ))}
 
-          <div>
-            <button className="button primary">
-              Save changes <span>&rarr;</span>
+          <div className="admin-form-actions">
+            <button className="button primary" disabled={saving}>
+              {saving ? "Saving..." : "Save changes"} <span>&rarr;</span>
             </button>
           </div>
         </form>
