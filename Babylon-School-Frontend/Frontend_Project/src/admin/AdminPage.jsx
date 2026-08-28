@@ -52,7 +52,6 @@ function Login({ onLogin }) {
   return (
     <main className="admin-login">
       <form onSubmit={submit}>
-        {/* School Logo */}
         <div className="admin-login-logo">
           <SchoolLogo />
         </div>
@@ -699,6 +698,166 @@ function Inbox({ endpoint, title, fields, onBack }) {
 }
 
 /* =========================================================
+   CONTACTS INBOX (Card style like Admissions)
+========================================================= */
+
+function ContactsInbox({ onBack }) {
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [message, setMessage] = useState("");
+
+  const load = async () => {
+    setLoading(true);
+    try {
+      const response = await api("/contacts");
+      setItems(response.data || []);
+    } catch (err) {
+      setMessage(err.message || "Failed to load contact messages.");
+      toast.error(err.message || "Failed to load contact messages.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    load();
+  }, []);
+
+  async function remove(id) {
+    if (!window.confirm("Are you sure you want to delete this message?")) {
+      return;
+    }
+    try {
+      await api(`/contacts/${id}`, { method: "DELETE" });
+      setMessage("Message deleted successfully.");
+      toast.success("Message deleted successfully.");
+      load();
+    } catch (err) {
+      setMessage(err.message || "Failed to delete message.");
+      toast.error(err.message || "Failed to delete message.");
+    }
+  }
+
+  function formatDate(date) {
+    if (!date) return "—";
+    const parsed = new Date(date);
+    if (Number.isNaN(parsed.getTime())) return "—";
+    return parsed.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  }
+
+  return (
+    <section className="admin-resource">
+      <div className="admin-resource-head">
+        <button type="button" className="admin-back" onClick={onBack}>
+          ← Dashboard
+        </button>
+        <div>
+          <p className="eyebrow">INBOX</p>
+          <h2>Contact Messages</h2>
+        </div>
+      </div>
+
+      {message && <p className="admin-message">{message}</p>}
+
+      <div className="admin-table">
+        {loading ? (
+          <p>Loading contact messages...</p>
+        ) : items.length === 0 ? (
+          <p>No contact messages yet.</p>
+        ) : (
+          items.map((item) => (
+            <article
+              key={item._id}
+              style={{ display: "block", padding: "24px" }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "flex-start",
+                  gap: "20px",
+                  marginBottom: "20px",
+                }}
+              >
+                <div>
+                  <h3 style={{ marginBottom: "6px" }}>
+                    {item.name || item.fullName || "Unknown"}
+                  </h3>
+                  <p style={{ margin: 0 }}>
+                    Subject: <strong>{item.subject || "—"}</strong>
+                  </p>
+                </div>
+                <span className="status-chip">{item.status || "New"}</span>
+              </div>
+
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+                  gap: "14px",
+                  marginBottom: "20px",
+                }}
+              >
+                <div>
+                  <strong>Name</strong>
+                  <p>{item.name || item.fullName || "—"}</p>
+                </div>
+                <div>
+                  <strong>Email</strong>
+                  <p>{item.email || "—"}</p>
+                </div>
+                <div>
+                  <strong>Phone</strong>
+                  <p>{item.phone || "—"}</p>
+                </div>
+                <div>
+                  <strong>Subject</strong>
+                  <p>{item.subject || "—"}</p>
+                </div>
+                <div>
+                  <strong>Submitted</strong>
+                  <p>{formatDate(item.createdAt)}</p>
+                </div>
+              </div>
+
+              {item.message && (
+                <div
+                  style={{
+                    padding: "15px",
+                    background: "#f7fafc",
+                    borderRadius: "8px",
+                    marginBottom: "15px",
+                  }}
+                >
+                  <strong>Message</strong>
+                  <p style={{ marginBottom: 0, whiteSpace: "pre-wrap" }}>
+                    {item.message}
+                  </p>
+                </div>
+              )}
+
+              <div className="admin-row-actions">
+                <button
+                  type="button"
+                  className="delete"
+                  onClick={() => remove(item._id)}
+                >
+                  Delete
+                </button>
+              </div>
+            </article>
+          ))
+        )}
+      </div>
+    </section>
+  );
+}
+
+/* =========================================================
    ADMISSIONS
 ========================================================= */
 
@@ -1021,7 +1180,7 @@ function AdminUsers({ onBack }) {
       if (editing?._id) {
         await api(`/users/${editing._id}`, { method: "PUT", body });
         setMessage("Admin updated successfully.");
-      toast.success("Admin updated successfully.");
+        toast.success("Admin updated successfully.");
       } else {
         await api("/users/admin", {
           method: "POST",
@@ -1032,7 +1191,7 @@ function AdminUsers({ onBack }) {
           },
         });
         setMessage("Admin created successfully.");
-      toast.success("Admin created successfully.");
+        toast.success("Admin created successfully.");
       }
       setEditing(null);
       load();
@@ -1310,7 +1469,6 @@ function DashboardOverview({ user, setView }) {
   });
   const [loadingStats, setLoadingStats] = useState(true);
 
-  // Exact keys from resourceConfig.js
   const staffKey = resources.faculty ? "faculty" : null;
   const eventsKey = resources.events ? "events" : null;
   const blogKey = resources.news ? "news" : null;
@@ -1540,16 +1698,6 @@ function DashboardOverview({ user, setView }) {
             </button>
           </div>
         </div>
-        {/* <div className="admin-panel">
-          <div className="admin-panel-head">
-            <h3>Tips</h3>
-          </div>
-          <p className="admin-panel-empty" style={{ textAlign: "left", padding: "8px 0" }}>
-            Changes saved here appear on the public Babylon website after refresh.
-            Use the sidebar to jump between content sections. Stat cards update
-            automatically from live data.
-          </p>
-        </div> */}
       </div>
     </div>
   );
@@ -1596,8 +1744,8 @@ export default function AdminPage() {
   }
 
   if (checking) {
-  return <LoadingScreen message="Checking admin access..." />;
-}
+    return <LoadingScreen message="Checking admin access..." />;
+  }
 
   if (!user) {
     return <Login onLogin={setUser} />;
@@ -1629,14 +1777,7 @@ export default function AdminPage() {
   } else if (view === "admissions") {
     content = <AdmissionsInbox onBack={() => setView(null)} />;
   } else if (view === "contacts") {
-    content = (
-      <Inbox
-        endpoint="/contacts"
-        title="Contact messages"
-        fields={["email", "phone", "subject", "message"]}
-        onBack={() => setView(null)}
-      />
-    );
+    content = <ContactsInbox onBack={() => setView(null)} />;
   } else if (view === "career-apps") {
     content = (
       <Inbox
