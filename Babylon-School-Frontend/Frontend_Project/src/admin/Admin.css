@@ -35,14 +35,66 @@
 
 .admin-login form {
   background: #fff;
-  width: min(420px, 100%);
-  padding: 44px 40px;
+  width: min(440px, 100%);
+  padding: 40px 40px 36px;
   border-radius: 16px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 18px;
   box-shadow: 0 25px 60px rgba(0, 0, 0, 0.35);
 }
+
+/* Logo centered at top */
+.admin-login-logo {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 4px;
+}
+
+.admin-login-logo .school-logo {
+  width: 280px !important;
+  height: auto !important;
+}
+
+.admin-login-logo .school-logo img {
+  width: 100% !important;
+  height: auto !important;
+  max-width: 280px;
+}
+
+/* "Welcome to MIS" heading */
+.admin-login-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #e57c23;
+  text-align: center;
+  margin: 0;
+}
+
+/* "Please sign-in..." subtitle */
+.admin-login-subtitle {
+  font-size: 14.5px;
+  color: var(--admin-muted);
+  text-align: center;
+  margin: -8px 0 4px;
+}
+
+/* Blue Sign In button */
+.admin-login-btn {
+  background: linear-gradient(135deg, #4f8ef7, #3b7cf6) !important;
+  font-size: 15px !important;
+  padding: 14px !important;
+  border-radius: 8px !important;
+  letter-spacing: 0.2px;
+}
+
+.admin-login-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #3b7cf6, #2563eb) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(59, 130, 246, 0.35);
+}
+
+
 
 .admin-login .eyebrow {
   color: var(--admin-purple);

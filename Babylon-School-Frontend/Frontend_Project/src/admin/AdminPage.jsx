@@ -8,6 +8,7 @@ import "./Admin.css";
 
 import LoadingScreen from "../components/common/LoadingScreen";
 import "../components/common/LoadingScreen.css";
+import SchoolLogo from "../components/common/SchoolLogo";
 
 const blank = (config) =>
   Object.fromEntries(config.fields.map(([key]) => [key, ""]));
@@ -51,26 +52,30 @@ function Login({ onLogin }) {
   return (
     <main className="admin-login">
       <form onSubmit={submit}>
-        <p className="eyebrow">BABYLON ADMIN</p>
-        <h1>Content management</h1>
-        <p>
-          Sign in to manage the information shown across the school website.
+        {/* School Logo */}
+        <div className="admin-login-logo">
+          <SchoolLogo />
+        </div>
+
+        <h2 className="admin-login-title">Welcome to MIS</h2>
+        <p className="admin-login-subtitle">
+          Please sign-in to your account
         </p>
 
         <label>
-          Email
-          <input name="email" type="email" required />
+          USERNAME OR EMAIL
+          <input name="email" type="email" required placeholder="Username" />
         </label>
 
         <label>
-          Password
-          <input name="password" type="password" required />
+          PASSWORD
+          <input name="password" type="password" required placeholder="••••••••••••" />
         </label>
 
         {error && <p className="admin-error">{error}</p>}
 
-        <button className="button primary" disabled={loading}>
-          {loading ? "Signing in..." : "Sign in"} <span>&rarr;</span>
+        <button className="button primary admin-login-btn" disabled={loading}>
+          {loading ? "Signing in..." : "Sign in"}
         </button>
 
         <a href="/">Return to website</a>

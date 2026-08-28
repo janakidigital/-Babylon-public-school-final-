@@ -1,7 +1,10 @@
 import React, { useEffect } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
+import { AnimatePresence } from 'framer-motion';
 import Header from '../components/common/Header';
 import Footer from '../components/common/Footer';
+import PageTransition from '../components/common/PageTransition';
+
 import HomePage from '../pages/Home/HomePage';
 import AboutPage from '../pages/About/AboutPage';
 import AcademicsPage from '../pages/Academics/AcademicsPage';
@@ -25,7 +28,7 @@ import AchievementsPage from '../pages/Achievements/AchievementsPage';
 import FaqPage from '../pages/FAQ/FaqPage';
 import ContactPage from '../pages/Contact/ContactPage';
 import DownloadsPage from '../pages/Downloads/DownloadsPage';
-// import LoginPage from '../pages/Auth/LoginPage';
+import LoginPage from '../pages/Auth/LoginPage';
 // import SignupPage from '../pages/Auth/SignupPage';
 // import DashboardPage from '../pages/Dashboard/DashboardPage';
 import NotFoundPage from '../pages/NotFound/NotFoundPage';
@@ -46,40 +49,45 @@ function PublicLayout({ children }) {
 }
 
 export default function PublicRoutes() {
+  const location = useLocation();
+  
   return (
     <PublicLayout>
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/about" element={<AboutPage />} />
-        <Route path="/academics" element={<AcademicsPage />} />
-        <Route path="/courses" element={<CoursesPage />} />
-        <Route path="/course-details/:id" element={<CourseDetailsPage />} />
-        <Route path="/events" element={<EventsPage />} />
-        <Route path="/event-details/:id" element={<EventDetailsPage />} />
-        <Route path="/notices" element={<NoticesPage />} />
-        <Route path="/notices/:id" element={<NoticesPage />} />
-        <Route path="/downloads" element={<DownloadsPage />} />
-        <Route path="/blog" element={<BlogPage />} />
-        <Route path="/blog-grid-one" element={<BlogGridOnePage />} />
-        <Route path="/blog-grid-two" element={<BlogGridTwoPage />} />
-        <Route path="/blog-details/:id" element={<BlogDetailsPage />} />
-        <Route path="/team" element={<TeamPage />} />
-        <Route path="/teacher-profile/:id" element={<TeacherProfilePage />} />
-        <Route path="/teachers/:id" element={<TeacherProfilePage />} />
-        <Route path="/become-a-teacher" element={<BecomeTeacherPage />} />
-        <Route path="/admissions" element={<AdmissionsPage />} />
-        <Route path="/facilities" element={<FacilitiesPage />} />
-        <Route path="/facilities/:id" element={<FacilitiesPage />} />
-        <Route path="/gallery" element={<GalleryPage />} />
-        <Route path="/achievements" element={<AchievementsPage />} />
-        <Route path="/faq" element={<FaqPage />} />
-        <Route path="/contact" element={<ContactPage />} />
-        
-        {/* <Route path="/dashboard" element={<DashboardPage />} /> */}
+      <AnimatePresence mode="wait">
+        <Routes location={location} key={location.pathname}>
+          <Route path="/" element={<PageTransition><HomePage /></PageTransition>} />
+          <Route path="/about" element={<PageTransition><AboutPage /></PageTransition>} />
+          <Route path="/academics" element={<PageTransition><AcademicsPage /></PageTransition>} />
+          <Route path="/courses" element={<PageTransition><CoursesPage /></PageTransition>} />
+          <Route path="/course-details/:id" element={<PageTransition><CourseDetailsPage /></PageTransition>} />
+          <Route path="/events" element={<PageTransition><EventsPage /></PageTransition>} />
+          <Route path="/event-details/:id" element={<PageTransition><EventDetailsPage /></PageTransition>} />
+          <Route path="/notices" element={<PageTransition><NoticesPage /></PageTransition>} />
+          <Route path="/notices/:id" element={<PageTransition><NoticesPage /></PageTransition>} />
+          <Route path="/downloads" element={<PageTransition><DownloadsPage /></PageTransition>} />
+          <Route path="/blog" element={<PageTransition><BlogPage /></PageTransition>} />
+          <Route path="/blog-grid-one" element={<PageTransition><BlogGridOnePage /></PageTransition>} />
+          <Route path="/blog-grid-two" element={<PageTransition><BlogGridTwoPage /></PageTransition>} />
+          <Route path="/blog-details/:id" element={<PageTransition><BlogDetailsPage /></PageTransition>} />
+          <Route path="/team" element={<PageTransition><TeamPage /></PageTransition>} />
+          <Route path="/teacher-profile/:id" element={<PageTransition><TeacherProfilePage /></PageTransition>} />
+          <Route path="/teachers/:id" element={<PageTransition><TeacherProfilePage /></PageTransition>} />
+          <Route path="/become-a-teacher" element={<PageTransition><BecomeTeacherPage /></PageTransition>} />
+          <Route path="/admissions" element={<PageTransition><AdmissionsPage /></PageTransition>} />
+          <Route path="/facilities" element={<PageTransition><FacilitiesPage /></PageTransition>} />
+          <Route path="/facilities/:id" element={<PageTransition><FacilitiesPage /></PageTransition>} />
+          <Route path="/gallery" element={<PageTransition><GalleryPage /></PageTransition>} />
+          <Route path="/achievements" element={<PageTransition><AchievementsPage /></PageTransition>} />
+          <Route path="/faq" element={<PageTransition><FaqPage /></PageTransition>} />
+          <Route path="/contact" element={<PageTransition><ContactPage /></PageTransition>} />
+          <Route path="/login" element={<PageTransition><LoginPage /></PageTransition>} />
+          
+          {/* <Route path="/dashboard" element={<PageTransition><DashboardPage /></PageTransition>} /> */}
 
-        {/* 404 page for any unknown route */}
-        <Route path="*" element={<NotFoundPage />} />
-      </Routes>
+          {/* 404 page for any unknown route */}
+          <Route path="*" element={<PageTransition><NotFoundPage /></PageTransition>} />
+        </Routes>
+      </AnimatePresence>
     </PublicLayout>
   );
 }

@@ -58,7 +58,15 @@ export default function Header() {
       {/* Top Strip */}
       <div className="top-strip">
         <div className="shell top-strip-inner">
-          <span>{settings.address || "Shantinagar, Kathmandu, Nepal"}</span>
+          <a
+            href="https://www.google.com/maps/place/Babylon+National+School/@27.6944248,85.3468418,776m/data=!3m2!1e3!4b1!4m6!3m5!1s0x39eb198562c4ddb1:0x643554472674ff47!8m2!3d27.6944248!4d85.3468418!16s%2Fg%2F1tfqd6m3?entry=ttu&g_ep=EgoyMDI2MDgyNS4wIKXMDSoASAFQAw%3D%3D"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ display: "flex", alignItems: "center", gap: "6px", textDecoration: "none", color: "inherit" }}
+          >
+            <i className="bi bi-geo-alt-fill"></i>
+            <span>{settings.address || "Shantinagar, Kathmandu, Nepal"}</span>
+          </a>
 
           <div className="top-strip-right">
             <span>{settings.email || "info@babylonschool.edu.np"}</span>

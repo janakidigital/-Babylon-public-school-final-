@@ -1,4 +1,3 @@
-import SchoolLogo from "./SchoolLogo";
 import { Link } from "react-router-dom";
 import { useSite } from "../../context/SiteContext";
 import "bootstrap-icons/font/bootstrap-icons.css";
@@ -10,21 +9,30 @@ export default function Footer() {
     <footer>
       <div className="shell footer-grid">
 
-        {/* School Info */}
-        <div>
-          <SchoolLogo footer />
-
-          <p>
-            {settings.shortDescription ||
-              "A co-ed English medium school from PG to secondary level."}
-          </p>
+        {/* Google Maps Column */}
+        <div className="footer-map-col">
+          <h4>Find Us</h4>
+          <iframe
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d776!2d85.3468418!3d27.6944248!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x39eb198562c4ddb1%3A0x643554472674ff47!2sBabylon%20National%20School!5e0!3m2!1sen!2snp!4v1693300000000!5m2!1sen!2snp"
+            allowFullScreen=""
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+            title="Babylon National School Location"
+          ></iframe>
+          <a
+            href="https://www.google.com/maps/place/Babylon+National+School/@27.6944248,85.3468418,776m/data=!3m2!1e3!4b1!4m6!3m5!1s0x39eb198562c4ddb1:0x643554472674ff47!8m2!3d27.6944248!4d85.3468418!16s%2Fg%2F1tfqd6m3?entry=ttu&g_ep=EgoyMDI2MDgyNS4wIKXMDSoASAFQAw%3D%3D"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="footer-map-link"
+          >
+            <i className="bi bi-box-arrow-up-right"></i>
+            View on Google Maps
+          </a>
         </div>
 
 
         {/* Navigation */}
-        <div
-          className="footer-navigation"
-        >
+        <div className="footer-navigation">
           {/* Explore */}
           <div>
             <h4>Explore</h4>
@@ -59,10 +67,14 @@ export default function Footer() {
           <div className="footer-contact">
             <i className="bi bi-geo-alt-fill"></i>
 
-            <p>
+            <a
+              href="https://www.google.com/maps/place/Babylon+National+School/@27.6944248,85.3468418,776m/data=!3m2!1e3!4b1!4m6!3m5!1s0x39eb198562c4ddb1:0x643554472674ff47!8m2!3d27.6944248!4d85.3468418!16s%2Fg%2F1tfqd6m3?entry=ttu&g_ep=EgoyMDI2MDgyNS4wIKXMDSoASAFQAw%3D%3D"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               {settings.address ||
                 "Shantinagar, Kathmandu, Nepal"}
-            </p>
+            </a>
           </div>
 
 
