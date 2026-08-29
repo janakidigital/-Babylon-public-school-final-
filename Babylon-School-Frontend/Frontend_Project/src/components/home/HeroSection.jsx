@@ -4,7 +4,6 @@ import { assetPath } from "../../data/content";
 
 const slides = [
   {
-    image: `${assetPath}banner/banner_1.jpg`,
     eyebrow: "WELCOME TO BABYLON NATIONAL SCHOOL",
     heading: (
       <>
@@ -17,7 +16,6 @@ const slides = [
       "A community of passionate educators in Shantinagar, Kathmandu, dedicated since 1996 to a dynamic learning environment from PG to secondary.",
   },
   {
-    image: `${assetPath}banner/banner_2.jpg`,
     eyebrow: "EXCELLENCE IN LEARNING",
     heading: (
       <>
@@ -30,7 +28,6 @@ const slides = [
       "Empowering students with world-class education, values, and skills to succeed in a rapidly changing global landscape.",
   },
   {
-    image: `${assetPath}banner/banner_3.png`,
     eyebrow: "NURTURING YOUNG MINDS",
     heading: (
       <>
@@ -43,7 +40,6 @@ const slides = [
       "From pre-school to secondary, we provide a nurturing environment where every child's potential is discovered and developed.",
   },
   {
-    image: `${assetPath}banner/banner_4.jpg`,
     eyebrow: "COMMUNITY & CULTURE",
     heading: (
       <>
@@ -61,6 +57,7 @@ export default function HeroSection() {
   const [current, setCurrent] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const timerRef = useRef(null);
+  const videoRef = useRef(null);
 
   const goTo = useCallback(
     (index) => {
@@ -80,31 +77,41 @@ export default function HeroSection() {
     goTo((current + 1) % slides.length);
   }, [current, goTo]);
 
-  // Auto-play
+  // Auto-play text slides
   useEffect(() => {
     timerRef.current = setInterval(next, 5500);
     return () => clearInterval(timerRef.current);
   }, [next]);
 
-  // Reset timer on manual navigation (dots)
-  const handleManualChange = (index) => {
-    clearInterval(timerRef.current);
-    goTo(index);
-    timerRef.current = setInterval(next, 5500);
-  };
+  // Ensure video keeps playing
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const tryPlay = () => {
+      video.play().catch(() => {});
+    };
+
+    tryPlay();
+    video.addEventListener("loadeddata", tryPlay);
+
+    return () => video.removeEventListener("loadeddata", tryPlay);
+  }, []);
 
   const slide = slides[current];
 
   return (
     <section className="hero" id="home">
-      {/* Background slides */}
-      {slides.map((s, i) => (
-        <div
-          key={i}
-          className={`hero-slide-bg ${i === current ? "active" : ""}`}
-          style={{ backgroundImage: `url(${s.image})` }}
-        />
-      ))}
+      {/* Single video background */}
+      <video
+        ref={videoRef}
+        className="hero-video-bg"
+        src={`${assetPath}banner/videoPlay.mp4`}
+        autoPlay
+        muted
+        loop
+        playsInline
+      />
 
       <div className="hero-shade" />
 
@@ -128,22 +135,10 @@ export default function HeroSection() {
         </div>
       </div>
 
-      {/* Dots only */}
-      <div className="hero-dots">
-        {slides.map((_, i) => (
-          <button
-            key={i}
-            className={`hero-dot ${i === current ? "active" : ""}`}
-            onClick={() => handleManualChange(i)}
-            aria-label={`Go to slide ${i + 1}`}
-          />
-        ))}
-      </div>
-
       {/* Counter */}
-      <div className="hero-mark">
+      {/* <div className="hero-mark">
         0{current + 1} <span />
-      </div>
+      </div> */}
     </section>
   );
 }
