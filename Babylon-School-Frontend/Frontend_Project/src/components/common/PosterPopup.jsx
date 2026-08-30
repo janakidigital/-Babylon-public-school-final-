@@ -6,9 +6,6 @@ export default function PosterPopup() {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    const hasSeen = localStorage.getItem("babylon_poster_seen");
-    if (hasSeen) return;
-
     publicApi
       .posters()
       .then((result) => {
@@ -28,7 +25,6 @@ export default function PosterPopup() {
 
   const closePopup = () => {
     setVisible(false);
-    localStorage.setItem("babylon_poster_seen", "true");
   };
 
   if (!visible || posters.length === 0) return null;
