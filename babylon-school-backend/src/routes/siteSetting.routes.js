@@ -12,8 +12,8 @@ const upload = require("../middleware/upload.middleware");
 
 router.get("/", getSiteSettings);
 
-router.post("/", protect, upload.single("logo"), createSiteSettings);
+router.post("/", protect, upload.any(), createSiteSettings);
 
-router.put("/", protect, upload.single("logo"), updateSiteSettings);
+router.put("/", protect, upload.any(), updateSiteSettings);
 
 module.exports = router;

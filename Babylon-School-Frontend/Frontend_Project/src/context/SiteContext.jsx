@@ -11,6 +11,41 @@ export const fallbackSettings = {
   socialLinks: { facebook: "", instagram: "", youtube: "", twitter: "", linkedin: "" },
   googleMapUrl: "",
   logo: "",
+  favicon: "",
+  stats: {
+    studentsCount: "1000+",
+    studentsLabel: "Students",
+    teachersCount: "30+",
+    teachersLabel: "Teachers",
+    sinceValue: "1996 A.D.",
+    sinceLabel: "Since",
+  },
+  studentLife: {
+    eyebrow: "LIFE AT BABYLON",
+    title: "Every day is an opportunity to shine.",
+    description:
+      "Beyond the classroom, students grow through sport, arts, scouting, music, dance and service — a home away from home in Shantinagar.",
+    heading: "Growing with purpose and pride.",
+    image: "",
+  },
+  pageBanners: {
+    about: "",
+    academics: "",
+    admissions: "",
+    studentLife: "",
+    careers: "",
+    news: "",
+    events: "",
+    notices: "",
+    gallery: "",
+    facilities: "",
+    team: "",
+    achievements: "",
+    downloads: "",
+    faq: "",
+    contact: "",
+    defaultBanner: "",
+  },
 };
 
 const SiteContext = createContext({
@@ -44,6 +79,18 @@ export function SiteProvider({ children }) {
           socialLinks: {
             ...fallbackSettings.socialLinks,
             ...(data.socialLinks || {}),
+          },
+          stats: {
+            ...fallbackSettings.stats,
+            ...(data.stats || {}),
+          },
+          studentLife: {
+            ...fallbackSettings.studentLife,
+            ...(data.studentLife || {}),
+          },
+          pageBanners: {
+            ...fallbackSettings.pageBanners,
+            ...(data.pageBanners || {}),
           },
         });
       }
@@ -79,6 +126,17 @@ export function SiteProvider({ children }) {
       window.removeEventListener("site-data-updated", onSiteUpdate);
     };
   }, [refresh]);
+
+  useEffect(() => {
+    const faviconUrl = settings?.favicon || "/favicon.png";
+    let link = document.querySelector("link[rel~='icon']");
+    if (!link) {
+      link = document.createElement("link");
+      link.rel = "icon";
+      document.head.appendChild(link);
+    }
+    link.href = faviconUrl;
+  }, [settings?.favicon]);
 
   return (
     <SiteContext.Provider value={{ settings, home, about, refresh, loading }}>

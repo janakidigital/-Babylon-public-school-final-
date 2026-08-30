@@ -8,6 +8,7 @@ export default function AcademicsPage() {
         eyebrow="OUR ACADEMICS"
         title="Learning with purpose."
         image="banner/inner_banner_3.jpg"
+        pageKey="academics"
       />
       <ProgramsSection />
       <section className="academic-note">

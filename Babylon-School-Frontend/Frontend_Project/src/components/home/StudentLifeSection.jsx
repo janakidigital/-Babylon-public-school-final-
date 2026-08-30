@@ -1,18 +1,50 @@
 import { assetPath } from "../../data/content";
 import { useSite } from "../../context/SiteContext";
+import { mediaUrl } from "../../lib/media";
 
 export default function StudentLifeSection() {
-  const { home } = useSite();
+  const { settings, home } = useSite();
 
-  // Prefer admin-configured statistics, otherwise use fixed fallback
+  // Prefer siteSettings stats (Students, Teachers, Since) configured in Admin,
+  // then home statistics, then default fallback
+  const statsFromSettings = settings?.stats
+    ? [
+        {
+          value: settings.stats.studentsCount || "1000+",
+          label: settings.stats.studentsLabel || "Students",
+        },
+        {
+          value: settings.stats.teachersCount || "30+",
+          label: settings.stats.teachersLabel || "Teachers",
+        },
+        {
+          value: settings.stats.sinceValue || "1996 A.D.",
+          label: settings.stats.sinceLabel || "Since",
+        },
+      ]
+    : null;
+
   const displayStats =
-    home?.statistics?.length > 0
+    statsFromSettings ||
+    (home?.statistics?.length > 0
       ? home.statistics.slice(0, 3)
       : [
           { value: "1000+", label: "Students" },
           { value: "30+", label: "Teachers" },
           { value: "1996 A.D.", label: "Since" },
-        ];
+        ]);
+
+  const studentLifePhoto = settings?.studentLife?.image
+    ? mediaUrl(settings.studentLife.image)
+    : `${assetPath}banner/banner_2.jpg`;
+
+  const eyebrow = settings?.studentLife?.eyebrow || "LIFE AT BABYLON";
+  const title = settings?.studentLife?.title || "Every day is an opportunity to shine.";
+  const description =
+    settings?.studentLife?.description ||
+    "Beyond the classroom, students grow through sport, arts, scouting, music, dance and service — a home away from home in Shantinagar.";
+  const heading =
+    settings?.studentLife?.heading || "Growing with purpose and pride.";
 
   return (
     <section className="life" id="life">
@@ -37,22 +69,24 @@ export default function StudentLifeSection() {
           `}</style>
 
           <div className="life-copy">
-            <p className="eyebrow light">LIFE AT BABYLON</p>
+            <p className="eyebrow light">{eyebrow}</p>
             <h2>
-              Every day is an
-              <br />
-              <em>opportunity</em> to shine.
+              {title.includes("opportunity") ? (
+                <>
+                  {title.split("opportunity")[0]}
+                  <em>opportunity</em>
+                  {title.split("opportunity")[1]}
+                </>
+              ) : (
+                title
+              )}
             </h2>
-            <p>
-              Beyond the classroom, students grow through sport, arts,
-              scouting, music, dance and service — a home away from home in
-              Shantinagar.
-            </p>
+            <p>{description}</p>
           </div>
 
           <div className="life-photo">
             <img
-              src={`${assetPath}banner/banner_2.jpg`}
+              src={studentLifePhoto}
               alt="Babylon school student"
               style={{
                 width: "100%",
@@ -96,9 +130,7 @@ export default function StudentLifeSection() {
                 lineHeight: 1.25,
               }}
             >
-              Growing with
-              <br />
-              purpose and pride.
+              {heading}
             </h2>
 
             <div

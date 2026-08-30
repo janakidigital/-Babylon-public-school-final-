@@ -13,6 +13,7 @@ export default function TeamPage() {
         eyebrow="OUR TEAM"
         title="Meet the people behind Babylon."
         image="banner/inner_banner_2.jpg"
+        pageKey="team"
       />
       <section className="listing-page shell">
         <div className="center-heading">

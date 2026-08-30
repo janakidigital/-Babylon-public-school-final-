@@ -23,6 +23,7 @@ export default function NoticesPage() {
           eyebrow="SCHOOL UPDATES"
           title="Notices and announcements."
           image="banner/inner_banner_5.jpg"
+          pageKey="notices"
         />
         <NoticesSection />
       </>
@@ -37,6 +38,7 @@ export default function NoticesPage() {
           eyebrow="NOTICE"
           title="Loading..."
           image="banner/inner_banner_5.jpg"
+          pageKey="notices"
         />
         <section className="shell listing-page">
           <p>Loading notice...</p>
@@ -53,6 +55,7 @@ export default function NoticesPage() {
           eyebrow="NOTICE"
           title="Notice not found."
           image="banner/inner_banner_5.jpg"
+          pageKey="notices"
         />
         <section className="shell listing-page">
           <EmptyState
@@ -87,6 +90,7 @@ export default function NoticesPage() {
         eyebrow={notice.category || "NOTICE"}
         title={notice.title}
         image="banner/inner_banner_5.jpg"
+        pageKey="notices"
       />
 
       {/* Removed the image prop so the big photo no longer shows */}

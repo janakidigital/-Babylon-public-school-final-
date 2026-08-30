@@ -42,6 +42,7 @@ export default function FacilitiesPage() {
             : "Spaces designed for discovery."
         }
         image="banner/inner_banner_5.jpg"
+        pageKey="facilities"
       />
 
       <section className="listing-page shell">

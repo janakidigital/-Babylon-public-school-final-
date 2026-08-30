@@ -12,6 +12,7 @@ export default function EventsPage() {
         eyebrow="SCHOOL EVENTS"
         title="Moments that bring us together."
         image="banner/inner_banner_4.jpg"
+        pageKey="events"
       />
       <section className="listing-page shell">
         <div className="center-heading">

@@ -12,6 +12,7 @@ export default function AboutPage() {
         eyebrow="ABOUT BABYLON"
         title="A co-ed English medium school since 1996."
         image="banner/inner_banner_2.jpg"
+        pageKey="about"
       />
       {/* <AboutStory /> */}
       <AboutPossibilities />

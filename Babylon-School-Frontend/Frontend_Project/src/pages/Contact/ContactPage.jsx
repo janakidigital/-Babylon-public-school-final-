@@ -64,6 +64,7 @@ export default function ContactPage() {
         eyebrow="GET IN TOUCH"
         title="We would love to hear from you."
         image="banner/inner_banner_1.jpg"
+        pageKey="contact"
       />
 
       <section className="contact-page shell">

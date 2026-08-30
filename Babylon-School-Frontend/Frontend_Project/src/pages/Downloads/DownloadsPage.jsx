@@ -16,6 +16,7 @@ export default function DownloadsPage() {
         eyebrow="RESOURCES"
         title="Downloads & Documents"
         image="banner/inner_banner_5.jpg"
+        pageKey="downloads"
       />
 
       <section className="shell" style={{ padding: "80px 0" }}>

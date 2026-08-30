@@ -12,6 +12,7 @@ export default function CoursesPage() {
         eyebrow="COURSES"
         title="Explore our learning programmes."
         image="banner/inner_banner_3.jpg"
+        pageKey="academics"
       />
       <section className="listing-page shell">
         <div className="center-heading">

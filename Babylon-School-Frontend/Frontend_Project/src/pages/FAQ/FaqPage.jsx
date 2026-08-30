@@ -15,6 +15,7 @@ export default function FaqPage() {
         eyebrow="FAQ"
         title="How can we help?"
         image="banner/inner_banner_5.jpg"
+        pageKey="faq"
       />
       <section className="about-faq">
         <div className="shell">

@@ -1,5 +1,5 @@
 import PageBanner from "../../components/common/PageBanner";
-// import StudentLifeSection from "../../components/home/StudentLifeSection";
+import StudentLifeSection from "../../components/home/StudentLifeSection";
 import { assetPath } from "../../data/content";
 
 const activities = [
@@ -15,6 +15,7 @@ export default function StudentLifePage() {
         eyebrow="STUDENT LIFE"
         title="A vibrant life beyond class."
         image="banner/inner_banner_4.jpg"
+        pageKey="studentLife"
       />
       <StudentLifeSection />
       <section className="activity-section shell">

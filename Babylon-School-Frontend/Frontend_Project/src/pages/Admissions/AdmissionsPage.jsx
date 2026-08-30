@@ -108,6 +108,7 @@ export default function AdmissionsPage() {
         eyebrow="ADMISSIONS"
         title="Begin your Babylon journey."
         image="banner/inner_banner_1.jpg"
+        pageKey="admissions"
       />
 
       <section className="admissions-page shell">

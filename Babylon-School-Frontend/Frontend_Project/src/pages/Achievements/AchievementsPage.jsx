@@ -30,6 +30,7 @@ export default function AchievementsPage() {
         eyebrow="ACHIEVEMENTS"
         title="Celebrating every success."
         image="banner/counter_bg.jpg"
+        pageKey="achievements"
       />
 
       <section className="listing-page shell">

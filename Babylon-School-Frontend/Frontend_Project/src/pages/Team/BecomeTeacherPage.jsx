@@ -79,6 +79,7 @@ export default function BecomeTeacherPage() {
         eyebrow="CAREERS"
         title="Teach, inspire and grow with us."
         image="banner/instructor.jpg"
+        pageKey="careers"
       />
 
       {/* ===================== OPEN ROLES ===================== */}

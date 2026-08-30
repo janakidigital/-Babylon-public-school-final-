@@ -12,6 +12,7 @@ export default function BlogPage() {
         eyebrow="SCHOOL STORIES"
         title="News & Blog from the Babylon community."
         image="banner/inner_banner_1.jpg"
+        pageKey="news"
       />
       <section className="listing-page shell">
         {loading ? (

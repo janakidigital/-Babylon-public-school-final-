@@ -1167,3 +1167,215 @@
     padding: 0.9rem 1.15rem;
   }
 }
+
+/* =========================================================
+   SITE SETTINGS TABS & BANNER MANAGER STYLES
+========================================================= */
+
+.admin-tabs-nav {
+  display: flex;
+  gap: 8px;
+  border-bottom: 2px solid var(--admin-line);
+  margin-bottom: 24px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.admin-tab-btn {
+  padding: 10px 18px;
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--admin-muted);
+  background: transparent;
+  border: none;
+  border-radius: 8px 8px 0 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.admin-tab-btn:hover {
+  color: var(--admin-navy);
+  background: rgba(59, 130, 246, 0.06);
+}
+
+.admin-tab-btn.active {
+  color: var(--admin-blue);
+  border-bottom: 3px solid var(--admin-blue);
+  margin-bottom: -6px;
+  background: #fff;
+}
+
+.admin-stats-inputs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.admin-stat-box {
+  background: #f8fafc;
+  border: 1px solid var(--admin-line);
+  border-radius: 10px;
+  padding: 16px;
+}
+
+.admin-stat-box-title {
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--admin-navy);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.admin-banner-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+.admin-banner-card {
+  background: #ffffff;
+  border: 1px solid var(--admin-line);
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.admin-banner-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+}
+
+.admin-banner-preview {
+  position: relative;
+  height: 140px;
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 14px;
+  color: #fff;
+}
+
+.admin-banner-preview::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(3, 36, 76, 0.88), rgba(3, 36, 76, 0.55));
+}
+
+.admin-banner-preview-content {
+  position: relative;
+  z-index: 1;
+}
+
+.admin-banner-preview-content .eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.85);
+  margin: 0 0 4px;
+}
+
+.admin-banner-preview-content h4 {
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0;
+  color: #fff;
+  line-height: 1.2;
+}
+
+.admin-banner-card-body {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+}
+
+.admin-banner-card-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--admin-navy);
+  margin: 0;
+}
+
+.admin-banner-card-desc {
+  font-size: 13px;
+  color: var(--admin-muted);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.admin-banner-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 8px;
+}
+
+.admin-file-upload-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  background: #f1f5f9;
+  border: 1px solid var(--admin-line);
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--admin-navy);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.admin-file-upload-label:hover {
+  background: #e2e8f0;
+  border-color: #cbd5e1;
+}
+
+.admin-file-upload-input {
+  display: none;
+}
+
+.admin-banner-reset-btn {
+  padding: 7px 12px;
+  background: transparent;
+  border: 1px solid #fed7d7;
+  color: #c53030;
+  border-radius: 6px;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.admin-banner-reset-btn:hover {
+  background: #fff5f5;
+}
+
+.admin-photo-preview-box {
+  position: relative;
+  max-width: 320px;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1.5px solid var(--admin-line);
+  margin-top: 8px;
+}
+
+.admin-photo-preview-box img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  display: block;
+}

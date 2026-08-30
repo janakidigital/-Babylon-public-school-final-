@@ -2,7 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 import toast from "react-hot-toast";
 import { useNavigate, useLocation } from "react-router-dom";
 import { api } from "../services/api";
-import { slugify } from "../lib/media";
+import { slugify, mediaUrl } from "../lib/media";
+import { assetPath } from "../data/content";
 import { resources, singletons } from "./resourceConfig";
 import "./Admin.css";
 
@@ -464,8 +465,614 @@ function ResourceEditor({ resourceKey, onBack }) {
 }
 
 /* =========================================================
-   SINGLETON EDITOR
+   SITE SETTINGS & PAGE COVERS EDITOR
 ========================================================= */
+
+const PAGE_BANNER_DEFINITIONS = [
+  {
+    key: "careers",
+    title: "Careers / Vacancies",
+    eyebrow: "CAREERS",
+    defaultImg: "banner/instructor.jpg",
+    heading: "Teach, inspire and grow with us.",
+    description: "Header background banner for Careers and Job application page",
+  },
+  {
+    key: "studentLife",
+    title: "Student Life",
+    eyebrow: "STUDENT LIFE",
+    defaultImg: "banner/inner_banner_4.jpg",
+    heading: "A vibrant life beyond class.",
+    description: "Header background banner for Student Life overview page",
+  },
+  {
+    key: "about",
+    title: "About Us",
+    eyebrow: "ABOUT BABYLON",
+    defaultImg: "banner/inner_banner_2.jpg",
+    heading: "A co-ed English medium school since 1996.",
+    description: "Header background banner for About Babylon page",
+  },
+  {
+    key: "academics",
+    title: "Academics & Courses",
+    eyebrow: "OUR ACADEMICS",
+    defaultImg: "banner/inner_banner_3.jpg",
+    heading: "Learning with purpose.",
+    description: "Header background banner for Academic Programmes & Courses pages",
+  },
+  {
+    key: "admissions",
+    title: "Admissions",
+    eyebrow: "ADMISSIONS",
+    defaultImg: "banner/inner_banner_1.jpg",
+    heading: "Begin your Babylon journey.",
+    description: "Header background banner for Admissions & Application form page",
+  },
+  {
+    key: "news",
+    title: "News & Stories",
+    eyebrow: "SCHOOL STORIES",
+    defaultImg: "banner/inner_banner_1.jpg",
+    heading: "News & Blog from the Babylon community.",
+    description: "Header background banner for News, Articles, and Blog pages",
+  },
+  {
+    key: "events",
+    title: "School Events",
+    eyebrow: "SCHOOL EVENTS",
+    defaultImg: "banner/inner_banner_4.jpg",
+    heading: "Moments that bring us together.",
+    description: "Header background banner for School Events & Calendar",
+  },
+  {
+    key: "notices",
+    title: "Notice Board",
+    eyebrow: "SCHOOL UPDATES",
+    defaultImg: "banner/inner_banner_5.jpg",
+    heading: "Notices and announcements.",
+    description: "Header background banner for Notices & Circulars page",
+  },
+  {
+    key: "gallery",
+    title: "Photo Gallery",
+    eyebrow: "GALLERY",
+    defaultImg: "banner/inner_banner_4.jpg",
+    heading: "Moments from Babylon.",
+    description: "Header background banner for Photo Gallery albums",
+  },
+  {
+    key: "team",
+    title: "Faculty & Staff",
+    eyebrow: "OUR TEAM",
+    defaultImg: "banner/inner_banner_2.jpg",
+    heading: "Meet the people behind Babylon.",
+    description: "Header background banner for Educators & Faculty page",
+  },
+  {
+    key: "facilities",
+    title: "Campus Facilities",
+    eyebrow: "OUR FACILITIES",
+    defaultImg: "banner/inner_banner_5.jpg",
+    heading: "Spaces designed for discovery.",
+    description: "Header background banner for Facilities & Infrastructure page",
+  },
+  {
+    key: "achievements",
+    title: "Achievements",
+    eyebrow: "ACHIEVEMENTS",
+    defaultImg: "banner/counter_bg.jpg",
+    heading: "Celebrating every success.",
+    description: "Header background banner for Achievements & Honors page",
+  },
+  {
+    key: "downloads",
+    title: "Downloads & Forms",
+    eyebrow: "RESOURCES",
+    defaultImg: "banner/inner_banner_5.jpg",
+    heading: "Downloads & Documents",
+    description: "Header background banner for PDF forms & downloads page",
+  },
+  {
+    key: "faq",
+    title: "FAQ & Help",
+    eyebrow: "FAQ",
+    defaultImg: "banner/inner_banner_5.jpg",
+    heading: "How can we help?",
+    description: "Header background banner for Frequently Asked Questions page",
+  },
+  {
+    key: "contact",
+    title: "Contact Us",
+    eyebrow: "GET IN TOUCH",
+    defaultImg: "banner/inner_banner_1.jpg",
+    heading: "We would love to hear from you.",
+    description: "Header background banner for Contact page",
+  },
+  {
+    key: "defaultBanner",
+    title: "Default Fallback Banner",
+    eyebrow: "BABYLON NATIONAL",
+    defaultImg: "banner/inner_banner_1.jpg",
+    heading: "Education for the Quest",
+    description: "General fallback background for detail pages without a specific cover",
+  },
+];
+
+function SiteSettingsEditor({ onBack }) {
+  const [activeTab, setActiveTab] = useState("general");
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState("");
+
+  const [selectedFiles, setSelectedFiles] = useState({});
+  const [previewUrls, setPreviewUrls] = useState({});
+
+  const load = async () => {
+    setLoading(true);
+    try {
+      const res = await api("/settings");
+      setData(res.data || {});
+    } catch (err) {
+      toast.error(err.message || "Failed to load settings");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    load();
+  }, []);
+
+  const handleFileChange = (fieldKey, file) => {
+    if (!file) return;
+    setSelectedFiles((prev) => ({ ...prev, [fieldKey]: file }));
+    const url = URL.createObjectURL(file);
+    setPreviewUrls((prev) => ({ ...prev, [fieldKey]: url }));
+  };
+
+  const handleClearFile = (fieldKey) => {
+    setSelectedFiles((prev) => {
+      const copy = { ...prev };
+      delete copy[fieldKey];
+      return copy;
+    });
+    setPreviewUrls((prev) => {
+      const copy = { ...prev };
+      delete copy[fieldKey];
+      return copy;
+    });
+  };
+
+  const handleResetBanner = (bannerKey) => {
+    handleClearFile(`banner_${bannerKey}`);
+    setData((prev) => ({
+      ...prev,
+      pageBanners: {
+        ...(prev.pageBanners || {}),
+        [bannerKey]: "",
+      },
+    }));
+  };
+
+  async function save(e) {
+    e.preventDefault();
+    setSaving(true);
+    setMessage("");
+
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+
+    // Append all selected files
+    Object.entries(selectedFiles).forEach(([fieldKey, file]) => {
+      formData.set(fieldKey, file);
+    });
+
+    try {
+      await api("/settings", {
+        method: "PUT",
+        body: formData,
+      });
+
+      toast.success("Site settings saved successfully!");
+      setMessage("Site settings saved successfully.");
+      window.dispatchEvent(new CustomEvent("site-data-updated"));
+      setSelectedFiles({});
+      setPreviewUrls({});
+      load();
+    } catch (err) {
+      toast.error(err.message || "Failed to save settings");
+      setMessage(err.message || "An error occurred");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  if (loading) {
+    return (
+      <section className="admin-resource">
+        <p>Loading site settings...</p>
+      </section>
+    );
+  }
+
+  const stats = data?.stats || {};
+  const studentLife = data?.studentLife || {};
+  const pageBanners = data?.pageBanners || {};
+
+  return (
+    <section className="admin-resource">
+      <div className="admin-resource-head">
+        <button type="button" className="admin-back" onClick={onBack}>
+          ← Dashboard
+        </button>
+        <div>
+          <p className="eyebrow">SITE CONFIGURATION</p>
+          <h2>Site Settings</h2>
+        </div>
+      </div>
+
+      {message && <p className="admin-message">{message}</p>}
+
+      <div className="admin-tabs-nav">
+        <button
+          type="button"
+          className={`admin-tab-btn ${activeTab === "general" ? "active" : ""}`}
+          onClick={() => setActiveTab("general")}
+        >
+          <span>⚙️</span> General & Contact
+        </button>
+        <button
+          type="button"
+          className={`admin-tab-btn ${activeTab === "stats" ? "active" : ""}`}
+          onClick={() => setActiveTab("stats")}
+        >
+          <span>📊</span> Statistics & Student Life
+        </button>
+        <button
+          type="button"
+          className={`admin-tab-btn ${activeTab === "banners" ? "active" : ""}`}
+          onClick={() => setActiveTab("banners")}
+        >
+          <span>🖼️</span> Page Cover Images (Banners)
+        </button>
+      </div>
+
+      <form className="admin-form singleton-form" onSubmit={save}>
+        {/* ================= TAB 1: GENERAL & CONTACT ================= */}
+        {activeTab === "general" && (
+          <div className="admin-card">
+            <div className="admin-card-header">
+              <h3>🏫 School & Contact Information</h3>
+            </div>
+            <div className="admin-card-body">
+              <label className="admin-field">
+                <span className="admin-field-label">School Name</span>
+                <input
+                  name="schoolName"
+                  type="text"
+                  defaultValue={data?.schoolName || "Babylon National School"}
+                  required
+                />
+              </label>
+
+              <label className="admin-field">
+                <span className="admin-field-label">Email Address</span>
+                <input
+                  name="email"
+                  type="email"
+                  defaultValue={data?.email || "info@babylonschool.edu.np"}
+                />
+              </label>
+
+              <label className="admin-field">
+                <span className="admin-field-label">Phone Number</span>
+                <input
+                  name="phone"
+                  type="text"
+                  defaultValue={data?.phone || "+977-1-4108905, 4108973"}
+                />
+              </label>
+
+              <label className="admin-field">
+                <span className="admin-field-label">Address</span>
+                <textarea
+                  name="address"
+                  rows={3}
+                  defaultValue={data?.address || "Shantinagar, Kathmandu, Nepal"}
+                />
+              </label>
+
+              <label className="admin-field">
+                <span className="admin-field-label">Short Description (Footer / Meta)</span>
+                <textarea
+                  name="shortDescription"
+                  rows={3}
+                  defaultValue={
+                    data?.shortDescription ||
+                    "A co-ed English medium school from PG to secondary level. Education for the Quest."
+                  }
+                />
+              </label>
+
+              <label className="admin-field">
+                <span className="admin-field-label">Google Map Embed URL</span>
+                <input
+                  name="googleMapUrl"
+                  type="text"
+                  defaultValue={data?.googleMapUrl || ""}
+                  placeholder="https://www.google.com/maps/embed?..."
+                />
+              </label>
+            </div>
+          </div>
+        )}
+
+        {/* ================= TAB 2: STATS & STUDENT LIFE ================= */}
+        {activeTab === "stats" && (
+          <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+            <div className="admin-card">
+              <div className="admin-card-header">
+                <h3>🔢 Site Statistics (Shown in Student Life & Home)</h3>
+              </div>
+              <div className="admin-card-body">
+                <p style={{ color: "var(--admin-muted)", fontSize: "14px", margin: "0 0 16px" }}>
+                  Customize the 3 main statistics counters and labels displayed on the website.
+                </p>
+
+                <div className="admin-stats-inputs-grid">
+                  {/* Stat 1: Students */}
+                  <div className="admin-stat-box">
+                    <div className="admin-stat-box-title">
+                      <span>👨‍🎓</span> Statistic 1 (Students)
+                    </div>
+                    <label className="admin-field">
+                      <span className="admin-field-label">Count / Value</span>
+                      <input
+                        name="stats[studentsCount]"
+                        type="text"
+                        defaultValue={stats.studentsCount ?? "1000+"}
+                        placeholder="e.g. 1000+"
+                      />
+                    </label>
+                    <label className="admin-field" style={{ marginTop: 10 }}>
+                      <span className="admin-field-label">Label Text</span>
+                      <input
+                        name="stats[studentsLabel]"
+                        type="text"
+                        defaultValue={stats.studentsLabel ?? "Students"}
+                        placeholder="e.g. Students"
+                      />
+                    </label>
+                  </div>
+
+                  {/* Stat 2: Teachers */}
+                  <div className="admin-stat-box">
+                    <div className="admin-stat-box-title">
+                      <span>👩‍🏫</span> Statistic 2 (Teachers)
+                    </div>
+                    <label className="admin-field">
+                      <span className="admin-field-label">Count / Value</span>
+                      <input
+                        name="stats[teachersCount]"
+                        type="text"
+                        defaultValue={stats.teachersCount ?? "30+"}
+                        placeholder="e.g. 30+"
+                      />
+                    </label>
+                    <label className="admin-field" style={{ marginTop: 10 }}>
+                      <span className="admin-field-label">Label Text</span>
+                      <input
+                        name="stats[teachersLabel]"
+                        type="text"
+                        defaultValue={stats.teachersLabel ?? "Teachers"}
+                        placeholder="e.g. Teachers"
+                      />
+                    </label>
+                  </div>
+
+                  {/* Stat 3: Since / Established */}
+                  <div className="admin-stat-box">
+                    <div className="admin-stat-box-title">
+                      <span>🏛️</span> Statistic 3 (Since / Established)
+                    </div>
+                    <label className="admin-field">
+                      <span className="admin-field-label">Year / Value</span>
+                      <input
+                        name="stats[sinceValue]"
+                        type="text"
+                        defaultValue={stats.sinceValue ?? "1996 A.D."}
+                        placeholder="e.g. 1996 A.D."
+                      />
+                    </label>
+                    <label className="admin-field" style={{ marginTop: 10 }}>
+                      <span className="admin-field-label">Label Text</span>
+                      <input
+                        name="stats[sinceLabel]"
+                        type="text"
+                        defaultValue={stats.sinceLabel ?? "Since"}
+                        placeholder="e.g. Since"
+                      />
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="admin-card">
+              <div className="admin-card-header">
+                <h3>🎒 Student Life Section Content & Photo</h3>
+              </div>
+              <div className="admin-card-body">
+                <label className="admin-field">
+                  <span className="admin-field-label">Section Eyebrow</span>
+                  <input
+                    name="studentLife[eyebrow]"
+                    type="text"
+                    defaultValue={studentLife.eyebrow ?? "LIFE AT BABYLON"}
+                  />
+                </label>
+
+                <label className="admin-field">
+                  <span className="admin-field-label">Section Title</span>
+                  <input
+                    name="studentLife[title]"
+                    type="text"
+                    defaultValue={studentLife.title ?? "Every day is an opportunity to shine."}
+                  />
+                </label>
+
+                <label className="admin-field">
+                  <span className="admin-field-label">Section Description</span>
+                  <textarea
+                    name="studentLife[description]"
+                    rows={3}
+                    defaultValue={
+                      studentLife.description ??
+                      "Beyond the classroom, students grow through sport, arts, scouting, music, dance and service — a home away from home in Shantinagar."
+                    }
+                  />
+                </label>
+
+                <label className="admin-field">
+                  <span className="admin-field-label">Bottom Heading (Above Stats)</span>
+                  <input
+                    name="studentLife[heading]"
+                    type="text"
+                    defaultValue={studentLife.heading ?? "Growing with purpose and pride."}
+                  />
+                </label>
+
+                <div className="admin-field" style={{ marginTop: 14 }}>
+                  <span className="admin-field-label">Student Life Section Photo</span>
+                  <p style={{ fontSize: "13px", color: "var(--admin-muted)", margin: "0 0 8px" }}>
+                    Upload a high-quality photo to display in the Student Life section.
+                  </p>
+
+                  <div className="admin-photo-preview-box">
+                    <img
+                      src={
+                        previewUrls.studentLifePhoto ||
+                        (studentLife.image
+                          ? mediaUrl(studentLife.image)
+                          : `${assetPath}banner/banner_2.jpg`)
+                      }
+                      alt="Student Life Preview"
+                    />
+                  </div>
+
+                  <div style={{ display: "flex", gap: "10px", marginTop: "10px", alignItems: "center" }}>
+                    <label className="admin-file-upload-label">
+                      <span>📁</span> Choose New Photo
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="admin-file-upload-input"
+                        onChange={(e) => handleFileChange("studentLifePhoto", e.target.files?.[0])}
+                      />
+                    </label>
+
+                    {(previewUrls.studentLifePhoto || studentLife.image) && (
+                      <button
+                        type="button"
+                        className="admin-banner-reset-btn"
+                        onClick={() => {
+                          handleClearFile("studentLifePhoto");
+                          setData((prev) => ({
+                            ...prev,
+                            studentLife: { ...(prev.studentLife || {}), image: "" },
+                          }));
+                        }}
+                      >
+                        Revert to default photo
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ================= TAB 3: PAGE COVER BANNERS ================= */}
+        {activeTab === "banners" && (
+          <div className="admin-card">
+            <div className="admin-card-header">
+              <h3>🖼️ Page Header Cover Images (Banners)</h3>
+            </div>
+            <div className="admin-card-body">
+              <p style={{ color: "var(--admin-muted)", fontSize: "14px", margin: "0 0 20px" }}>
+                Upload custom cover images for each page banner across the website. The dark blue gradient overlay will be automatically applied just like on the live site.
+              </p>
+
+              <div className="admin-banner-grid">
+                {PAGE_BANNER_DEFINITIONS.map((banner) => {
+                  const customImg = pageBanners[banner.key];
+                  const previewImg =
+                    previewUrls[`banner_${banner.key}`] ||
+                    (customImg ? mediaUrl(customImg) : `${assetPath}${banner.defaultImg}`);
+
+                  return (
+                    <div key={banner.key} className="admin-banner-card">
+                      <div
+                        className="admin-banner-preview"
+                        style={{
+                          backgroundImage: `url(${previewImg})`,
+                        }}
+                      >
+                        <div className="admin-banner-preview-content">
+                          <p className="eyebrow">{banner.eyebrow}</p>
+                          <h4>{banner.heading}</h4>
+                        </div>
+                      </div>
+
+                      <div className="admin-banner-card-body">
+                        <h4 className="admin-banner-card-title">{banner.title}</h4>
+                        <p className="admin-banner-card-desc">{banner.description}</p>
+
+                        <div className="admin-banner-card-actions">
+                          <label className="admin-file-upload-label">
+                            <span>📷</span> Change Image
+                            <input
+                              type="file"
+                              accept="image/*"
+                              className="admin-file-upload-input"
+                              onChange={(e) =>
+                                handleFileChange(`banner_${banner.key}`, e.target.files?.[0])
+                              }
+                            />
+                          </label>
+
+                          {(previewUrls[`banner_${banner.key}`] || customImg) && (
+                            <button
+                              type="button"
+                              className="admin-banner-reset-btn"
+                              onClick={() => handleResetBanner(banner.key)}
+                              title="Revert to default"
+                            >
+                              Reset
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        )}
+
+        <div className="admin-form-actions" style={{ marginTop: 20 }}>
+          <button className="button primary" disabled={saving} style={{ padding: "12px 28px", fontSize: "15px" }}>
+            {saving ? "Saving changes..." : "Save All Changes"} <span>&rarr;</span>
+          </button>
+        </div>
+      </form>
+    </section>
+  );
+}
 
 /* =========================================================
    SINGLETON EDITOR (Card style – like Admissions)
@@ -865,6 +1472,240 @@ function ContactsInbox({ onBack }) {
               </div>
             </article>
           ))
+        )}
+      </div>
+    </section>
+  );
+}
+
+/* =========================================================
+   CAREER APPLICATIONS INBOX (Card style)
+========================================================= */
+
+function CareerAppsInbox({ onBack }) {
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [message, setMessage] = useState("");
+  const [expanded, setExpanded] = useState({});
+
+  const load = async () => {
+    setLoading(true);
+    try {
+      const response = await api("/career-applications");
+      setItems(response.data || []);
+    } catch (err) {
+      setMessage(err.message || "Failed to load career applications.");
+      toast.error(err.message || "Failed to load career applications.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    load();
+  }, []);
+
+  async function remove(id) {
+    if (!window.confirm("Are you sure you want to delete this application?")) {
+      return;
+    }
+    try {
+      await api(`/career-applications/${id}`, { method: "DELETE" });
+      setMessage("Application deleted successfully.");
+      toast.success("Application deleted successfully.");
+      load();
+    } catch (err) {
+      setMessage(err.message || "Failed to delete application.");
+      toast.error(err.message || "Failed to delete application.");
+    }
+  }
+
+  function formatDate(date) {
+    if (!date) return "—";
+    const parsed = new Date(date);
+    if (Number.isNaN(parsed.getTime())) return "—";
+    return parsed.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  }
+
+  function toggleExpanded(id) {
+    setExpanded((prev) => ({ ...prev, [id]: !prev[id] }));
+  }
+
+  const resumeUrl = (item) =>
+    item.resumeUrl || item.cv || item.resume || item.cvUrl || null;
+
+  return (
+    <section className="admin-resource">
+      <div className="admin-resource-head">
+        <button type="button" className="admin-back" onClick={onBack}>
+          ← Dashboard
+        </button>
+        <div>
+          <p className="eyebrow">INBOX</p>
+          <h2>Career Applications</h2>
+        </div>
+      </div>
+
+      {message && <p className="admin-message">{message}</p>}
+
+      <div className="admin-table">
+        {loading ? (
+          <p>Loading career applications...</p>
+        ) : items.length === 0 ? (
+          <p>No career applications yet.</p>
+        ) : (
+          items.map((item) => {
+            const isExpanded = expanded[item._id];
+            const cvUrl = resumeUrl(item);
+
+            return (
+              <article
+                key={item._id}
+                style={{ display: "block", padding: "24px" }}
+              >
+                {/* Header row: name + position + status chip */}
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "flex-start",
+                    gap: "20px",
+                    marginBottom: "20px",
+                    flexWrap: "wrap",
+                  }}
+                >
+                  <div>
+                    <h3 style={{ marginBottom: "5px" }}>
+                      {item.name || item.fullName || "Unknown Applicant"}
+                    </h3>
+                    <p style={{ margin: 0, fontWeight: 600, color: "var(--admin-accent, #063b78)" }}>
+                      🎯 {item.careerTitle || item.position || item.jobTitle || "General Application"}
+                    </p>
+                  </div>
+                  <span className="status-chip">{item.status || "New"}</span>
+                </div>
+
+                {/* Info grid */}
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+                    gap: "14px",
+                    marginBottom: "20px",
+                  }}
+                >
+                  <div>
+                    <strong>Name</strong>
+                    <p>{item.name || item.fullName || "—"}</p>
+                  </div>
+                  <div>
+                    <strong>Email</strong>
+                    <p>
+                      <a href={`mailto:${item.email}`} style={{ color: "var(--admin-accent, #063b78)" }}>
+                        {item.email || "—"}
+                      </a>
+                    </p>
+                  </div>
+                  <div>
+                    <strong>Phone</strong>
+                    <p>
+                      {item.phone ? (
+                        <a href={`tel:${item.phone}`} style={{ color: "var(--admin-accent, #063b78)" }}>
+                          {item.phone}
+                        </a>
+                      ) : "—"}
+                    </p>
+                  </div>
+                  <div>
+                    <strong>Applied For</strong>
+                    <p>{item.careerTitle || item.position || item.jobTitle || "—"}</p>
+                  </div>
+                  <div>
+                    <strong>Applied On</strong>
+                    <p>{formatDate(item.createdAt)}</p>
+                  </div>
+                </div>
+
+                {/* Cover Letter */}
+                {item.coverLetter && (
+                  <div
+                    style={{
+                      padding: "15px",
+                      background: "#f7fafc",
+                      borderRadius: "8px",
+                      marginBottom: "15px",
+                      border: "1px solid #e2e8f0",
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        marginBottom: isExpanded ? "10px" : 0,
+                      }}
+                    >
+                      <strong>📝 Cover Letter</strong>
+                      <button
+                        type="button"
+                        onClick={() => toggleExpanded(item._id)}
+                        style={{
+                          background: "none",
+                          border: "none",
+                          color: "var(--admin-accent, #063b78)",
+                          cursor: "pointer",
+                          fontWeight: 600,
+                          fontSize: "13px",
+                          padding: "2px 6px",
+                        }}
+                      >
+                        {isExpanded ? "▲ Show less" : "▼ Read more"}
+                      </button>
+                    </div>
+                    {isExpanded && (
+                      <p style={{ margin: 0, whiteSpace: "pre-wrap", color: "#4a5568" }}>
+                        {item.coverLetter}
+                      </p>
+                    )}
+                    {!isExpanded && (
+                      <p style={{ margin: 0, color: "#718096", fontStyle: "italic", fontSize: "13px" }}>
+                        {item.coverLetter.slice(0, 150)}{item.coverLetter.length > 150 ? "..." : ""}
+                      </p>
+                    )}
+                  </div>
+                )}
+
+                {/* Actions row */}
+                <div className="admin-row-actions" style={{ justifyContent: "space-between", flexWrap: "wrap", gap: "10px" }}>
+                  <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+                    {cvUrl && (
+                      <a
+                        href={cvUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="button primary"
+                        style={{ fontSize: "13px", padding: "8px 16px", textDecoration: "none" }}
+                      >
+                        📄 View / Download CV
+                      </a>
+                    )}
+
+                  </div>
+                  <button
+                    type="button"
+                    className="delete"
+                    onClick={() => remove(item._id)}
+                  >
+                    Delete
+                  </button>
+                </div>
+              </article>
+            );
+          })
         )}
       </div>
     </section>
@@ -1785,22 +2626,18 @@ export default function AdminPage() {
       <ResourceEditor resourceKey={view} onBack={() => setView(null)} />
     );
   } else if (singletons[view]) {
-    content = (
-      <SingletonEditor singletonKey={view} onBack={() => setView(null)} />
-    );
+    content =
+      view === "settings" ? (
+        <SiteSettingsEditor onBack={() => setView(null)} />
+      ) : (
+        <SingletonEditor singletonKey={view} onBack={() => setView(null)} />
+      );
   } else if (view === "admissions") {
     content = <AdmissionsInbox onBack={() => setView(null)} />;
   } else if (view === "contacts") {
     content = <ContactsInbox onBack={() => setView(null)} />;
   } else if (view === "career-apps") {
-    content = (
-      <Inbox
-        endpoint="/career-applications"
-        title="Career applications"
-        fields={["email", "phone", "careerTitle", "coverLetter"]}
-        onBack={() => setView(null)}
-      />
-    );
+    content = <CareerAppsInbox onBack={() => setView(null)} />;
   } else {
     content = <DashboardOverview user={user} setView={setView} />;
   }

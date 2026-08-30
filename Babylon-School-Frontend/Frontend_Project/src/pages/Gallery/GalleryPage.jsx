@@ -85,6 +85,7 @@ export default function GalleryPage() {
         eyebrow="GALLERY"
         title="Moments from Babylon."
         image="banner/inner_banner_4.jpg"
+        pageKey="gallery"
       />
 
       <section className="listing-page shell gallery-page">

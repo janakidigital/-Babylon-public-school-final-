@@ -1,13 +1,36 @@
 import { Link } from "react-router-dom";
 import { assetPath } from "../../data/content";
 import { mediaUrl } from "../../lib/media";
+import { useSite } from "../../context/SiteContext";
 
 export default function PageBanner({
   eyebrow,
   title,
   image = "banner/inner_banner_1.jpg",
+  pageKey,
 }) {
-  const src = mediaUrl(image, `${assetPath}${image}`);
+  const { settings } = useSite();
+
+  // Normalize eyebrow or slug if pageKey isn't provided directly
+  const normalizedKey =
+    pageKey ||
+    (eyebrow
+      ? eyebrow
+          .toLowerCase()
+          .replace(/&/g, "")
+          .replace(/[^a-z0-9]+/g, "")
+      : "");
+
+  // Check admin configured banner for this page, or default banner, or fallback image
+  const adminBanner =
+    (pageKey && settings?.pageBanners?.[pageKey]) ||
+    (normalizedKey && settings?.pageBanners?.[normalizedKey]) ||
+    settings?.pageBanners?.[eyebrow?.toLowerCase()] ||
+    null;
+
+  const activeImage = adminBanner || image;
+  const src = mediaUrl(activeImage, `${assetPath}${activeImage}`);
+
   return (
     <section
       className="page-banner"
