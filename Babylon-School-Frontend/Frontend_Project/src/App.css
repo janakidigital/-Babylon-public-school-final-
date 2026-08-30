@@ -3037,3 +3037,17 @@ footer {
     max-width: 190px;
   }
 }
+
+
+
+.facility-grid {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 1.5rem;
+}
+
+@media (min-width: 640px) {
+  .facility-grid {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)) !important;
+  }
+}

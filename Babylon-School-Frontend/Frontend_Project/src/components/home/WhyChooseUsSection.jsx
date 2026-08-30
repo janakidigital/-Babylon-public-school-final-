@@ -37,101 +37,107 @@ export default function WhyChooseUsSection() {
         </p>
       </div>
 
-      {/* Loading */}
       {loading ? (
-        <p
-          style={{
-            textAlign: "center",
-            marginTop: "2rem",
-          }}
-        >
+        <p style={{ textAlign: "center", marginTop: "2rem" }}>
           Loading facilities...
         </p>
       ) : items.length === 0 ? (
-        /* Empty State */
         <EmptyState title="No facilities listed" />
       ) : (
-        /* Facility Cards */
-        <div
-          className="facility-grid"
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(3, 1fr)",
-            gap: "1.5rem",
-            marginTop: "3rem",
-          }}
-        >
-          {items.map((item, index) => (
-            <Link
-              key={item._id || item.title}
-              to="/facilities"
-              style={{
-                textDecoration: "none",
-                color: "inherit",
-                display: "block",
-              }}
-            >
-              <article
+        <>
+          <style>{`
+            .why-choose-us .facility-grid {
+              display: grid !important;
+              grid-template-columns: repeat(2, 1fr) !important;
+              gap: 0.9rem !important;
+              margin-top: 2.5rem;
+            }
+
+            @media (min-width: 900px) {
+              .why-choose-us .facility-grid {
+                grid-template-columns: repeat(3, 1fr) !important;
+                gap: 1.5rem !important;
+              }
+            }
+          `}</style>
+
+          <div className="facility-grid">
+            {items.map((item, index) => (
+              <Link
+                key={item._id || item.title}
+                to={`/facilities/${item._id}`}
                 style={{
-                  backgroundColor: "#fff",
-                  borderRadius: "14px",
-                  overflow: "hidden",
-                  boxShadow: "0 4px 18px rgba(0,0,0,0.07)",
-                  transition:
-                    "transform 0.2s ease, box-shadow 0.2s ease",
-                  cursor: "pointer",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform =
-                    "translateY(-5px)";
-
-                  e.currentTarget.style.boxShadow =
-                    "0 8px 25px rgba(0,0,0,0.12)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform =
-                    "translateY(0)";
-
-                  e.currentTarget.style.boxShadow =
-                    "0 4px 18px rgba(0,0,0,0.07)";
+                  textDecoration: "none",
+                  color: "inherit",
+                  display: "block",
+                  height: "100%",
                 }}
               >
-                {/* Facility Image */}
-                <img
-                  src={mediaUrl(
-                    item.image,
-                    `${assetPath}courses/courses_${(index % 6) + 1}.jpg`
-                  )}
-                  alt={item.title || ""}
+                <article
                   style={{
-                    width: "100%",
-                    height: "180px",
-                    objectFit: "cover",
-                    display: "block",
+                    backgroundColor: "#fff",
+                    borderRadius: "14px",
+                    overflow: "hidden",
+                    boxShadow: "0 4px 18px rgba(0,0,0,0.07)",
+                    transition: "transform 0.2s ease, box-shadow 0.2s ease",
+                    cursor: "pointer",
+                    height: "100%",
+                    display: "flex",
+                    flexDirection: "column",
                   }}
-                />
-
-                {/* Facility Name */}
-                <div
-                  style={{
-                    padding: "1rem 1.2rem",
-                    textAlign: "center",
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = "translateY(-5px)";
+                    e.currentTarget.style.boxShadow =
+                      "0 8px 25px rgba(0,0,0,0.12)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = "translateY(0)";
+                    e.currentTarget.style.boxShadow =
+                      "0 4px 18px rgba(0,0,0,0.07)";
                   }}
                 >
-                  <h3
+                  {/* Facility Image */}
+                  <img
+                    src={mediaUrl(
+                      item.image,
+                      `${assetPath}courses/courses_${(index % 6) + 1}.jpg`
+                    )}
+                    alt={item.title || ""}
                     style={{
-                      margin: 0,
-                      fontSize: "1.1rem",
-                      color: "#1a3c6e",
+                      width: "100%",
+                      height: "150px",
+                      objectFit: "cover",
+                      display: "block",
+                    }}
+                  />
+
+                  {/* Facility Name */}
+                  <div
+                    style={{
+                      padding: "0.85rem 1rem",
+                      textAlign: "center",
+                      flexGrow: 1,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
                     }}
                   >
-                    {item.title}
-                  </h3>
-                </div>
-              </article>
-            </Link>
-          ))}
-        </div>
+                    <h3
+                      style={{
+                        margin: 0,
+                        fontSize: "1rem",
+                        color: "#1a3c6e",
+                        lineHeight: 1.3,
+                      }}
+                    >
+                      {item.title}
+                    </h3>
+                  </div>
+                </article>
+              </Link>
+            ))}
+          </div>
+        </>
       )}
     </section>
   );

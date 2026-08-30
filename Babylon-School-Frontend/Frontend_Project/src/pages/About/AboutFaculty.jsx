@@ -19,25 +19,104 @@ export default function AboutFaculty() {
           encouragement.
         </p>
       </div>
+
       {loading ? (
         <p>Loading faculty...</p>
       ) : (
         <>
+          <style>{`
+            .about-faculty .faculty-grid {
+              display: grid !important;
+              grid-template-columns: repeat(2, 1fr) !important;
+              gap: 0.9rem !important;
+              margin-top: 1.75rem;
+              max-width: 100%;
+            }
+
+            /* Desktop: 3 columns, but cards stay reasonable size */
+            @media (min-width: 900px) {
+              .about-faculty .faculty-grid {
+                grid-template-columns: repeat(3, 1fr) !important;
+                gap: 1.5rem !important;
+                max-width: 960px;          /* prevents cards from becoming huge */
+                margin-left: auto;
+                margin-right: auto;
+              }
+              .about-faculty .faculty-card-img {
+                height: 220px !important;  /* fixed smaller image height on desktop */
+                aspect-ratio: unset !important;
+              }
+            }
+          `}</style>
+
           <div className="faculty-grid">
             {preview.map((teacher) => (
-              <article key={teacher._id}>
-                <Link to={`/teacher-profile/${teacher._id}`}>
-                  <img
-                    src={mediaUrl(teacher.image, `${assetPath}team/team_1.jpg`)}
-                    alt={teacher.name}
-                  />
+              <article
+                key={teacher._id}
+                style={{
+                  background: "#fff",
+                  borderRadius: "12px",
+                  overflow: "hidden",
+                  boxShadow: "0 4px 14px rgba(0,0,0,0.07)",
+                  border: "1px solid rgba(0,0,0,0.05)",
+                  textAlign: "center",
+                }}
+              >
+                <Link
+                  to={`/teacher-profile/${teacher._id}`}
+                  style={{ display: "block" }}
+                >
+                  <div
+                    className="faculty-card-img"
+                    style={{
+                      width: "100%",
+                      aspectRatio: "1 / 1",
+                      overflow: "hidden",
+                    }}
+                  >
+                    <img
+                      src={mediaUrl(
+                        teacher.image,
+                        `${assetPath}team/team_1.jpg`
+                      )}
+                      alt={teacher.name}
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                        display: "block",
+                      }}
+                    />
+                  </div>
                 </Link>
-                <h3>{teacher.name}</h3>
-                <span>{teacher.designation}</span>
+
+                <div style={{ padding: "0.7rem 0.5rem 0.9rem" }}>
+                  <h3
+                    style={{
+                      margin: "0 0 0.2rem",
+                      color: "#1a3c6e",
+                      fontSize: "0.95rem",
+                      fontWeight: 700,
+                      lineHeight: 1.25,
+                    }}
+                  >
+                    {teacher.name}
+                  </h3>
+                  <span
+                    style={{
+                      color: "#666",
+                      fontSize: "0.8rem",
+                      display: "block",
+                    }}
+                  >
+                    {teacher.designation}
+                  </span>
+                </div>
               </article>
             ))}
           </div>
-          <p style={{ textAlign: "center", marginTop: "2rem" }}>
+
+          <p style={{ textAlign: "center", marginTop: "1.75rem" }}>
             <Link className="text-link" to="/team">
               View all faculty <b>&rarr;</b>
             </Link>

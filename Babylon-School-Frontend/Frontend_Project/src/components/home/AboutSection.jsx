@@ -10,7 +10,7 @@ export default function AboutSection() {
       <AboutPossibilities />
       <AboutStats />
       <AboutFaculty />
-      <AboutFaq />
+      {/* <AboutFaq /> */}
     </>
   );
 }
