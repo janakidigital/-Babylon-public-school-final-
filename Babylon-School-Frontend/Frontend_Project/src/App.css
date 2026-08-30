@@ -84,20 +84,23 @@ a {
 }
 
 .admin-login-btn {
-  background: #c53030;
+  background: var(--blue);
   color: #fff !important;
-  padding: 6px 15px;
+  padding: 7px 16px;
   border-radius: 4px;
-  font-size: 13.5px;
+  font-size: 13px;
   font-weight: 600;
   text-decoration: none;
-  transition: background 0.2s ease;
+  transition: background 0.2s ease, transform 0.15s ease;
   white-space: nowrap;
+  border: none;
+  letter-spacing: 0.02em;
 }
 
 .admin-login-btn:hover {
-  background: #9b2c2c;
+  background: var(--navy);
   color: #fff !important;
+  transform: translateY(-1px);
 }
 
 .desktop-only {
@@ -116,17 +119,18 @@ a {
 ========================================= */
 
 .header {
-  height: 100px;
+  height: 78px;
   background: #fff;
   position: relative;
   z-index: 5;
+  border-bottom: 1px solid var(--line);
 }
 
 .header-inner {
   height: 100%;
   display: flex;
   align-items: center;
-  gap: 30px;
+  gap: 24px;
 }
 
 .logo {
@@ -165,22 +169,26 @@ a {
   margin-left: auto;
   display: flex;
   align-items: center;
-  gap: 28px;
+  gap: 26px;
   font-size: 15px;
   font-weight: 600;
 }
 
-.nav a {
+.nav a,
+.nav .nav-link {
   position: relative;
-  padding: 38px 0;
+  padding: 28px 0;
 }
 
 .nav a.active,
-.nav a:hover {
+.nav a:hover,
+.nav .nav-link.active,
+.nav .nav-link:hover {
   color: var(--red);
 }
 
-.nav a.active:after {
+.nav a.active:after,
+.nav .nav-link.active:after {
   content: '';
   height: 3px;
   background: var(--red);
@@ -230,14 +238,14 @@ a {
 .school-logo {
   display: flex;
   align-items: center;
-  width: 300px;
-  height: 100px;
+  width: 260px;
+  height: 78px;
   overflow: hidden;
   flex-shrink: 0;
 }
 
 .school-logo img {
-  width: 320px;
+  width: 260px;
   height: auto;
   max-width: 100%;
   object-fit: contain;
@@ -265,7 +273,6 @@ a {
   color: white;
 }
 
-/* Video background */
 .hero-video-bg {
   position: absolute;
   inset: 0;
@@ -289,7 +296,6 @@ a {
   z-index: 1;
 }
 
-/* Content */
 .hero-content {
   padding-top: 145px;
   position: relative;
@@ -1692,6 +1698,348 @@ footer {
    GALLERY
 ========================================= */
 
+.gallery-page {
+  padding-bottom: 4rem;
+}
+
+.gallery-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 4rem 0;
+  color: var(--muted);
+}
+
+.gallery-spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid #e5e7eb;
+  border-top-color: var(--blue);
+  border-radius: 50%;
+  animation: gallery-spin 0.7s linear infinite;
+}
+
+@keyframes gallery-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.gallery-header {
+  margin-bottom: 1.5rem;
+}
+
+.gallery-header h2 {
+  margin: 0.25rem 0 0.5rem;
+  color: var(--blue);
+  font: 700 44px/1.2 var(--serif);
+}
+
+.gallery-subtitle {
+  color: var(--muted);
+  margin: 0;
+  max-width: 36rem;
+}
+
+.gallery-categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+  padding-bottom: 0.25rem;
+}
+
+.gallery-cat-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--ink);
+  font-size: 0.9rem;
+  font-weight: 600;
+  font-family: var(--sans);
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.gallery-cat-btn:hover {
+  border-color: var(--blue);
+  color: var(--blue);
+}
+
+.gallery-cat-btn.is-active {
+  background: var(--blue);
+  border-color: var(--blue);
+  color: #fff;
+}
+
+.gallery-cat-count {
+  font-size: 0.75rem;
+  opacity: 0.75;
+  font-weight: 400;
+}
+
+.gallery-cat-btn.is-active .gallery-cat-count {
+  opacity: 0.9;
+}
+
+.gallery-albums {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1.75rem;
+}
+
+.gallery-album-card {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: none;
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  text-align: left;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.gallery-album-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+}
+
+.gallery-album-cover {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: #f3f4f6;
+}
+
+.gallery-album-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.35s ease;
+}
+
+.gallery-album-card:hover .gallery-album-cover img {
+  transform: scale(1.05);
+}
+
+.gallery-album-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.gallery-album-card:hover .gallery-album-overlay {
+  opacity: 1;
+}
+
+.gallery-view-btn {
+  background: #fff;
+  color: #111;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+}
+
+.gallery-album-info {
+  padding: 1rem 1.1rem 1.25rem;
+}
+
+.gallery-album-info h3 {
+  margin: 0 0 0.25rem;
+  font-size: 1.05rem;
+  color: var(--blue);
+  line-height: 1.3;
+  font-family: var(--serif);
+}
+
+.gallery-photo-count {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.gallery-album-header {
+  margin-bottom: 1.5rem;
+}
+
+.gallery-album-header h3 {
+  margin: 0 0 0.35rem;
+  font-size: 1.35rem;
+  color: var(--blue);
+  font-family: var(--serif);
+}
+
+.gallery-album-header p {
+  color: var(--muted);
+  margin: 0 0 0.5rem;
+  max-width: 40rem;
+}
+
+.gallery-empty-msg {
+  color: var(--muted);
+  padding: 2rem 0;
+}
+
+.gallery-photos {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.gallery-photo-card {
+  position: relative;
+  padding: 0;
+  border: none;
+  background: #f3f4f6;
+  border-radius: 10px;
+  overflow: hidden;
+  cursor: pointer;
+  aspect-ratio: 1;
+}
+
+.gallery-photo-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.gallery-photo-card:hover img {
+  transform: scale(1.06);
+}
+
+.gallery-photo-caption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 0.5rem 0.75rem;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
+  color: #fff;
+  font-size: 0.8rem;
+  text-align: left;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.gallery-photo-card:hover .gallery-photo-caption {
+  opacity: 1;
+}
+
+.gallery-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(1, 18, 40, 0.92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  animation: gallery-fade-in 0.2s ease;
+}
+
+@keyframes gallery-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.gallery-lightbox-content {
+  max-width: min(90vw, 1000px);
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.gallery-lightbox-content img {
+  max-width: 100%;
+  max-height: 75vh;
+  object-fit: contain;
+  border-radius: 6px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.gallery-lightbox-meta {
+  margin-top: 1rem;
+  text-align: center;
+  color: #e5e7eb;
+}
+
+.gallery-lightbox-meta p {
+  margin: 0 0 0.35rem;
+  font-size: 0.95rem;
+}
+
+.gallery-lightbox-meta span {
+  font-size: 0.8rem;
+  color: #9ca3af;
+}
+
+.gallery-lightbox-close {
+  position: absolute;
+  top: 1rem;
+  right: 1.25rem;
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  font-size: 1.75rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.gallery-lightbox-close:hover {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.gallery-lightbox-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 48px;
+  height: 48px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  font-size: 1.75rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.gallery-lightbox-nav:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.gallery-lightbox-prev {
+  left: 1rem;
+}
+
+.gallery-lightbox-next {
+  right: 1rem;
+}
+
 .gallery-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -1818,7 +2166,7 @@ footer {
 }
 
 .possibilities .possibility-list li::before {
-  content: "";
+  content: '';
   position: absolute;
   left: 0;
   top: 0.55em;
@@ -1978,7 +2326,7 @@ footer {
   }
 
   .header {
-    height: 70px;
+    height: 64px;
   }
 
   .header-inner {
@@ -1987,14 +2335,14 @@ footer {
   }
 
   .school-logo {
-    width: 280px !important;
-    height: 70px !important;
+    width: 240px !important;
+    height: 64px !important;
     overflow: hidden;
   }
 
   .school-logo img {
-    width: 280px !important;
-    max-width: 280px !important;
+    width: 240px !important;
+    max-width: 240px !important;
     height: auto;
   }
 
@@ -2003,7 +2351,7 @@ footer {
     position: absolute;
     left: 0;
     right: 0;
-    top: 70px;
+    top: 64px;
     background: #fff;
     flex-direction: column;
     align-items: stretch;
@@ -2018,12 +2366,14 @@ footer {
     display: flex;
   }
 
-  .nav a {
+  .nav a,
+  .nav .nav-link {
     padding: 13px 0;
     border-bottom: 1px solid #f0f0f0;
   }
 
-  .nav a.active:after {
+  .nav a.active:after,
+  .nav .nav-link.active:after {
     display: none;
   }
 
@@ -2164,6 +2514,20 @@ footer {
   .stats-grid div:nth-child(3) {
     border-left: 0;
   }
+
+  .gallery-albums {
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  .gallery-photos {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.65rem;
+  }
+
+  .gallery-header h2 {
+    font-size: 32px !important;
+  }
 }
 
 /* =========================================
@@ -2180,18 +2544,18 @@ footer {
   }
 
   .header {
-    height: 64px;
+    height: 58px;
   }
 
   .school-logo {
-    width: 270px !important;
-    height: 64px !important;
+    width: 220px !important;
+    height: 58px !important;
     overflow: visible !important;
   }
 
   .school-logo img {
-    width: 270px !important;
-    max-width: 270px !important;
+    width: 220px !important;
+    max-width: 220px !important;
     height: auto;
   }
 
@@ -2200,7 +2564,7 @@ footer {
   }
 
   .nav {
-    top: 64px;
+    top: 58px;
   }
 
   .hero {
@@ -2282,6 +2646,29 @@ footer {
 
   .gallery-grid img {
     height: 200px;
+  }
+
+  .gallery-categories {
+    gap: 0.4rem;
+  }
+
+  .gallery-cat-btn {
+    padding: 0.4rem 0.75rem;
+    font-size: 0.85rem;
+  }
+
+  .gallery-lightbox-nav {
+    width: 40px;
+    height: 40px;
+    font-size: 1.4rem;
+  }
+
+  .gallery-lightbox-prev {
+    left: 0.5rem;
+  }
+
+  .gallery-lightbox-next {
+    right: 0.5rem;
   }
 
   .testimonial-slide blockquote {
@@ -2701,7 +3088,7 @@ footer {
 }
 
 /* =========================================
-   PHILOSOPHY – Clean & Perfectly Aligned
+   PHILOSOPHY
 ========================================= */
 
 .philosophy-grid {
@@ -2757,14 +3144,12 @@ footer {
   width: 100%;
 }
 
-/* Remove any markers */
 .philosophy-list li::marker,
 .philosophy-list li::before {
   content: none !important;
   display: none !important;
 }
 
-/* Mobile – single column, perfect left alignment */
 @media (max-width: 768px) {
   .philosophy-grid {
     grid-template-columns: 1fr;
@@ -2786,7 +3171,6 @@ footer {
   }
 }
 
-/* Show more / Show less button for Goals */
 .show-more-btn {
   display: inline-flex;
   align-items: center;
@@ -2807,7 +3191,6 @@ footer {
   color: #fff;
 }
 
-/* Optional: make the button a bit more compact on very small screens */
 @media (max-width: 480px) {
   .show-more-btn {
     width: 100%;
@@ -2815,7 +3198,6 @@ footer {
   }
 }
 
-/* Elegant Philosophy Description Card */
 .philosophy-card {
   background: rgba(255, 255, 255, 0.92);
   backdrop-filter: blur(8px);
@@ -2833,7 +3215,6 @@ footer {
   font-style: italic;
 }
 
-/* Mobile */
 @media (max-width: 768px) {
   .philosophy-card {
     padding: 2rem 1.6rem;
@@ -2847,8 +3228,6 @@ footer {
   }
 }
 
-
-
 /* =========================================
    LEADERSHIP MESSAGE
 ========================================= */
@@ -2860,12 +3239,11 @@ footer {
 
 .leadership-grid {
   display: grid;
-  grid-template-columns: 260px 1fr;   /* ← much smaller */
+  grid-template-columns: 260px 1fr;
   gap: 50px;
   align-items: center;
 }
 
-/* Photo */
 .leadership-photo {
   width: 100%;
   aspect-ratio: 4 / 5;
@@ -2883,7 +3261,6 @@ footer {
   display: block;
 }
 
-/* Content */
 .leadership-body {
   transition: opacity 0.28s ease, transform 0.28s ease;
 }
@@ -2938,7 +3315,6 @@ footer {
   font-style: italic;
 }
 
-/* Controls */
 .leadership-controls {
   display: flex;
   align-items: center;
@@ -2986,7 +3362,6 @@ footer {
   transform: scale(1.25);
 }
 
-/* Responsive */
 @media (max-width: 900px) {
   .leadership-grid {
     grid-template-columns: 1fr;
@@ -3037,8 +3412,6 @@ footer {
     max-width: 190px;
   }
 }
-
-
 
 .facility-grid {
   display: grid !important;

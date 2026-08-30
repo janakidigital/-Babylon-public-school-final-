@@ -15,8 +15,44 @@ export default function AdmissionsPage() {
   const [submitted, setSubmitted] = useState("");
   const [isError, setIsError] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [parentPhoneError, setParentPhoneError] = useState("");
+  const [studentPhoneError, setStudentPhoneError] = useState("");
 
   const { data: programs } = usePublicData(publicApi.programs, []);
+
+  function validatePhone(value) {
+    if (!value) return "Phone number is required";
+    if (!/^\d*$/.test(value)) return "Only numbers are allowed";
+    if (value.length !== 10) return "Phone number must be exactly 10 digits";
+    return "";
+  }
+
+  function handleParentPhoneChange(event) {
+    const value = event.target.value;
+    // Block non-digits and more than 10 chars at input level via maxLength + pattern
+    if (value && !/^\d*$/.test(value)) {
+      setParentPhoneError("Only numbers are allowed");
+      return;
+    }
+    setParentPhoneError(
+      value.length > 0 && value.length !== 10
+        ? "Phone number must be exactly 10 digits"
+        : "",
+    );
+  }
+
+  function handleStudentPhoneChange(event) {
+    const value = event.target.value;
+    if (value && !/^\d*$/.test(value)) {
+      setStudentPhoneError("Only numbers are allowed");
+      return;
+    }
+    setStudentPhoneError(
+      value.length > 0 && value.length !== 10
+        ? "Phone number must be exactly 10 digits"
+        : "",
+    );
+  }
 
   async function submit(event) {
     event.preventDefault();
@@ -30,6 +66,22 @@ export default function AdmissionsPage() {
     const form = new FormData(formElement);
     const payload = Object.fromEntries(form.entries());
 
+    // Validate both phone fields
+    const parentErr = validatePhone(payload.parentPhone || "");
+    const studentErr = validatePhone(payload.phone || "");
+
+    setParentPhoneError(parentErr);
+    setStudentPhoneError(studentErr);
+
+    if (parentErr || studentErr) {
+      const message = parentErr || studentErr;
+      toast.error(message);
+      setSubmitted(message);
+      setIsError(true);
+      setSubmitting(false);
+      return;
+    }
+
     try {
       await publicApi.admission(payload);
 
@@ -38,6 +90,8 @@ export default function AdmissionsPage() {
         "Thank you. Your admission enquiry has been submitted. Our admissions team will contact you soon.",
       );
       setIsError(false);
+      setParentPhoneError("");
+      setStudentPhoneError("");
       formElement.reset();
     } catch (error) {
       toast.error(error.message || "Something went wrong. Please try again.");
@@ -110,9 +164,21 @@ export default function AdmissionsPage() {
                   name="parentPhone"
                   type="tel"
                   required
+                  inputMode="numeric"
+                  pattern="[0-9]{10}"
+                  maxLength={10}
                   autoComplete="tel"
-                  placeholder="Contact number"
+                  placeholder="10-digit contact number"
+                  onChange={handleParentPhoneChange}
                 />
+                {parentPhoneError && (
+                  <span
+                    className="field-error"
+                    style={{ color: "red", fontSize: "0.875rem" }}
+                  >
+                    {parentPhoneError}
+                  </span>
+                )}
               </label>
             </div>
           </fieldset>
@@ -148,8 +214,20 @@ export default function AdmissionsPage() {
                   name="phone"
                   type="tel"
                   required
-                  placeholder="Contact number"
+                  inputMode="numeric"
+                  pattern="[0-9]{10}"
+                  maxLength={10}
+                  placeholder="10-digit contact number"
+                  onChange={handleStudentPhoneChange}
                 />
+                {studentPhoneError && (
+                  <span
+                    className="field-error"
+                    style={{ color: "red", fontSize: "0.875rem" }}
+                  >
+                    {studentPhoneError}
+                  </span>
+                )}
               </label>
 
               <label>

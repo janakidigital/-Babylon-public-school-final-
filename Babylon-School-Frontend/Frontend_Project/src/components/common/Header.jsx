@@ -62,7 +62,13 @@ export default function Header() {
             href="https://www.google.com/maps/place/Babylon+National+School/@27.6944248,85.3468418,776m/data=!3m2!1e3!4b1!4m6!3m5!1s0x39eb198562c4ddb1:0x643554472674ff47!8m2!3d27.6944248!4d85.3468418!16s%2Fg%2F1tfqd6m3?entry=ttu&g_ep=EgoyMDI2MDgyNS4wIKXMDSoASAFQAw%3D%3D"
             target="_blank"
             rel="noopener noreferrer"
-            style={{ display: "flex", alignItems: "center", gap: "6px", textDecoration: "none", color: "inherit" }}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "6px",
+              textDecoration: "none",
+              color: "inherit",
+            }}
           >
             <i className="bi bi-geo-alt-fill"></i>
             <span>{settings.address || "Shantinagar, Kathmandu, Nepal"}</span>
@@ -74,7 +80,7 @@ export default function Header() {
             <span>{settings.phone || "+977-1-4108905, 4108973"}</span>
 
             <Link to="/admin" className="admin-login-btn desktop-only">
-              🔒 Login
+              Login
             </Link>
           </div>
         </div>
@@ -85,7 +91,6 @@ export default function Header() {
         <div className="shell header-inner">
           <SchoolLogo />
 
-          {/* Mobile Toggle Button */}
           <button
             className="mobile-toggle"
             onClick={() => {
@@ -98,7 +103,6 @@ export default function Header() {
             {menuOpen ? "✕" : "☰"}
           </button>
 
-          {/* Navigation */}
           <nav className={menuOpen ? "nav open" : "nav"}>
             {primaryNav.map((item) =>
               item.children ? (
@@ -157,13 +161,12 @@ export default function Header() {
               )
             )}
 
-            {/* Admin Login - Mobile Only */}
             <Link
               to="/admin"
               className="admin-login-btn mobile-admin"
               onClick={closeMenu}
             >
-              🔒 Login
+              Login
             </Link>
           </nav>
         </div>

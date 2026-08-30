@@ -56,7 +56,7 @@ function Login({ onLogin }) {
           <SchoolLogo />
         </div>
 
-        <h2 className="admin-login-title">Welcome to MIS</h2>
+        <h2 className="admin-login-title">Welcome to CMS</h2>
         <p className="admin-login-subtitle">
           Please sign-in to your account
         </p>

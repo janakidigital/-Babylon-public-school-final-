@@ -7,17 +7,50 @@ import toast from "react-hot-toast";
 export default function ContactPage() {
   const { settings } = useSite();
   const [result, setResult] = useState("");
+  const [phoneError, setPhoneError] = useState("");
+
+  function handlePhoneChange(event) {
+    const value = event.target.value;
+
+    // Allow only digits
+    if (value && !/^\d*$/.test(value)) {
+      setPhoneError("Only numbers are allowed");
+      return;
+    }
+
+    // Limit to 10 digits
+    if (value.length > 10) {
+      setPhoneError("Phone number must be exactly 10 digits");
+      return;
+    }
+
+    setPhoneError(
+      value.length > 0 && value.length !== 10
+        ? "Phone number must be exactly 10 digits"
+        : "",
+    );
+  }
 
   async function submit(event) {
     event.preventDefault();
     const form = event.currentTarget; // capture before await
+    const formData = Object.fromEntries(new FormData(form).entries());
+    const phone = formData.phone || "";
+
+    // Validate phone on submit
+    if (phone && !/^\d{10}$/.test(phone)) {
+      const message = "Phone number must be exactly 10 digits";
+      setPhoneError(message);
+      toast.error(message);
+      setResult(message);
+      return;
+    }
 
     try {
-      await publicApi.contact(
-        Object.fromEntries(new FormData(form).entries()),
-      );
+      await publicApi.contact(formData);
       toast.success("Thank you. Your message has been sent.");
       setResult("Thank you. Your message has been sent.");
+      setPhoneError("");
       form.reset();
     } catch (error) {
       toast.error(error.message);
@@ -85,8 +118,17 @@ export default function ContactPage() {
             <input
               name="phone"
               type="tel"
-              placeholder="Your contact number"
+              inputMode="numeric"
+              pattern="[0-9]{10}"
+              maxLength={10}
+              placeholder="10-digit contact number"
+              onChange={handlePhoneChange}
             />
+            {phoneError && (
+              <span className="field-error" style={{ color: "red", fontSize: "0.875rem" }}>
+                {phoneError}
+              </span>
+            )}
           </label>
 
           <label>

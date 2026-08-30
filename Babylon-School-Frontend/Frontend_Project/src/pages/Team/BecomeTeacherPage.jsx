@@ -8,6 +8,27 @@ export default function BecomeTeacherPage() {
   const { data: vacancies, loading } = usePublicData(publicApi.careers, []);
   const [result, setResult] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [phoneError, setPhoneError] = useState("");
+
+  function validatePhone(value) {
+    if (!value) return ""; // optional field
+    if (!/^\d*$/.test(value)) return "Only numbers are allowed";
+    if (value.length !== 10) return "Phone number must be exactly 10 digits";
+    return "";
+  }
+
+  function handlePhoneChange(event) {
+    const value = event.target.value;
+    if (value && !/^\d*$/.test(value)) {
+      setPhoneError("Only numbers are allowed");
+      return;
+    }
+    setPhoneError(
+      value.length > 0 && value.length !== 10
+        ? "Phone number must be exactly 10 digits"
+        : "",
+    );
+  }
 
   async function submit(event) {
     event.preventDefault();
@@ -15,12 +36,34 @@ export default function BecomeTeacherPage() {
     setResult("");
 
     const form = event.currentTarget;
-    const formData = new FormData(form); // Important: send as FormData
+    const formData = new FormData(form);
+
+    const phone = formData.get("phone") || "";
+    const phoneErr = validatePhone(phone);
+    setPhoneError(phoneErr);
+
+    if (phoneErr) {
+      toast.error(phoneErr);
+      setResult(phoneErr);
+      setSubmitting(false);
+      return;
+    }
+
+    // Optional: extra check that resume is PDF
+    const resume = formData.get("resume");
+    if (resume && resume.name && !resume.name.toLowerCase().endsWith(".pdf")) {
+      const msg = "Please upload a PDF file only";
+      toast.error(msg);
+      setResult(msg);
+      setSubmitting(false);
+      return;
+    }
 
     try {
       await publicApi.applyCareer(formData);
       toast.success("Thank you. Your application has been sent successfully.");
       setResult("Thank you. Your application has been sent successfully.");
+      setPhoneError("");
       form.reset();
     } catch (error) {
       toast.error(error.message || "Something went wrong. Please try again.");
@@ -79,7 +122,6 @@ export default function BecomeTeacherPage() {
                   </span>
                 </div>
 
-                {/* Description with proper paragraphs */}
                 <div className="job-description">
                   {(v.description || "")
                     .split("\n")
@@ -146,7 +188,23 @@ export default function BecomeTeacherPage() {
 
           <label>
             Phone
-            <input name="phone" type="tel" placeholder="Your contact number" />
+            <input
+              name="phone"
+              type="tel"
+              inputMode="numeric"
+              pattern="[0-9]{10}"
+              maxLength={10}
+              placeholder="10-digit contact number"
+              onChange={handlePhoneChange}
+            />
+            {phoneError && (
+              <span
+                className="field-error"
+                style={{ color: "red", fontSize: "0.875rem" }}
+              >
+                {phoneError}
+              </span>
+            )}
           </label>
 
           <label>
@@ -183,17 +241,17 @@ export default function BecomeTeacherPage() {
             />
           </label>
 
-          {/* ========== CV / RESUME UPLOAD ========== */}
+          {/* ========== CV / RESUME UPLOAD — PDF ONLY ========== */}
           <label>
-            Upload CV / Resume (PDF or Word)
+            Upload CV / Resume (PDF only)
             <input
               name="resume"
               type="file"
-              accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+              accept=".pdf,application/pdf"
               required
             />
             <small style={{ display: "block", marginTop: "6px", color: "#666" }}>
-              Accepted formats: PDF, DOC, DOCX (Max 5MB recommended)
+              Accepted format: PDF only (Max 5MB recommended)
             </small>
           </label>
 
