@@ -51,10 +51,10 @@ const createDownload = async (req, res) => {
       fileUrl = uploadedFile.url;
     }
 
-    if (!title || !fileUrl) {
+    if (!title) {
       return res.status(400).json({
         success: false,
-        message: "Title and file are required",
+        message: "Title is required",
       });
     }
 

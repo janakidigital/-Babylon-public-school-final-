@@ -27,7 +27,7 @@ const primaryNav = [
     ],
   },
   { label: "Gallery", link: "/gallery" },
-  { label: "Downloads", link: "/downloads" },
+  { label: "Parents Portal", link: "/downloads?category=Parents Portal" },
   {
     label: "Admissions",
     link: "/admissions",

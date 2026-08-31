@@ -12,7 +12,8 @@ const downloadSchema = new mongoose.Schema({
   },
   file: {
     type: String,
-    required: [true, 'Please provide a file URL'],
+    required: false,
+    default: '',
   },
   category: {
     type: String,

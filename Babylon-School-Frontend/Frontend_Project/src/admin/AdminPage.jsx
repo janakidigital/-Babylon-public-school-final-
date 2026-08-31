@@ -58,9 +58,7 @@ function Login({ onLogin }) {
         </div>
 
         <h2 className="admin-login-title">Welcome to CMS</h2>
-        <p className="admin-login-subtitle">
-          Please sign-in to your account
-        </p>
+        <p className="admin-login-subtitle">Please sign-in to your account</p>
 
         <label>
           USERNAME OR EMAIL
@@ -69,7 +67,12 @@ function Login({ onLogin }) {
 
         <label>
           PASSWORD
-          <input name="password" type="password" required placeholder="••••••••••••" />
+          <input
+            name="password"
+            type="password"
+            required
+            placeholder="••••••••••••"
+          />
         </label>
 
         {error && <p className="admin-error">{error}</p>}
@@ -98,7 +101,7 @@ function ResourceEditor({ resourceKey, onBack }) {
 
   const formValues = useMemo(
     () => (editing ? { ...blank(config), ...editing } : blank(config)),
-    [editing, config]
+    [editing, config],
   );
 
   const load = async () => {
@@ -132,9 +135,7 @@ function ResourceEditor({ resourceKey, onBack }) {
     if (form.has("slug") && !String(form.get("slug") || "").trim()) {
       form.set(
         "slug",
-        slugify(
-          form.get("title") || form.get("name") || `item-${Date.now()}`
-        )
+        slugify(form.get("title") || form.get("name") || `item-${Date.now()}`),
       );
     }
 
@@ -149,18 +150,13 @@ function ResourceEditor({ resourceKey, onBack }) {
     }
 
     const body =
-      config.image || config.file
-        ? form
-        : Object.fromEntries(form.entries());
+      config.image || config.file ? form : Object.fromEntries(form.entries());
 
     try {
-      await api(
-        `${config.endpoint}${editing?._id ? `/${editing._id}` : ""}`,
-        {
-          method: editing?._id ? "PUT" : "POST",
-          body,
-        }
-      );
+      await api(`${config.endpoint}${editing?._id ? `/${editing._id}` : ""}`, {
+        method: editing?._id ? "PUT" : "POST",
+        body,
+      });
 
       setEditing(null);
       setMessage(`${config.label} saved successfully.`);
@@ -223,7 +219,7 @@ function ResourceEditor({ resourceKey, onBack }) {
 
       {editing !== null && (
         <form className="admin-form" onSubmit={save}>
-          {config.fields.map(([key, label, type = "text"]) => {
+          {config.fields.map(([key, label, type = "text", options]) => {
             if (type === "checkbox") {
               return (
                 <label key={key} className="admin-checkbox">
@@ -237,6 +233,26 @@ function ResourceEditor({ resourceKey, onBack }) {
                     }
                   />
                   <span>{label}</span>
+                </label>
+              );
+            }
+
+            if (type === "select") {
+              return (
+                <label key={key}>
+                  {label}
+                  <select
+                    name={key}
+                    defaultValue={formValues[key] || ""}
+                    required
+                  >
+                    <option value="">— Select category —</option>
+                    {(options || []).map((opt) => (
+                      <option key={opt} value={opt}>
+                        {opt}
+                      </option>
+                    ))}
+                  </select>
                 </label>
               );
             }
@@ -280,9 +296,7 @@ function ResourceEditor({ resourceKey, onBack }) {
 
           {config.image && (
             <label style={{ gridColumn: "1 / -1" }}>
-              {config.multiple
-                ? "Upload Images (select many)"
-                : "Image upload"}
+              {config.multiple ? "Upload Images (select many)" : "Image upload"}
               <input
                 name="image"
                 type="file"
@@ -290,12 +304,16 @@ function ResourceEditor({ resourceKey, onBack }) {
                 multiple={!!config.multiple}
               />
               {editing?.image && !config.multiple && (
-                <small style={{ display: "block", marginTop: 6, color: "#666" }}>
+                <small
+                  style={{ display: "block", marginTop: 6, color: "#666" }}
+                >
                   Current: {editing.image}
                 </small>
               )}
               {config.multiple && (
-                <small style={{ display: "block", marginTop: 6, color: "#666" }}>
+                <small
+                  style={{ display: "block", marginTop: 6, color: "#666" }}
+                >
                   You can select 15+ images at once
                 </small>
               )}
@@ -314,7 +332,8 @@ function ResourceEditor({ resourceKey, onBack }) {
                   <div
                     style={{
                       display: "grid",
-                      gridTemplateColumns: "repeat(auto-fill, minmax(100px, 1fr))",
+                      gridTemplateColumns:
+                        "repeat(auto-fill, minmax(100px, 1fr))",
                       gap: "12px",
                     }}
                   >
@@ -372,17 +391,28 @@ function ResourceEditor({ resourceKey, onBack }) {
 
           {config.file && (
             <label>
-              {config.fileLabel || "Attachment (PDF)"}
+              {config.fileLabel || "Attachment (PDF)"}{" "}
+              <span
+                style={{ fontWeight: 400, color: "#666", fontSize: "13px" }}
+              >
+                (optional)
+              </span>
               <input
                 name={config.fileField || "attachment"}
                 type="file"
                 accept={config.fileAccept || ".pdf,application/pdf"}
               />
               {editing?.[config.fileField || "attachment"] && (
-                <small style={{ display: "block", marginTop: 6, color: "#666" }}>
+                <small
+                  style={{ display: "block", marginTop: 6, color: "#666" }}
+                >
                   Current file: {editing[config.fileField || "attachment"]}
                 </small>
               )}
+              <small style={{ display: "block", marginTop: 4, color: "#888" }}>
+                Leave empty if you only want to add a title, category, or link
+                in the description.
+              </small>
             </label>
           )}
 
@@ -475,7 +505,8 @@ const PAGE_BANNER_DEFINITIONS = [
     eyebrow: "CAREERS",
     defaultImg: "banner/instructor.jpg",
     heading: "Teach, inspire and grow with us.",
-    description: "Header background banner for Careers and Job application page",
+    description:
+      "Header background banner for Careers and Job application page",
   },
   {
     key: "studentLife",
@@ -499,7 +530,8 @@ const PAGE_BANNER_DEFINITIONS = [
     eyebrow: "OUR ACADEMICS",
     defaultImg: "banner/inner_banner_3.jpg",
     heading: "Learning with purpose.",
-    description: "Header background banner for Academic Programmes & Courses pages",
+    description:
+      "Header background banner for Academic Programmes & Courses pages",
   },
   {
     key: "admissions",
@@ -507,7 +539,8 @@ const PAGE_BANNER_DEFINITIONS = [
     eyebrow: "ADMISSIONS",
     defaultImg: "banner/inner_banner_1.jpg",
     heading: "Begin your Babylon journey.",
-    description: "Header background banner for Admissions & Application form page",
+    description:
+      "Header background banner for Admissions & Application form page",
   },
   {
     key: "news",
@@ -555,7 +588,8 @@ const PAGE_BANNER_DEFINITIONS = [
     eyebrow: "OUR FACILITIES",
     defaultImg: "banner/inner_banner_5.jpg",
     heading: "Spaces designed for discovery.",
-    description: "Header background banner for Facilities & Infrastructure page",
+    description:
+      "Header background banner for Facilities & Infrastructure page",
   },
   {
     key: "achievements",
@@ -595,7 +629,8 @@ const PAGE_BANNER_DEFINITIONS = [
     eyebrow: "BABYLON NATIONAL",
     defaultImg: "banner/inner_banner_1.jpg",
     heading: "Education for the Quest",
-    description: "General fallback background for detail pages without a specific cover",
+    description:
+      "General fallback background for detail pages without a specific cover",
   },
 ];
 
@@ -780,12 +815,16 @@ function SiteSettingsEditor({ onBack }) {
                 <textarea
                   name="address"
                   rows={3}
-                  defaultValue={data?.address || "Shantinagar, Kathmandu, Nepal"}
+                  defaultValue={
+                    data?.address || "Shantinagar, Kathmandu, Nepal"
+                  }
                 />
               </label>
 
               <label className="admin-field">
-                <span className="admin-field-label">Short Description (Footer / Meta)</span>
+                <span className="admin-field-label">
+                  Short Description (Footer / Meta)
+                </span>
                 <textarea
                   name="shortDescription"
                   rows={3}
@@ -811,14 +850,23 @@ function SiteSettingsEditor({ onBack }) {
 
         {/* ================= TAB 2: STATS & STUDENT LIFE ================= */}
         {activeTab === "stats" && (
-          <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+          <div
+            style={{ display: "flex", flexDirection: "column", gap: "24px" }}
+          >
             <div className="admin-card">
               <div className="admin-card-header">
                 <h3>🔢 Site Statistics (Shown in Student Life & Home)</h3>
               </div>
               <div className="admin-card-body">
-                <p style={{ color: "var(--admin-muted)", fontSize: "14px", margin: "0 0 16px" }}>
-                  Customize the 3 main statistics counters and labels displayed on the website.
+                <p
+                  style={{
+                    color: "var(--admin-muted)",
+                    fontSize: "14px",
+                    margin: "0 0 16px",
+                  }}
+                >
+                  Customize the 3 main statistics counters and labels displayed
+                  on the website.
                 </p>
 
                 <div className="admin-stats-inputs-grid">
@@ -919,7 +967,10 @@ function SiteSettingsEditor({ onBack }) {
                   <input
                     name="studentLife[title]"
                     type="text"
-                    defaultValue={studentLife.title ?? "Every day is an opportunity to shine."}
+                    defaultValue={
+                      studentLife.title ??
+                      "Every day is an opportunity to shine."
+                    }
                   />
                 </label>
 
@@ -936,18 +987,31 @@ function SiteSettingsEditor({ onBack }) {
                 </label>
 
                 <label className="admin-field">
-                  <span className="admin-field-label">Bottom Heading (Above Stats)</span>
+                  <span className="admin-field-label">
+                    Bottom Heading (Above Stats)
+                  </span>
                   <input
                     name="studentLife[heading]"
                     type="text"
-                    defaultValue={studentLife.heading ?? "Growing with purpose and pride."}
+                    defaultValue={
+                      studentLife.heading ?? "Growing with purpose and pride."
+                    }
                   />
                 </label>
 
                 <div className="admin-field" style={{ marginTop: 14 }}>
-                  <span className="admin-field-label">Student Life Section Photo</span>
-                  <p style={{ fontSize: "13px", color: "var(--admin-muted)", margin: "0 0 8px" }}>
-                    Upload a high-quality photo to display in the Student Life section.
+                  <span className="admin-field-label">
+                    Student Life Section Photo
+                  </span>
+                  <p
+                    style={{
+                      fontSize: "13px",
+                      color: "var(--admin-muted)",
+                      margin: "0 0 8px",
+                    }}
+                  >
+                    Upload a high-quality photo to display in the Student Life
+                    section.
                   </p>
 
                   <div className="admin-photo-preview-box">
@@ -962,14 +1026,26 @@ function SiteSettingsEditor({ onBack }) {
                     />
                   </div>
 
-                  <div style={{ display: "flex", gap: "10px", marginTop: "10px", alignItems: "center" }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      gap: "10px",
+                      marginTop: "10px",
+                      alignItems: "center",
+                    }}
+                  >
                     <label className="admin-file-upload-label">
                       <span>📁</span> Choose New Photo
                       <input
                         type="file"
                         accept="image/*"
                         className="admin-file-upload-input"
-                        onChange={(e) => handleFileChange("studentLifePhoto", e.target.files?.[0])}
+                        onChange={(e) =>
+                          handleFileChange(
+                            "studentLifePhoto",
+                            e.target.files?.[0],
+                          )
+                        }
                       />
                     </label>
 
@@ -981,7 +1057,10 @@ function SiteSettingsEditor({ onBack }) {
                           handleClearFile("studentLifePhoto");
                           setData((prev) => ({
                             ...prev,
-                            studentLife: { ...(prev.studentLife || {}), image: "" },
+                            studentLife: {
+                              ...(prev.studentLife || {}),
+                              image: "",
+                            },
                           }));
                         }}
                       >
@@ -1002,8 +1081,16 @@ function SiteSettingsEditor({ onBack }) {
               <h3>🖼️ Page Header Cover Images (Banners)</h3>
             </div>
             <div className="admin-card-body">
-              <p style={{ color: "var(--admin-muted)", fontSize: "14px", margin: "0 0 20px" }}>
-                Upload custom cover images for each page banner across the website. The dark blue gradient overlay will be automatically applied just like on the live site.
+              <p
+                style={{
+                  color: "var(--admin-muted)",
+                  fontSize: "14px",
+                  margin: "0 0 20px",
+                }}
+              >
+                Upload custom cover images for each page banner across the
+                website. The dark blue gradient overlay will be automatically
+                applied just like on the live site.
               </p>
 
               <div className="admin-banner-grid">
@@ -1011,7 +1098,9 @@ function SiteSettingsEditor({ onBack }) {
                   const customImg = pageBanners[banner.key];
                   const previewImg =
                     previewUrls[`banner_${banner.key}`] ||
-                    (customImg ? mediaUrl(customImg) : `${assetPath}${banner.defaultImg}`);
+                    (customImg
+                      ? mediaUrl(customImg)
+                      : `${assetPath}${banner.defaultImg}`);
 
                   return (
                     <div key={banner.key} className="admin-banner-card">
@@ -1028,8 +1117,12 @@ function SiteSettingsEditor({ onBack }) {
                       </div>
 
                       <div className="admin-banner-card-body">
-                        <h4 className="admin-banner-card-title">{banner.title}</h4>
-                        <p className="admin-banner-card-desc">{banner.description}</p>
+                        <h4 className="admin-banner-card-title">
+                          {banner.title}
+                        </h4>
+                        <p className="admin-banner-card-desc">
+                          {banner.description}
+                        </p>
 
                         <div className="admin-banner-card-actions">
                           <label className="admin-file-upload-label">
@@ -1039,12 +1132,16 @@ function SiteSettingsEditor({ onBack }) {
                               accept="image/*"
                               className="admin-file-upload-input"
                               onChange={(e) =>
-                                handleFileChange(`banner_${banner.key}`, e.target.files?.[0])
+                                handleFileChange(
+                                  `banner_${banner.key}`,
+                                  e.target.files?.[0],
+                                )
                               }
                             />
                           </label>
 
-                          {(previewUrls[`banner_${banner.key}`] || customImg) && (
+                          {(previewUrls[`banner_${banner.key}`] ||
+                            customImg) && (
                             <button
                               type="button"
                               className="admin-banner-reset-btn"
@@ -1065,8 +1162,13 @@ function SiteSettingsEditor({ onBack }) {
         )}
 
         <div className="admin-form-actions" style={{ marginTop: 20 }}>
-          <button className="button primary" disabled={saving} style={{ padding: "12px 28px", fontSize: "15px" }}>
-            {saving ? "Saving changes..." : "Save All Changes"} <span>&rarr;</span>
+          <button
+            className="button primary"
+            disabled={saving}
+            style={{ padding: "12px 28px", fontSize: "15px" }}
+          >
+            {saving ? "Saving changes..." : "Save All Changes"}{" "}
+            <span>&rarr;</span>
           </button>
         </div>
       </form>
@@ -1255,7 +1357,9 @@ function Inbox({ endpoint, title, fields, onBack }) {
       load();
     } catch (err) {
       setMessage(err.message || "Failed to delete application.");
-      toast.error(err.message || "Failed to delete application." || "An error occurred");
+      toast.error(
+        err.message || "Failed to delete application." || "An error occurred",
+      );
     }
   }
 
@@ -1582,8 +1686,18 @@ function CareerAppsInbox({ onBack }) {
                     <h3 style={{ marginBottom: "5px" }}>
                       {item.name || item.fullName || "Unknown Applicant"}
                     </h3>
-                    <p style={{ margin: 0, fontWeight: 600, color: "var(--admin-accent, #063b78)" }}>
-                      🎯 {item.careerTitle || item.position || item.jobTitle || "General Application"}
+                    <p
+                      style={{
+                        margin: 0,
+                        fontWeight: 600,
+                        color: "var(--admin-accent, #063b78)",
+                      }}
+                    >
+                      🎯{" "}
+                      {item.careerTitle ||
+                        item.position ||
+                        item.jobTitle ||
+                        "General Application"}
                     </p>
                   </div>
                   <span className="status-chip">{item.status || "New"}</span>
@@ -1605,7 +1719,10 @@ function CareerAppsInbox({ onBack }) {
                   <div>
                     <strong>Email</strong>
                     <p>
-                      <a href={`mailto:${item.email}`} style={{ color: "var(--admin-accent, #063b78)" }}>
+                      <a
+                        href={`mailto:${item.email}`}
+                        style={{ color: "var(--admin-accent, #063b78)" }}
+                      >
                         {item.email || "—"}
                       </a>
                     </p>
@@ -1614,15 +1731,25 @@ function CareerAppsInbox({ onBack }) {
                     <strong>Phone</strong>
                     <p>
                       {item.phone ? (
-                        <a href={`tel:${item.phone}`} style={{ color: "var(--admin-accent, #063b78)" }}>
+                        <a
+                          href={`tel:${item.phone}`}
+                          style={{ color: "var(--admin-accent, #063b78)" }}
+                        >
                           {item.phone}
                         </a>
-                      ) : "—"}
+                      ) : (
+                        "—"
+                      )}
                     </p>
                   </div>
                   <div>
                     <strong>Applied For</strong>
-                    <p>{item.careerTitle || item.position || item.jobTitle || "—"}</p>
+                    <p>
+                      {item.careerTitle ||
+                        item.position ||
+                        item.jobTitle ||
+                        "—"}
+                    </p>
                   </div>
                   <div>
                     <strong>Applied On</strong>
@@ -1667,33 +1794,63 @@ function CareerAppsInbox({ onBack }) {
                       </button>
                     </div>
                     {isExpanded && (
-                      <p style={{ margin: 0, whiteSpace: "pre-wrap", color: "#4a5568" }}>
+                      <p
+                        style={{
+                          margin: 0,
+                          whiteSpace: "pre-wrap",
+                          color: "#4a5568",
+                        }}
+                      >
                         {item.coverLetter}
                       </p>
                     )}
                     {!isExpanded && (
-                      <p style={{ margin: 0, color: "#718096", fontStyle: "italic", fontSize: "13px" }}>
-                        {item.coverLetter.slice(0, 150)}{item.coverLetter.length > 150 ? "..." : ""}
+                      <p
+                        style={{
+                          margin: 0,
+                          color: "#718096",
+                          fontStyle: "italic",
+                          fontSize: "13px",
+                        }}
+                      >
+                        {item.coverLetter.slice(0, 150)}
+                        {item.coverLetter.length > 150 ? "..." : ""}
                       </p>
                     )}
                   </div>
                 )}
 
                 {/* Actions row */}
-                <div className="admin-row-actions" style={{ justifyContent: "space-between", flexWrap: "wrap", gap: "10px" }}>
-                  <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+                <div
+                  className="admin-row-actions"
+                  style={{
+                    justifyContent: "space-between",
+                    flexWrap: "wrap",
+                    gap: "10px",
+                  }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      gap: "10px",
+                      alignItems: "center",
+                    }}
+                  >
                     {cvUrl && (
                       <a
                         href={cvUrl}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="button primary"
-                        style={{ fontSize: "13px", padding: "8px 16px", textDecoration: "none" }}
+                        style={{
+                          fontSize: "13px",
+                          padding: "8px 16px",
+                          textDecoration: "none",
+                        }}
                       >
                         📄 View / Download CV
                       </a>
                     )}
-
                   </div>
                   <button
                     type="button"
@@ -1729,7 +1886,11 @@ function AdmissionsInbox({ onBack }) {
       setItems(response.data || []);
     } catch (err) {
       setMessage(err.message || "Failed to load admission applications.");
-      toast.error(err.message || "Failed to load admission applications." || "An error occurred");
+      toast.error(
+        err.message ||
+          "Failed to load admission applications." ||
+          "An error occurred",
+      );
     } finally {
       setLoading(false);
     }
@@ -1755,14 +1916,18 @@ function AdmissionsInbox({ onBack }) {
       load();
     } catch (err) {
       setMessage(err.message || "Failed to update admission application.");
-      toast.error(err.message || "Failed to update admission application." || "An error occurred");
+      toast.error(
+        err.message ||
+          "Failed to update admission application." ||
+          "An error occurred",
+      );
     }
   }
 
   async function remove(id) {
     if (
       !window.confirm(
-        "Are you sure you want to delete this admission application?"
+        "Are you sure you want to delete this admission application?",
       )
     ) {
       return;
@@ -1774,7 +1939,11 @@ function AdmissionsInbox({ onBack }) {
       load();
     } catch (err) {
       setMessage(err.message || "Failed to delete admission application.");
-      toast.error(err.message || "Failed to delete admission application." || "An error occurred");
+      toast.error(
+        err.message ||
+          "Failed to delete admission application." ||
+          "An error occurred",
+      );
     }
   }
 
@@ -2009,7 +2178,9 @@ function AdminUsers({ onBack }) {
       setAdmins(response.data || []);
     } catch (err) {
       setMessage(err.message || "Failed to load admins");
-      toast.error(err.message || "Failed to load admins" || "An error occurred");
+      toast.error(
+        err.message || "Failed to load admins" || "An error occurred",
+      );
     } finally {
       setLoading(false);
     }
@@ -2064,7 +2235,9 @@ function AdminUsers({ onBack }) {
       load();
     } catch (err) {
       setMessage(err.message || "Failed to delete admin");
-      toast.error(err.message || "Failed to delete admin" || "An error occurred");
+      toast.error(
+        err.message || "Failed to delete admin" || "An error occurred",
+      );
     }
   }
 
@@ -2283,10 +2456,19 @@ function AdminTopbar({ user, title, onLogout, onMenuToggle }) {
         <span className="admin-badge">
           {user.role === "superAdmin" ? "SuperAdmin" : "Admin"}
         </span>
-        <a href="/" className="admin-topbar-btn" target="_blank" rel="noreferrer">
+        <a
+          href="/"
+          className="admin-topbar-btn"
+          target="_blank"
+          rel="noreferrer"
+        >
           <span>🔗</span> View Site
         </a>
-        <button type="button" className="admin-topbar-btn logout" onClick={onLogout}>
+        <button
+          type="button"
+          className="admin-topbar-btn logout"
+          onClick={onLogout}
+        >
           <span>→</span> Logout
         </button>
       </div>
@@ -2413,7 +2595,13 @@ function DashboardOverview({ user, setView }) {
           type="button"
           className="admin-stat-card"
           onClick={() => setView(null)}
-          style={{ cursor: "pointer", border: "1px solid var(--admin-line)", background: "#fff", textAlign: "left", font: "inherit" }}
+          style={{
+            cursor: "pointer",
+            border: "1px solid var(--admin-line)",
+            background: "#fff",
+            textAlign: "left",
+            font: "inherit",
+          }}
         >
           <div className="admin-stat-icon blue">👥</div>
           <div className="admin-stat-body">
@@ -2426,7 +2614,13 @@ function DashboardOverview({ user, setView }) {
           type="button"
           className="admin-stat-card"
           onClick={() => staffKey && setView(staffKey)}
-          style={{ cursor: staffKey ? "pointer" : "default", border: "1px solid var(--admin-line)", background: "#fff", textAlign: "left", font: "inherit" }}
+          style={{
+            cursor: staffKey ? "pointer" : "default",
+            border: "1px solid var(--admin-line)",
+            background: "#fff",
+            textAlign: "left",
+            font: "inherit",
+          }}
         >
           <div className="admin-stat-icon gray">👤</div>
           <div className="admin-stat-body">
@@ -2439,7 +2633,13 @@ function DashboardOverview({ user, setView }) {
           type="button"
           className="admin-stat-card"
           onClick={() => eventsKey && setView(eventsKey)}
-          style={{ cursor: eventsKey ? "pointer" : "default", border: "1px solid var(--admin-line)", background: "#fff", textAlign: "left", font: "inherit" }}
+          style={{
+            cursor: eventsKey ? "pointer" : "default",
+            border: "1px solid var(--admin-line)",
+            background: "#fff",
+            textAlign: "left",
+            font: "inherit",
+          }}
         >
           <div className="admin-stat-icon amber">📅</div>
           <div className="admin-stat-body">
@@ -2452,7 +2652,13 @@ function DashboardOverview({ user, setView }) {
           type="button"
           className="admin-stat-card"
           onClick={() => blogKey && setView(blogKey)}
-          style={{ cursor: blogKey ? "pointer" : "default", border: "1px solid var(--admin-line)", background: "#fff", textAlign: "left", font: "inherit" }}
+          style={{
+            cursor: blogKey ? "pointer" : "default",
+            border: "1px solid var(--admin-line)",
+            background: "#fff",
+            textAlign: "left",
+            font: "inherit",
+          }}
         >
           <div className="admin-stat-icon pink">📝</div>
           <div className="admin-stat-body">
@@ -2465,7 +2671,13 @@ function DashboardOverview({ user, setView }) {
           type="button"
           className="admin-stat-card"
           onClick={() => docsKey && setView(docsKey)}
-          style={{ cursor: docsKey ? "pointer" : "default", border: "1px solid var(--admin-line)", background: "#fff", textAlign: "left", font: "inherit" }}
+          style={{
+            cursor: docsKey ? "pointer" : "default",
+            border: "1px solid var(--admin-line)",
+            background: "#fff",
+            textAlign: "left",
+            font: "inherit",
+          }}
         >
           <div className="admin-stat-icon green">📄</div>
           <div className="admin-stat-body">
@@ -2478,7 +2690,13 @@ function DashboardOverview({ user, setView }) {
           type="button"
           className="admin-stat-card"
           onClick={() => setView("admissions")}
-          style={{ cursor: "pointer", border: "1px solid var(--admin-line)", background: "#fff", textAlign: "left", font: "inherit" }}
+          style={{
+            cursor: "pointer",
+            border: "1px solid var(--admin-line)",
+            background: "#fff",
+            textAlign: "left",
+            font: "inherit",
+          }}
         >
           <div className="admin-stat-icon orange">☑</div>
           <div className="admin-stat-body">
