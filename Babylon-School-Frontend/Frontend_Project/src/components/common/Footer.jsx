@@ -12,13 +12,23 @@ export default function Footer() {
         {/* Google Maps Column */}
         <div className="footer-map-col">
           <h4>Find Us</h4>
-          <iframe
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d776!2d85.3468418!3d27.6944248!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x39eb198562c4ddb1%3A0x643554472674ff47!2sBabylon%20National%20School!5e0!3m2!1sen!2snp!4v1693300000000!5m2!1sen!2snp"
-            allowFullScreen=""
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-            title="Babylon National School Location"
-          ></iframe>
+          <a
+            href="https://www.google.com/maps/place/Babylon+National+School/@27.6944248,85.3468418,776m/data=!3m2!1e3!4b1!4m6!3m5!1s0x39eb198562c4ddb1:0x643554472674ff47!8m2!3d27.6944248!4d85.3468418!16s%2Fg%2F1tfqd6m3?entry=ttu&g_ep=EgoyMDI2MDgyNS4wIKXMDSoASAFQAw%3D%3D"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="footer-map-wrapper"
+          >
+            <iframe
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d776!2d85.3468418!3d27.6944248!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x39eb198562c4ddb1%3A0x643554472674ff47!2sBabylon%20National%20School!5e0!3m2!1sen!2snp!4v1693300000000!5m2!1sen!2snp"
+              width="100%"
+              height="100%"
+              style={{ border: 0, display: "block" }}
+              allowFullScreen=""
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              title="Babylon National School Location"
+            ></iframe>
+          </a>
           <a
             href="https://www.google.com/maps/place/Babylon+National+School/@27.6944248,85.3468418,776m/data=!3m2!1e3!4b1!4m6!3m5!1s0x39eb198562c4ddb1:0x643554472674ff47!8m2!3d27.6944248!4d85.3468418!16s%2Fg%2F1tfqd6m3?entry=ttu&g_ep=EgoyMDI2MDgyNS4wIKXMDSoASAFQAw%3D%3D"
             target="_blank"
@@ -42,6 +52,7 @@ export default function Footer() {
             <Link to="/admissions">Admissions</Link>
             <Link to="/facilities">Facilities</Link>
             <Link to="/gallery">Gallery</Link>
+            <Link to="/downloads">Downloads</Link>
           </div>
 
           {/* More Info */}
@@ -49,12 +60,20 @@ export default function Footer() {
             <h4>More Info</h4>
 
             <Link to="/notices">Notices</Link>
-            <Link to="/blog">News & Blog</Link>
+            <Link to="/blog">News &amp; Blog</Link>
             <Link to="/events">Events</Link>
             <Link to="/team">Our Team</Link>
             <Link to="/become-a-teacher">Careers</Link>
             <Link to="/achievements">Achievements</Link>
             <Link to="/faq">FAQ</Link>
+            <a
+              href="https://emis.babylonschool.edu.np/auth/login"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ display: "block", margin: "0 0 11px" }}
+            >
+              E-Portal
+            </a>
           </div>
         </div>
 

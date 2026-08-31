@@ -15,13 +15,13 @@ export default function HomePage() {
     <>
       <HeroSection />
       <StatisticsSection />
+      <NoticesSection limit={5} />
       <AboutSection />
       <ProgramsSection />
       <WhyChooseUsSection />
       <StudentLifeSection />
       {/* <HighlightsSection /> */}
       <TestimonialsSection />
-      <NoticesSection limit={5} />
       <ContactSection />
     </>
   )

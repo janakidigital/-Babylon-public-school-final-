@@ -11,6 +11,12 @@ const facultySchema = new mongoose.Schema(
       trim: true,
     },
 
+    category: {
+      type: String,
+      trim: true,
+      default: "FACULTIES",
+    },
+
     designation: {
       type: String,
       trim: true,

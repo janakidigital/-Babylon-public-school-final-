@@ -61,6 +61,7 @@ export default function PublicRoutes() {
           <Route path="/courses" element={<PageTransition><CoursesPage /></PageTransition>} />
           <Route path="/course-details/:id" element={<PageTransition><CourseDetailsPage /></PageTransition>} />
           <Route path="/events" element={<PageTransition><EventsPage /></PageTransition>} />
+          <Route path="/events/:id" element={<PageTransition><EventDetailsPage /></PageTransition>} />
           <Route path="/event-details/:id" element={<PageTransition><EventDetailsPage /></PageTransition>} />
           <Route path="/notices" element={<PageTransition><NoticesPage /></PageTransition>} />
           <Route path="/notices/:id" element={<PageTransition><NoticesPage /></PageTransition>} />

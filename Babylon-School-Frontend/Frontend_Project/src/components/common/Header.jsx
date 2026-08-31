@@ -79,9 +79,14 @@ export default function Header() {
             <span className="sep">|</span>
             <span>{settings.phone || "+977-1-4108905, 4108973"}</span>
 
-            <Link to="/admin" className="admin-login-btn desktop-only">
-              Login
-            </Link>
+            <a
+              href="https://emis.babylonschool.edu.np/auth/login"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="admin-login-btn desktop-only"
+            >
+              E-Portal
+            </a>
           </div>
         </div>
       </div>
@@ -161,13 +166,15 @@ export default function Header() {
               )
             )}
 
-            <Link
-              to="/admin"
+            <a
+              href="https://emis.babylonschool.edu.np/auth/login"
+              target="_blank"
+              rel="noopener noreferrer"
               className="admin-login-btn mobile-admin"
               onClick={closeMenu}
             >
-              Login
-            </Link>
+              E-Portal
+            </a>
           </nav>
         </div>
       </header>

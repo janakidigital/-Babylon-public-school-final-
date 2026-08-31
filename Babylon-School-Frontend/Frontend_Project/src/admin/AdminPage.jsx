@@ -98,14 +98,27 @@ function ResourceEditor({ resourceKey, onBack }) {
   const [editing, setEditing] = useState(null);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(true);
+  const [selectedType, setSelectedType] = useState("");
 
-  const formValues = useMemo(
-    () => (editing ? { ...blank(config), ...editing } : blank(config)),
-    [editing, config],
-  );
+  const formValues = useMemo(() => {
+    if (!editing) return blank(config);
+
+    const values = { ...blank(config), ...editing };
+
+    // Pre-fill videoUrls textarea from saved videos array
+    if (Array.isArray(editing.videos) && editing.videos.length > 0) {
+      values.videoUrls = editing.videos
+        .map((v) => v.url)
+        .filter(Boolean)
+        .join("\n");
+    }
+
+    return values;
+  }, [editing, config]);
 
   const load = async () => {
     setLoading(true);
+
     try {
       const response = await api(config.endpoint);
       setItems(response.data || []);
@@ -121,21 +134,57 @@ function ResourceEditor({ resourceKey, onBack }) {
     load();
   }, [resourceKey]);
 
+  const openEditor = (item = {}) => {
+    setEditing(item);
+    setSelectedType(
+      item.mediaType || item.type || item.category || (resourceKey === "gallery" ? "Photos" : "")
+    );
+  };
+
   async function save(event) {
     event.preventDefault();
+
     const form = new FormData(event.currentTarget);
 
+    /*
+     * Determine selected gallery type.
+     * Supports either "type" or "category".
+     */
+    const selectedTypeValue =
+      form.get("type") ||
+      form.get("category") ||
+      selectedType ||
+      "";
+
+    const isVideo = String(selectedTypeValue).toLowerCase() === "videos";
+
+    if (resourceKey === "gallery") {
+      form.set("type", isVideo ? "Videos" : "Photos");
+      form.set("mediaType", isVideo ? "Videos" : "Photos");
+    }
+
     const image = form.get("image");
-    if (!image?.name) form.delete("image");
+
+    // Only delete image if there's no file selected
+    if (!image?.name) {
+      form.delete("image");
+    }
 
     const fileField = config.fileField || "attachment";
     const file = form.get(fileField);
-    if (!file?.name) form.delete(fileField);
+
+    if (!file?.name) {
+      form.delete(fileField);
+    }
 
     if (form.has("slug") && !String(form.get("slug") || "").trim()) {
       form.set(
         "slug",
-        slugify(form.get("title") || form.get("name") || `item-${Date.now()}`),
+        slugify(
+          form.get("title") ||
+            form.get("name") ||
+            `item-${Date.now()}`,
+        ),
       );
     }
 
@@ -145,23 +194,56 @@ function ResourceEditor({ resourceKey, onBack }) {
       }
     });
 
+    /*
+     * For video items:
+     * - Only delete description (images/videos are still needed)
+     * - DO NOT delete the "image" field - it contains uploaded video files!
+     */
+    if (isVideo) {
+      form.delete("description");
+      // IMPORTANT: Do NOT delete "image" - it contains video files!
+    }
+
+    // Keep existing images after user removes some
     if (config.multiple && editing?.images) {
-      form.set("existingImages", JSON.stringify(editing.images));
+      form.set(
+        "existingImages",
+        JSON.stringify(editing.images),
+      );
+    }
+
+    // FIXED: Keep existing videos after user removes some
+    if (config.multiple && editing?.videos) {
+      form.set(
+        "existingVideos",
+        JSON.stringify(editing.videos),
+      );
     }
 
     const body =
-      config.image || config.file ? form : Object.fromEntries(form.entries());
+      config.image || config.file
+        ? form
+        : Object.fromEntries(form.entries());
 
     try {
-      await api(`${config.endpoint}${editing?._id ? `/${editing._id}` : ""}`, {
-        method: editing?._id ? "PUT" : "POST",
-        body,
-      });
+      await api(
+        `${config.endpoint}${editing?._id ? `/${editing._id}` : ""}`,
+        {
+          method: editing?._id ? "PUT" : "POST",
+          body,
+        },
+      );
 
       setEditing(null);
+      setSelectedType("");
       setMessage(`${config.label} saved successfully.`);
+
       toast.success(`${config.label} saved successfully.`);
-      window.dispatchEvent(new CustomEvent("site-data-updated"));
+
+      window.dispatchEvent(
+        new CustomEvent("site-data-updated"),
+      );
+
       load();
     } catch (err) {
       setMessage(err.message);
@@ -171,11 +253,19 @@ function ResourceEditor({ resourceKey, onBack }) {
 
   async function remove(id) {
     if (!window.confirm("Delete this item?")) return;
+
     try {
-      await api(`${config.endpoint}/${id}`, { method: "DELETE" });
+      await api(`${config.endpoint}/${id}`, {
+        method: "DELETE",
+      });
+
       setMessage("Item deleted.");
       toast.success("Item deleted.");
-      window.dispatchEvent(new CustomEvent("site-data-updated"));
+
+      window.dispatchEvent(
+        new CustomEvent("site-data-updated"),
+      );
+
       load();
     } catch (err) {
       setMessage(err.message);
@@ -185,7 +275,11 @@ function ResourceEditor({ resourceKey, onBack }) {
 
   function removeImage(index) {
     if (!editing?.images) return;
-    const updatedImages = editing.images.filter((_, i) => i !== index);
+
+    const updatedImages = editing.images.filter(
+      (_, i) => i !== index,
+    );
+
     setEditing({
       ...editing,
       images: updatedImages,
@@ -196,234 +290,499 @@ function ResourceEditor({ resourceKey, onBack }) {
     });
   }
 
+  function removeVideo(index) {
+    if (!editing?.videos) return;
+
+    const updatedVideos = editing.videos.filter(
+      (_, i) => i !== index,
+    );
+
+    setEditing({
+      ...editing,
+      videos: updatedVideos,
+      coverImage:
+        updatedVideos.length > 0
+          ? updatedVideos[0].url
+          : editing.coverImage || "",
+    });
+  }
+
+  /*
+   * Check whether the current editing item is a video.
+   */
+  const editingIsVideo =
+    String(selectedType).toLowerCase() === "videos";
+
   return (
     <section className="admin-resource">
       <div className="admin-resource-head">
-        <button type="button" className="admin-back" onClick={onBack}>
+        <button
+          type="button"
+          className="admin-back"
+          onClick={onBack}
+        >
           ← Dashboard
         </button>
+
         <div>
           <p className="eyebrow">CONTENT EDITOR</p>
           <h2>{config.label}</h2>
         </div>
+
         <button
           type="button"
           className="button primary"
-          onClick={() => setEditing({})}
+          onClick={() => openEditor({})}
         >
           Add {config.label.slice(0, -1)}
         </button>
       </div>
 
-      {message && <p className="admin-message">{message}</p>}
+      {message && (
+        <p className="admin-message">{message}</p>
+      )}
 
       {editing !== null && (
-        <form className="admin-form" onSubmit={save}>
-          {config.fields.map(([key, label, type = "text", options]) => {
-            if (type === "checkbox") {
-              return (
-                <label key={key} className="admin-checkbox">
-                  <input
-                    name={key}
-                    type="checkbox"
-                    defaultChecked={
-                      formValues[key] === true ||
-                      formValues[key] === "true" ||
-                      formValues[key] === "on"
-                    }
-                  />
-                  <span>{label}</span>
-                </label>
-              );
-            }
+        <form
+          className="admin-form"
+          onSubmit={save}
+        >
+          {config.fields.map(
+            ([key, label, type = "text", options]) => {
+              if (type === "select") {
+                return (
+                  <label key={key}>
+                    {label}
 
-            if (type === "select") {
+                    <select
+                      name={key}
+                      value={selectedType}
+                      onChange={(e) => setSelectedType(e.target.value)}
+                      required
+                    >
+                      <option value="">
+                        — Select category —
+                      </option>
+
+                      {(options || []).map((opt) => (
+                        <option
+                          key={opt}
+                          value={opt}
+                        >
+                          {opt}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                );
+              }
+
+              if (type === "checkbox") {
+                return (
+                  <label
+                    key={key}
+                    className="admin-checkbox"
+                  >
+                    <input
+                      name={key}
+                      type="checkbox"
+                      defaultChecked={
+                        formValues[key] === true ||
+                        formValues[key] === "true" ||
+                        formValues[key] === "on"
+                      }
+                    />
+
+                    <span>{label}</span>
+                  </label>
+                );
+              }
+
+              if (
+                key === "description" &&
+                editingIsVideo
+              ) {
+                return null;
+              }
+
+              if (key === "videoUrls") {
+                if (!editingIsVideo) {
+                  return null;
+                }
+
+                return (
+                  <label
+                    key={key}
+                    style={{
+                      gridColumn: "1 / -1",
+                    }}
+                  >
+                    {label || "YouTube Video URLs"}
+
+                    <textarea
+                      name={key}
+                      defaultValue={
+                        formValues[key] || ""
+                      }
+                      rows={6}
+                      placeholder={`Enter one YouTube URL per line\nhttps://www.youtube.com/watch?v=...\nhttps://www.youtube.com/watch?v=...`}
+                    />
+
+                    <small
+                      style={{
+                        display: "block",
+                        marginTop: 6,
+                        color: "#666",
+                      }}
+                    >
+                      Enter one YouTube video URL per line. You can also upload video files below.
+                    </small>
+                  </label>
+                );
+              }
+
               return (
                 <label key={key}>
                   {label}
-                  <select
-                    name={key}
-                    defaultValue={formValues[key] || ""}
-                    required
-                  >
-                    <option value="">— Select category —</option>
-                    {(options || []).map((opt) => (
-                      <option key={opt} value={opt}>
-                        {opt}
-                      </option>
-                    ))}
-                  </select>
+
+                  {type === "textarea" ? (
+                    <textarea
+                      name={key}
+                      defaultValue={
+                        formValues[key] || ""
+                      }
+                      required={[
+                        "title",
+                        "name",
+                        "question",
+                        "description",
+                        "content",
+                      ].includes(key)}
+                    />
+                  ) : (
+                    <input
+                      name={key}
+                      type={type}
+                      defaultValue={
+                        type === "date" &&
+                        formValues[key]
+                          ? String(
+                              formValues[key],
+                            ).slice(0, 10)
+                          : formValues[key] || ""
+                      }
+                      required={[
+                        "title",
+                        "name",
+                        "question",
+                        "description",
+                        "content",
+                      ].includes(key)}
+                    />
+                  )}
                 </label>
               );
-            }
+            },
+          )}
 
-            return (
-              <label key={key}>
-                {label}
-                {type === "textarea" ? (
-                  <textarea
-                    name={key}
-                    defaultValue={formValues[key] || ""}
-                    required={[
-                      "title",
-                      "name",
-                      "question",
-                      "description",
-                      "content",
-                    ].includes(key)}
-                  />
-                ) : (
-                  <input
-                    name={key}
-                    type={type}
-                    defaultValue={
-                      type === "date" && formValues[key]
-                        ? String(formValues[key]).slice(0, 10)
-                        : formValues[key] || ""
-                    }
-                    required={[
-                      "title",
-                      "name",
-                      "question",
-                      "description",
-                      "content",
-                    ].includes(key)}
-                  />
-                )}
-              </label>
-            );
-          })}
-
+          {/* IMAGE / VIDEO UPLOAD */}
           {config.image && (
-            <label style={{ gridColumn: "1 / -1" }}>
-              {config.multiple ? "Upload Images (select many)" : "Image upload"}
+            <label
+              style={{
+                gridColumn: "1 / -1",
+              }}
+            >
+              {editingIsVideo
+                ? "Upload Video Files (select many)"
+                : config.multiple
+                ? "Upload Images (select many)"
+                : "Image upload"}
+
               <input
                 name="image"
                 type="file"
-                accept="image/*"
+                accept={
+                  editingIsVideo
+                    ? "video/*,.mp4,.mov,.webm,.mkv,.avi,.m4v"
+                    : "image/*,.jpg,.jpeg,.png,.webp,.avif"
+                }
                 multiple={!!config.multiple}
               />
-              {editing?.image && !config.multiple && (
+
+              {editing?.image &&
+                !config.multiple &&
+                !editingIsVideo && (
+                  <small
+                    style={{
+                      display: "block",
+                      marginTop: 6,
+                      color: "#666",
+                    }}
+                  >
+                    Current: {editing.image}
+                  </small>
+                )}
+
+              {editingIsVideo && (
                 <small
-                  style={{ display: "block", marginTop: 6, color: "#666" }}
+                  style={{
+                    display: "block",
+                    marginTop: 6,
+                    color: "#666",
+                  }}
                 >
-                  Current: {editing.image}
+                  You can upload MP4, WebM, or other video formats
                 </small>
               )}
-              {config.multiple && (
+
+              {!editingIsVideo && config.multiple && (
                 <small
-                  style={{ display: "block", marginTop: 6, color: "#666" }}
+                  style={{
+                    display: "block",
+                    marginTop: 6,
+                    color: "#666",
+                  }}
                 >
                   You can select 15+ images at once
                 </small>
               )}
-              {config.multiple && editing?.images?.length > 0 && (
-                <div style={{ marginTop: "16px" }}>
-                  <p
-                    style={{
-                      fontSize: "13px",
-                      fontWeight: 600,
-                      marginBottom: "10px",
-                      color: "#1a365d",
-                    }}
-                  >
-                    Current Images ({editing.images.length}) — click × to remove
-                  </p>
-                  <div
-                    style={{
-                      display: "grid",
-                      gridTemplateColumns:
-                        "repeat(auto-fill, minmax(100px, 1fr))",
-                      gap: "12px",
-                    }}
-                  >
-                    {editing.images.map((img, index) => (
-                      <div
-                        key={index}
-                        style={{
-                          position: "relative",
-                          border: "1px solid #e2e8f0",
-                          borderRadius: "6px",
-                          overflow: "hidden",
-                        }}
-                      >
-                        <img
-                          src={img.url}
-                          alt={img.caption || `Image ${index + 1}`}
+
+              {/* Existing images for Photo albums */}
+              {!editingIsVideo &&
+                config.multiple &&
+                editing?.images?.length > 0 && (
+                  <div style={{ marginTop: "16px" }}>
+                    <p
+                      style={{
+                        fontSize: "13px",
+                        fontWeight: 600,
+                        marginBottom: "10px",
+                        color: "#1a365d",
+                      }}
+                    >
+                      Current Images ({editing.images.length}) — click × to remove
+                    </p>
+
+                    <div
+                      style={{
+                        display: "grid",
+                        gridTemplateColumns:
+                          "repeat(auto-fill, minmax(100px, 1fr))",
+                        gap: "12px",
+                      }}
+                    >
+                      {editing.images.map((img, index) => (
+                        <div
+                          key={index}
                           style={{
-                            width: "100%",
-                            height: "90px",
-                            objectFit: "cover",
-                            display: "block",
+                            position: "relative",
+                            border: "1px solid #e2e8f0",
+                            borderRadius: "6px",
+                            overflow: "hidden",
                           }}
-                        />
-                        <button
-                          type="button"
-                          onClick={() => removeImage(index)}
-                          style={{
-                            position: "absolute",
-                            top: "4px",
-                            right: "4px",
-                            background: "#c53030",
-                            color: "white",
-                            border: "none",
-                            borderRadius: "4px",
-                            width: "22px",
-                            height: "22px",
-                            fontSize: "14px",
-                            cursor: "pointer",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            lineHeight: 1,
-                          }}
-                          title="Remove image"
                         >
-                          ×
-                        </button>
-                      </div>
-                    ))}
+                          <img
+                            src={img.url}
+                            alt={img.caption || `Image ${index + 1}`}
+                            style={{
+                              width: "100%",
+                              height: "90px",
+                              objectFit: "cover",
+                              display: "block",
+                            }}
+                          />
+
+                          <button
+                            type="button"
+                            onClick={() => removeImage(index)}
+                            style={{
+                              position: "absolute",
+                              top: "4px",
+                              right: "4px",
+                              background: "#c53030",
+                              color: "white",
+                              border: "none",
+                              borderRadius: "4px",
+                              width: "22px",
+                              height: "22px",
+                              fontSize: "14px",
+                              cursor: "pointer",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              lineHeight: 1,
+                            }}
+                            title="Remove image"
+                          >
+                            ×
+                          </button>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
+
+              {/* Existing videos for Video albums */}
+              {editingIsVideo &&
+                editing?.videos?.length > 0 && (
+                  <div style={{ marginTop: "16px" }}>
+                    <p
+                      style={{
+                        fontSize: "13px",
+                        fontWeight: 600,
+                        marginBottom: "10px",
+                        color: "#1a365d",
+                      }}
+                    >
+                      Current Videos ({editing.videos.length})
+                    </p>
+
+                    <div
+                      style={{
+                        display: "grid",
+                        gridTemplateColumns:
+                          "repeat(auto-fill, minmax(180px, 1fr))",
+                        gap: "12px",
+                      }}
+                    >
+                      {editing.videos.map((video, index) => (
+                        <div
+                          key={index}
+                          style={{
+                            border: "1px solid #e2e8f0",
+                            borderRadius: "6px",
+                            padding: "8px",
+                            background: "#f7fafc",
+                          }}
+                        >
+                          {video.type === "youtube" ? (
+                            <div
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "8px",
+                              }}
+                            >
+                              <span>🎬</span>
+                              <a
+                                href={video.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                style={{
+                                  fontSize: "12px",
+                                  wordBreak: "break-all",
+                                  color: "#063b78",
+                                }}
+                              >
+                                YouTube Video
+                              </a>
+                            </div>
+                          ) : (
+                            <div
+                              style={{
+                                display: "flex",
+                                flexDirection: "column",
+                                alignItems: "center",
+                                gap: "8px",
+                              }}
+                            >
+                              <span>🎥</span>
+                              <video
+                                src={mediaUrl(video.url) || video.url}
+                                controls
+                                style={{
+                                  width: "100%",
+                                  maxHeight: "100px",
+                                  borderRadius: "4px",
+                                }}
+                              />
+                            </div>
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => removeVideo(index)}
+                            style={{
+                              marginTop: "6px",
+                              background: "#c53030",
+                              color: "white",
+                              border: "none",
+                              borderRadius: "4px",
+                              padding: "4px 8px",
+                              fontSize: "12px",
+                              cursor: "pointer",
+                              width: "100%",
+                            }}
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
             </label>
           )}
 
+          {/* PDF / ATTACHMENT */}
           {config.file && (
             <label>
               {config.fileLabel || "Attachment (PDF)"}{" "}
               <span
-                style={{ fontWeight: 400, color: "#666", fontSize: "13px" }}
+                style={{
+                  fontWeight: 400,
+                  color: "#666",
+                  fontSize: "13px",
+                }}
               >
                 (optional)
               </span>
+
               <input
                 name={config.fileField || "attachment"}
                 type="file"
-                accept={config.fileAccept || ".pdf,application/pdf"}
+                accept={
+                  config.fileAccept || ".pdf,application/pdf"
+                }
               />
+
               {editing?.[config.fileField || "attachment"] && (
                 <small
-                  style={{ display: "block", marginTop: 6, color: "#666" }}
+                  style={{
+                    display: "block",
+                    marginTop: 6,
+                    color: "#666",
+                  }}
                 >
-                  Current file: {editing[config.fileField || "attachment"]}
+                  Current file:{" "}
+                  {editing[config.fileField || "attachment"]}
                 </small>
               )}
-              <small style={{ display: "block", marginTop: 4, color: "#888" }}>
-                Leave empty if you only want to add a title, category, or link
-                in the description.
+
+              <small
+                style={{
+                  display: "block",
+                  marginTop: 4,
+                  color: "#888",
+                }}
+              >
+                Leave empty if you only want to add a title,
+                category, or link in the description.
               </small>
             </label>
           )}
 
           <div>
-            <button className="button primary">
+            <button className="button primary" type="submit">
               Save changes <span>&rarr;</span>
             </button>
+
             <button
               className="admin-cancel"
               type="button"
-              onClick={() => setEditing(null)}
+              onClick={() => {
+                setEditing(null);
+                setSelectedType("");
+              }}
             >
               Cancel
             </button>
@@ -445,21 +804,32 @@ function ResourceEditor({ resourceKey, onBack }) {
                     <img
                       src={item.coverImage || item.image}
                       alt=""
-                      style={{ width: 70, height: 58, objectFit: "cover" }}
+                      style={{
+                        width: 70,
+                        height: 58,
+                        objectFit: "cover",
+                      }}
                     />
                   )}
+
                   <div>
-                    <h3>{item.title || item.name || item.question}</h3>
+                    <h3>
+                      {item.title || item.name || item.question}
+                    </h3>
+
                     <p>
                       {item.shortDescription ||
                         item.description ||
                         item.designation ||
                         item.category ||
                         item.answer ||
-                        (item.images
-                          ? `${item.images.length} photos`
-                          : "No description")}
+                        (item.videos
+                          ? `${item.videos.length} videos`
+                          : item.images
+                            ? `${item.images.length} photos`
+                            : "No description")}
                     </p>
+
                     {item.attachment && (
                       <p style={{ marginTop: 6 }}>
                         <a
@@ -471,12 +841,24 @@ function ResourceEditor({ resourceKey, onBack }) {
                         </a>
                       </p>
                     )}
+
+                    {item.videos?.length > 0 && (
+                      <p style={{ marginTop: 6 }}>
+                        🎥 {item.videos.length} video
+                        {item.videos.length !== 1 ? "s" : ""}
+                      </p>
+                    )}
                   </div>
                 </div>
+
                 <div className="admin-row-actions">
-                  <button type="button" onClick={() => setEditing(item)}>
+                  <button
+                    type="button"
+                    onClick={() => openEditor(item)}
+                  >
                     Edit
                   </button>
+
                   <button
                     type="button"
                     className="delete"
@@ -576,11 +958,11 @@ const PAGE_BANNER_DEFINITIONS = [
   },
   {
     key: "team",
-    title: "Faculty & Staff",
+    title: "Our Team",
     eyebrow: "OUR TEAM",
     defaultImg: "banner/inner_banner_2.jpg",
     heading: "Meet the people behind Babylon.",
-    description: "Header background banner for Educators & Faculty page",
+    description: "Header background banner for Our Team page",
   },
   {
     key: "facilities",
@@ -699,7 +1081,6 @@ function SiteSettingsEditor({ onBack }) {
     const form = e.currentTarget;
     const formData = new FormData(form);
 
-    // Append all selected files
     Object.entries(selectedFiles).forEach(([fieldKey, file]) => {
       formData.set(fieldKey, file);
     });
@@ -775,7 +1156,6 @@ function SiteSettingsEditor({ onBack }) {
       </div>
 
       <form className="admin-form singleton-form" onSubmit={save}>
-        {/* ================= TAB 1: GENERAL & CONTACT ================= */}
         {activeTab === "general" && (
           <div className="admin-card">
             <div className="admin-card-header">
@@ -848,7 +1228,6 @@ function SiteSettingsEditor({ onBack }) {
           </div>
         )}
 
-        {/* ================= TAB 2: STATS & STUDENT LIFE ================= */}
         {activeTab === "stats" && (
           <div
             style={{ display: "flex", flexDirection: "column", gap: "24px" }}
@@ -870,7 +1249,6 @@ function SiteSettingsEditor({ onBack }) {
                 </p>
 
                 <div className="admin-stats-inputs-grid">
-                  {/* Stat 1: Students */}
                   <div className="admin-stat-box">
                     <div className="admin-stat-box-title">
                       <span>👨‍🎓</span> Statistic 1 (Students)
@@ -895,7 +1273,6 @@ function SiteSettingsEditor({ onBack }) {
                     </label>
                   </div>
 
-                  {/* Stat 2: Teachers */}
                   <div className="admin-stat-box">
                     <div className="admin-stat-box-title">
                       <span>👩‍🏫</span> Statistic 2 (Teachers)
@@ -920,7 +1297,6 @@ function SiteSettingsEditor({ onBack }) {
                     </label>
                   </div>
 
-                  {/* Stat 3: Since / Established */}
                   <div className="admin-stat-box">
                     <div className="admin-stat-box-title">
                       <span>🏛️</span> Statistic 3 (Since / Established)
@@ -1074,7 +1450,6 @@ function SiteSettingsEditor({ onBack }) {
           </div>
         )}
 
-        {/* ================= TAB 3: PAGE COVER BANNERS ================= */}
         {activeTab === "banners" && (
           <div className="admin-card">
             <div className="admin-card-header">
@@ -1177,7 +1552,7 @@ function SiteSettingsEditor({ onBack }) {
 }
 
 /* =========================================================
-   SINGLETON EDITOR (Card style – like Admissions)
+   SINGLETON EDITOR
 ========================================================= */
 
 function SingletonEditor({ singletonKey, onBack }) {
@@ -1423,7 +1798,7 @@ function Inbox({ endpoint, title, fields, onBack }) {
 }
 
 /* =========================================================
-   CONTACTS INBOX (Card style like Admissions)
+   CONTACTS INBOX
 ========================================================= */
 
 function ContactsInbox({ onBack }) {
@@ -1583,7 +1958,7 @@ function ContactsInbox({ onBack }) {
 }
 
 /* =========================================================
-   CAREER APPLICATIONS INBOX (Card style)
+   CAREER APPLICATIONS INBOX
 ========================================================= */
 
 function CareerAppsInbox({ onBack }) {
@@ -1671,7 +2046,6 @@ function CareerAppsInbox({ onBack }) {
                 key={item._id}
                 style={{ display: "block", padding: "24px" }}
               >
-                {/* Header row: name + position + status chip */}
                 <div
                   style={{
                     display: "flex",
@@ -1703,7 +2077,6 @@ function CareerAppsInbox({ onBack }) {
                   <span className="status-chip">{item.status || "New"}</span>
                 </div>
 
-                {/* Info grid */}
                 <div
                   style={{
                     display: "grid",
@@ -1757,7 +2130,6 @@ function CareerAppsInbox({ onBack }) {
                   </div>
                 </div>
 
-                {/* Cover Letter */}
                 {item.coverLetter && (
                   <div
                     style={{
@@ -1820,7 +2192,6 @@ function CareerAppsInbox({ onBack }) {
                   </div>
                 )}
 
-                {/* Actions row */}
                 <div
                   className="admin-row-actions"
                   style={{
@@ -1956,6 +2327,10 @@ function AdmissionsInbox({ onBack }) {
       month: "long",
       day: "numeric",
     });
+  }
+
+  function openEditor(item) {
+    setEditing(item);
   }
 
   return (
@@ -2141,7 +2516,7 @@ function AdmissionsInbox({ onBack }) {
               )}
 
               <div className="admin-row-actions">
-                <button type="button" onClick={() => setEditing(item)}>
+                <button type="button" onClick={() => openEditor(item)}>
                   Update Status / Note
                 </button>
                 <button
@@ -2241,6 +2616,10 @@ function AdminUsers({ onBack }) {
     }
   }
 
+  function openEditor(admin = {}) {
+    setEditing(admin);
+  }
+
   return (
     <section className="admin-resource">
       <div className="admin-resource-head">
@@ -2254,7 +2633,7 @@ function AdminUsers({ onBack }) {
         <button
           type="button"
           className="button primary"
-          onClick={() => setEditing({})}
+          onClick={() => openEditor({})}
         >
           Add New Admin
         </button>
@@ -2352,15 +2731,6 @@ function AdminUsers({ onBack }) {
 /* =========================================================
    SIDEBAR + TOP BAR
 ========================================================= */
-
-const NAV_ICONS = {
-  dashboard: "🏠",
-  admissions: "📋",
-  contacts: "✉️",
-  "career-apps": "💼",
-  "admin-users": "⭐",
-  default: "📄",
-};
 
 function AdminSidebar({ user, view, setView, onLogout, open, onClose }) {
   const navItems = [

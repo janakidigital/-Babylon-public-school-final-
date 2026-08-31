@@ -65,29 +65,52 @@ export const resources = {
   },
 
   gallery: {
-    label: "Gallery Albums",
-    endpoint: "/gallery",
-    image: true,
-    multiple: true,
-    fields: [
-      ["title", "Title"],
-      ["description", "Description", "textarea"],
-      ["category", "Category"],
+  label: "Gallery",
+  endpoint: "/gallery",
+  image: true,
+  multiple: true,
+  fields: [
+    ["title", "Title"],
+    [
+      "type",
+      "Type",
+      "select",
+      ["Photos", "Videos"],
     ],
-  },
+    ["description", "Description", "textarea"],
+    ["videoUrls", "Video URLs", "textarea"],
+  ],
+},
 
   faculty: {
-    label: "Faculty",
+    label: "Our Team",
     endpoint: "/faculty",
     image: true,
     fields: [
       ["name", "Name"],
+      [
+        "category",
+        "Category",
+        "select",
+        [
+          "BOARD OF DIRECTORS",
+          "ADMINISTRATION",
+          "COORDINATORS",
+          "HOD",
+          "FACULTIES",
+          "ACCOUNT & FINANCE",
+          "ECA / CCA",
+          "CAFETERIA",
+          "TRANSPORT",
+        ],
+      ],
       ["designation", "Designation"],
       ["department", "Department"],
-      ["qualification", "Qualification"],
+      ["qualification", "Qualification", "textarea"],
       ["bio", "Biography", "textarea"],
       ["email", "Email", "email"],
       ["phone", "Phone"],
+      ["displayOrder", "Display order", "number"],
     ],
   },
 
@@ -152,27 +175,32 @@ export const resources = {
   },
 
   // In resources.downloads (or whatever the key is)
-downloads: {
-  label: "Downloads",
-  endpoint: "/downloads", // adjust if different
-  file: true,
-  fileField: "file",       // or "attachment" — match what your API expects
-  fileLabel: "PDF / Document",
-  fileAccept: ".pdf,application/pdf",
-  fields: [
-    ["title", "Title", "text"],
-    ["category", "Category", "select", [
-      "Babylon_Buds",
-      "Parents Portal",
-      "Calendar",
-      "Syllabus",
-      "Administrative",
-      "Others",
-    ]],
-    ["description", "Description", "textarea"],
-    // keep any other existing fields (slug, etc.)
-  ],
-},
+  downloads: {
+    label: "Downloads",
+    endpoint: "/downloads", // adjust if different
+    file: true,
+    fileField: "file", // or "attachment" — match what your API expects
+    fileLabel: "PDF / Document",
+    fileAccept: ".pdf,application/pdf",
+    fields: [
+      ["title", "Title", "text"],
+      [
+        "category",
+        "Category",
+        "select",
+        [
+          "Babylon_Buds",
+          "Parents Portal",
+          "Calendar",
+          "Syllabus",
+          "Administrative",
+          "Others",
+        ],
+      ],
+      ["description", "Description", "textarea"],
+      // keep any other existing fields (slug, etc.)
+    ],
+  },
 
   // ===== NEW: Multiple Posters =====
   posters: {

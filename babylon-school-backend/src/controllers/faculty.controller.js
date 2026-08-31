@@ -53,7 +53,7 @@ const getSingleFaculty = async (req, res) => {
 // ======================================================
 const createFaculty = async (req, res) => {
   try {
-    const { name, designation, department, qualification, bio, email, phone, displayOrder, isActive } = req.body;
+    const { name, category, designation, department, qualification, bio, email, phone, displayOrder, isActive } = req.body;
 
     if (!name) {
       return res.status(400).json({ success: false, message: "Name is required" });
@@ -68,6 +68,7 @@ const createFaculty = async (req, res) => {
 
     const faculty = await Faculty.create({
       name,
+      category: category || "FACULTIES",
       designation,
       department,
       qualification,

@@ -1,19 +1,22 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { publicApi } from "../../services/api";
 import usePublicData from "../../hooks/usePublicData";
 import { mediaUrl } from "../../lib/media";
 import { assetPath } from "../../data/content";
+import TeacherModal from "../../components/shared/TeacherModal";
 
 export default function AboutFaculty() {
   const { data: faculty, loading } = usePublicData(publicApi.faculty, []);
+  const [selectedTeacher, setSelectedTeacher] = useState(null);
   const preview = faculty.slice(0, 3);
   if (!loading && preview.length === 0) return null;
 
   return (
     <section className="about-faculty shell">
       <div className="center-heading">
-        <p className="eyebrow">OUR EDUCATORS</p>
-        <h2>Meet our teachers</h2>
+        <p className="eyebrow">OUR TEAM</p>
+        <h2>Meet our educators</h2>
         <p>
           Passionate mentors who guide students with knowledge, care and
           encouragement.
@@ -21,7 +24,7 @@ export default function AboutFaculty() {
       </div>
 
       {loading ? (
-        <p>Loading faculty...</p>
+        <p>Loading educators...</p>
       ) : (
         <>
           <style>{`
@@ -53,6 +56,7 @@ export default function AboutFaculty() {
             {preview.map((teacher) => (
               <article
                 key={teacher._id}
+                onClick={() => setSelectedTeacher(teacher)}
                 style={{
                   background: "#fff",
                   borderRadius: "12px",
@@ -60,35 +64,38 @@ export default function AboutFaculty() {
                   boxShadow: "0 4px 14px rgba(0,0,0,0.07)",
                   border: "1px solid rgba(0,0,0,0.05)",
                   textAlign: "center",
+                  cursor: "pointer",
+                  transition: "transform 0.2s ease",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = "translateY(-3px)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = "translateY(0)";
                 }}
               >
-                <Link
-                  to={`/teacher-profile/${teacher._id}`}
-                  style={{ display: "block" }}
+                <div
+                  className="faculty-card-img"
+                  style={{
+                    width: "100%",
+                    aspectRatio: "1 / 1",
+                    overflow: "hidden",
+                  }}
                 >
-                  <div
-                    className="faculty-card-img"
+                  <img
+                    src={mediaUrl(
+                      teacher.image,
+                      `${assetPath}team/team_1.jpg`
+                    )}
+                    alt={teacher.name}
                     style={{
                       width: "100%",
-                      aspectRatio: "1 / 1",
-                      overflow: "hidden",
+                      height: "100%",
+                      objectFit: "cover",
+                      display: "block",
                     }}
-                  >
-                    <img
-                      src={mediaUrl(
-                        teacher.image,
-                        `${assetPath}team/team_1.jpg`
-                      )}
-                      alt={teacher.name}
-                      style={{
-                        width: "100%",
-                        height: "100%",
-                        objectFit: "cover",
-                        display: "block",
-                      }}
-                    />
-                  </div>
-                </Link>
+                  />
+                </div>
 
                 <div style={{ padding: "0.7rem 0.5rem 0.9rem" }}>
                   <h3
@@ -109,7 +116,7 @@ export default function AboutFaculty() {
                       display: "block",
                     }}
                   >
-                    {teacher.designation}
+                    {teacher.designation || teacher.department}
                   </span>
                 </div>
               </article>
@@ -118,10 +125,17 @@ export default function AboutFaculty() {
 
           <p style={{ textAlign: "center", marginTop: "1.75rem" }}>
             <Link className="text-link" to="/team">
-              View all faculty <b>&rarr;</b>
+              View all team members <b>&rarr;</b>
             </Link>
           </p>
         </>
+      )}
+
+      {selectedTeacher && (
+        <TeacherModal
+          teacher={selectedTeacher}
+          onClose={() => setSelectedTeacher(null)}
+        />
       )}
     </section>
   );

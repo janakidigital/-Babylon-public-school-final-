@@ -52,18 +52,25 @@ export default function EventDetailsPage() {
         label={`${date.full}${event.location ? ` | ${event.location}` : ""}`}
         title={event.title}
       >
-        {event.shortDescription && <p>{event.shortDescription}</p>}
+        {/* Back navigation */}
+        <p style={{ marginBottom: "24px" }}>
+          <Link className="text-link" to="/events">
+            ← Back to all events
+          </Link>
+        </p>
+
+        {event.shortDescription && <p style={{ fontSize: "1.1rem", fontWeight: 500, color: "#334155" }}>{event.shortDescription}</p>}
         {(event.description || "").split("\n").map((para, index) =>
           para.trim() ? <p key={index}>{para}</p> : null,
         )}
         {(event.startTime || event.endTime) && (
-          <>
-            <h3>Time</h3>
-            <p>
-              {event.startTime || "TBA"}
+          <div style={{ marginTop: "24px", padding: "16px 20px", background: "#f8fafc", borderRadius: "10px", border: "1px solid #e2e8f0" }}>
+            <h3 style={{ margin: "0 0 6px 0", fontSize: "1rem", color: "#1e293b" }}>Event Timing</h3>
+            <p style={{ margin: 0, fontWeight: 600, color: "#c53030" }}>
+              🕒 {event.startTime || "TBA"}
               {event.endTime ? ` – ${event.endTime}` : ""}
             </p>
-          </>
+          </div>
         )}
       </ArticleLayout>
     </>

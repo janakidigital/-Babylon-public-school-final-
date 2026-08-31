@@ -30,6 +30,8 @@ const getEvents = async (req, res) => {
   }
 };
 
+const mongoose = require("mongoose");
+
 // ======================================================
 // GET SINGLE EVENT
 // GET /api/v1/events/:id
@@ -37,10 +39,12 @@ const getEvents = async (req, res) => {
 // ======================================================
 const getEvent = async (req, res) => {
   try {
-    const event = await Event.findOne({
-      _id: req.params.id,
-      isActive: true,
-    });
+    const isObjectId = mongoose.Types.ObjectId.isValid(req.params.id);
+    const filter = isObjectId
+      ? { $or: [{ _id: req.params.id }, { slug: req.params.id }], isActive: true }
+      : { slug: req.params.id, isActive: true };
+
+    const event = await Event.findOne(filter);
 
     if (!event) {
       return res.status(404).json({
