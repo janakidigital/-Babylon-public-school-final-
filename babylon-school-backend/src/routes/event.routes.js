@@ -13,6 +13,7 @@ const {
 } = require("../controllers/event.controller");
 
 const { protect } = require("../middleware/auth");
+const authorize = require("../middleware/authorize.middleware");
 const upload = require("../middleware/upload.middleware");
 
 // ======================================================
@@ -25,18 +26,18 @@ router.get("/:id", getEvent);
 
 
 // ======================================================
-// PROTECTED ROUTES
+// PROTECTED ROUTES (Admin only)
 // ======================================================
 
-router.post("/", protect, upload.single("image"), createEvent);
+router.post("/", protect, authorize("admin", "superAdmin"), upload.single("image"), createEvent);
 
-router.put("/:id", protect, upload.single("image"), updateEvent);
+router.put("/:id", protect, authorize("admin", "superAdmin"), upload.single("image"), updateEvent);
 
-router.delete("/:id", protect, deleteEvent);
+router.delete("/:id", protect, authorize("admin", "superAdmin"), deleteEvent);
 
-router.patch("/:id/status", protect, toggleEventStatus);
+router.patch("/:id/status", protect, authorize("admin", "superAdmin"), toggleEventStatus);
 
-router.patch("/:id/featured", protect, toggleFeaturedStatus);
+router.patch("/:id/featured", protect, authorize("admin", "superAdmin"), toggleFeaturedStatus);
 
 
 module.exports = router;

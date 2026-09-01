@@ -12,6 +12,7 @@ const {
 } = require("../controllers/faculty.controller");
 
 const { protect } = require("../middleware/auth");
+const authorize = require("../middleware/authorize.middleware");
 const upload = require("../middleware/upload.middleware");
 
 // ======================================================
@@ -25,20 +26,20 @@ router.get("/", getFaculty);
 router.get("/:id", getSingleFaculty);
 
 // =====================================================
-// PROTECTED ROUTES
+// PROTECTED ROUTES (Admin only)
 // =====================================================
 
 // Create faculty member
-router.post("/", protect, upload.single("image"), createFaculty);
+router.post("/", protect, authorize("admin", "superAdmin"), upload.single("image"), createFaculty);
 
 // Update faculty member
-router.put("/:id", protect, upload.single("image"), updateFaculty);
+router.put("/:id", protect, authorize("admin", "superAdmin"), upload.single("image"), updateFaculty);
 
 // Delete faculty member
-router.delete("/:id", protect, deleteFaculty);
+router.delete("/:id", protect, authorize("admin", "superAdmin"), deleteFaculty);
 
 // Activate / Deactivate
-router.patch("/:id/status", protect, toggleFacultyStatus);
+router.patch("/:id/status", protect, authorize("admin", "superAdmin"), toggleFacultyStatus);
 
 module.exports = router;
 

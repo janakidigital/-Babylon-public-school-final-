@@ -13,6 +13,7 @@ const {
 } = require("../controllers/testimonial.controller");
 
 const { protect } = require("../middleware/auth");
+const authorize = require("../middleware/authorize.middleware");
 const upload = require("../middleware/upload.middleware");
 
 // ======================================================
@@ -25,24 +26,26 @@ router.get("/:id", getTestimonial);
 
 
 // ======================================================
-// PROTECTED ROUTES
+// PROTECTED ROUTES (Admin only)
 // ======================================================
 
-router.post("/", protect, upload.single("image"), createTestimonial);
+router.post("/", protect, authorize("admin", "superAdmin"), upload.single("image"), createTestimonial);
 
-router.put("/:id", protect, upload.single("image"), updateTestimonial);
+router.put("/:id", protect, authorize("admin", "superAdmin"), upload.single("image"), updateTestimonial);
 
-router.delete("/:id", protect, deleteTestimonial);
+router.delete("/:id", protect, authorize("admin", "superAdmin"), deleteTestimonial);
 
 router.patch(
   "/:id/status",
   protect,
+  authorize("admin", "superAdmin"),
   toggleTestimonialStatus
 );
 
 router.patch(
   "/:id/featured",
   protect,
+  authorize("admin", "superAdmin"),
   toggleFeaturedStatus
 );
 

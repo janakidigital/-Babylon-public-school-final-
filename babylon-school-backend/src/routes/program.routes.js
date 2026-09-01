@@ -13,6 +13,7 @@ const {
 } = require("../controllers/program.controller");
 
 const { protect } = require("../middleware/auth");
+const authorize = require("../middleware/authorize.middleware");
 const upload = require("../middleware/upload.middleware");
 
 // ======================================================
@@ -27,23 +28,23 @@ router.get("/:id", getProgram);
 
 
 // ======================================================
-// PROTECTED ROUTES
+// PROTECTED ROUTES (Admin only)
 // ======================================================
 
 // Create program
-router.post("/", protect, upload.single("image"), createProgram);
+router.post("/", protect, authorize("admin", "superAdmin"), upload.single("image"), createProgram);
 
 // Update program
-router.put("/:id", protect, upload.single("image"), updateProgram);
+router.put("/:id", protect, authorize("admin", "superAdmin"), upload.single("image"), updateProgram);
 
 // Delete program
-router.delete("/:id", protect, deleteProgram);
+router.delete("/:id", protect, authorize("admin", "superAdmin"), deleteProgram);
 
 // Activate / Deactivate program
-router.patch("/:id/status", protect, toggleProgramStatus);
+router.patch("/:id/status", protect, authorize("admin", "superAdmin"), toggleProgramStatus);
 
 // Mark / Unmark as featured
-router.patch("/:id/featured", protect, toggleFeaturedStatus);
+router.patch("/:id/featured", protect, authorize("admin", "superAdmin"), toggleFeaturedStatus);
 
 
 module.exports = router;

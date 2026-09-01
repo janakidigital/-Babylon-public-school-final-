@@ -8,12 +8,13 @@ const {
 
 const router = express.Router();
 const { protect } = require("../middleware/auth");
+const authorize = require("../middleware/authorize.middleware");
 const upload = require("../middleware/upload.middleware");
 
 router.get("/", getSiteSettings);
 
-router.post("/", protect, upload.any(), createSiteSettings);
+router.post("/", protect, authorize("admin", "superAdmin"), upload.any(), createSiteSettings);
 
-router.put("/", protect, upload.any(), updateSiteSettings);
+router.put("/", protect, authorize("admin", "superAdmin"), upload.any(), updateSiteSettings);
 
 module.exports = router;

@@ -10,7 +10,9 @@ const globalSearch = async (req, res) => {
     const q = (req.query.q || "").trim();
     if (!q) return res.status(400).json({ success: false, message: "Query (q) is required" });
 
-    const regex = new RegExp(q, "i");
+    // Escape special characters to prevent ReDoS and invalid regular expression syntax errors
+    const escapedQuery = q.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+    const regex = new RegExp(escapedQuery, "i");
 
     const [news, notices, events, programs, galleries] = await Promise.all([
       News.find({

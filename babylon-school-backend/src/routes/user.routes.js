@@ -90,22 +90,7 @@ router.delete(
 //
 // Only Super Admin can create Admin accounts.
 //
-// POST /api/users/admin
-router.post(
-    "/admin",
-    protect,
-    authorize("superAdmin"),
-    userController.createAdmin
-);
-
-
-
-
-// =====================================================
-// SUPER ADMIN
-// =====================================================
-
-// Create Admin
+// POST /api/v1/users/admin
 router.post(
     "/admin",
     protect,

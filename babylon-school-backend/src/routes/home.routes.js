@@ -11,24 +11,25 @@ const {
 } = require("../controllers/home.controller");
 
 const { protect } = require("../middleware/auth");
+const authorize = require("../middleware/authorize.middleware");
 
 // PUBLIC ROUTES
 // Get homepage content
 router.get("/", getHome);
 
 
-// PROTECTED ROUTES
+// PROTECTED ROUTES (Admin only)
 // Create homepage content
-router.post("/", protect, createHome);
+router.post("/", protect, authorize("admin", "superAdmin"), createHome);
 
 // Update homepage content
-router.put("/", protect, updateHome);
+router.put("/", protect, authorize("admin", "superAdmin"), updateHome);
 
 // Delete homepage content
-router.delete("/", protect, deleteHome);
+router.delete("/", protect, authorize("admin", "superAdmin"), deleteHome);
 
 // Activate / Deactivate homepage
-router.patch("/status", protect, toggleHomeStatus);
+router.patch("/status", protect, authorize("admin", "superAdmin"), toggleHomeStatus);
 
 
 module.exports = router;

@@ -14,6 +14,7 @@ const {
 } = require("../controllers/news.controller");
 
 const { protect, optionalProtect } = require("../middleware/auth");
+const authorize = require("../middleware/authorize.middleware");
 const upload = require("../middleware/upload.middleware");
 
 // ======================================================
@@ -28,26 +29,26 @@ router.get("/:id", getSingleNews);
 
 
 // ======================================================
-// PROTECTED ROUTES
+// PROTECTED ROUTES (Admin only)
 // ======================================================
 
 // Create news
-router.post("/", protect, upload.single("image"), createNews);
+router.post("/", protect, authorize("admin", "superAdmin"), upload.single("image"), createNews);
 
 // Update news
-router.put("/:id", protect, upload.single("image"), updateNews);
+router.put("/:id", protect, authorize("admin", "superAdmin"), upload.single("image"), updateNews);
 
 // Delete news
-router.delete("/:id", protect, deleteNews);
+router.delete("/:id", protect, authorize("admin", "superAdmin"), deleteNews);
 
 // Activate / Deactivate news
-router.patch("/:id/status", protect, toggleNewsStatus);
+router.patch("/:id/status", protect, authorize("admin", "superAdmin"), toggleNewsStatus);
 
 // Mark / Unmark as featured
-router.patch("/:id/featured", protect, toggleFeaturedStatus);
+router.patch("/:id/featured", protect, authorize("admin", "superAdmin"), toggleFeaturedStatus);
 
 // Publish / Unpublish news
-router.patch("/:id/publish", protect, togglePublishStatus);
+router.patch("/:id/publish", protect, authorize("admin", "superAdmin"), togglePublishStatus);
 
 
 module.exports = router;

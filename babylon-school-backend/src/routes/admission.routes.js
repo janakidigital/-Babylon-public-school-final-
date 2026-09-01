@@ -12,6 +12,7 @@ const {
 } = require("../controllers/admission.controller");
 
 const { protect } = require("../middleware/auth");
+const authorize = require("../middleware/authorize.middleware");
 
 // ======================================================
 // PUBLIC
@@ -21,24 +22,26 @@ router.post("/", submitAdmission);
 
 
 // ======================================================
-// PROTECTED
+// PROTECTED (Admin only)
 // ======================================================
 
-router.get("/", protect, getAdmissions);
+router.get("/", protect, authorize("admin", "superAdmin"), getAdmissions);
 
-router.get("/:id", protect, getAdmission);
+router.get("/:id", protect, authorize("admin", "superAdmin"), getAdmission);
 
-router.put("/:id", protect, updateAdmission);
+router.put("/:id", protect, authorize("admin", "superAdmin"), updateAdmission);
 
 router.patch(
   "/:id/status",
   protect,
+  authorize("admin", "superAdmin"),
   updateAdmissionStatus
 );
 
 router.delete(
   "/:id",
   protect,
+  authorize("admin", "superAdmin"),
   deleteAdmission
 );
 

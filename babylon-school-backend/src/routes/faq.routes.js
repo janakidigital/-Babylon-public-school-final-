@@ -11,16 +11,17 @@ const {
 } = require("../controllers/faq.controller");
 
 const { protect } = require("../middleware/auth");
+const authorize = require("../middleware/authorize.middleware");
 
 // Public
 router.get("/", getFaqs);
 router.get("/:id", getSingleFaq);
 
-// Protected
-router.post("/", protect, createFaq);
-router.put("/:id", protect, updateFaq);
-router.delete("/:id", protect, deleteFaq);
-router.patch("/:id/status", protect, toggleFaqStatus);
+// Protected (Admin only)
+router.post("/", protect, authorize("admin", "superAdmin"), createFaq);
+router.put("/:id", protect, authorize("admin", "superAdmin"), updateFaq);
+router.delete("/:id", protect, authorize("admin", "superAdmin"), deleteFaq);
+router.patch("/:id/status", protect, authorize("admin", "superAdmin"), toggleFaqStatus);
 
 module.exports = router;
 

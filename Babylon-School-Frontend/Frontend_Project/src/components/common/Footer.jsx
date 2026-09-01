@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { useSite } from "../../context/SiteContext";
+import SchoolLogo from "./SchoolLogo";
 import "bootstrap-icons/font/bootstrap-icons.css";
 
 export default function Footer() {
@@ -72,9 +73,15 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Contact */}
-        <div>
-          <h4>Contact</h4>
+        {/* Contact & School Logo */}
+        <div className="footer-contact-column">
+          {/* School logo on desktop in place of "Contact" heading */}
+          <div className="footer-logo-desktop">
+            <SchoolLogo footer />
+          </div>
+
+          {/* Contact heading shown only on mobile */}
+          <h4 className="footer-contact-title-mobile">Contact</h4>
 
           <div className="footer-contact">
             <i className="bi bi-geo-alt-fill"></i>

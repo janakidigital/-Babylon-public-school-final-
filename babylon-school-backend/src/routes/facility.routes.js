@@ -11,17 +11,18 @@ const {
 } = require("../controllers/facility.controller");
 
 const { protect } = require("../middleware/auth");
+const authorize = require("../middleware/authorize.middleware");
 const upload = require("../middleware/upload.middleware");
 
 // Public
 router.get("/", getFacilities);
 router.get("/:id", getSingleFacility);
 
-// Protected
-router.post("/", protect, upload.single("image"), createFacility);
-router.put("/:id", protect, upload.single("image"), updateFacility);
-router.delete("/:id", protect, deleteFacility);
-router.patch("/:id/status", protect, toggleFacilityStatus);
+// Protected (Admin only)
+router.post("/", protect, authorize("admin", "superAdmin"), upload.single("image"), createFacility);
+router.put("/:id", protect, authorize("admin", "superAdmin"), upload.single("image"), updateFacility);
+router.delete("/:id", protect, authorize("admin", "superAdmin"), deleteFacility);
+router.patch("/:id/status", protect, authorize("admin", "superAdmin"), toggleFacilityStatus);
 
 module.exports = router;
 
