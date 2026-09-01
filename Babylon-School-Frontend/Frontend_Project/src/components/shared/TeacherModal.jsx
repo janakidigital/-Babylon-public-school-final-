@@ -143,7 +143,7 @@ export default function TeacherModal({ teacher, onClose }) {
                   margin: "0 0 6px 0",
                   fontSize: "1.75rem",
                   fontWeight: 700,
-                  color: "#00acc1", // Cyan / Teal color matching user screenshot
+                  color: "#0a192f",
                   letterSpacing: "-0.01em",
                 }}
               >
@@ -169,7 +169,7 @@ export default function TeacherModal({ teacher, onClose }) {
                     display: "inline-block",
                     marginTop: "8px",
                     background: "#ecfeff",
-                    color: "#0891b2",
+                    color: "#0a192f",
                     fontSize: "0.75rem",
                     fontWeight: 700,
                     padding: "3px 10px",
@@ -272,7 +272,7 @@ export default function TeacherModal({ teacher, onClose }) {
                   <span style={{ fontWeight: 600 }}>Email:</span>
                   <a
                     href={`mailto:${teacher.email}`}
-                    style={{ color: "#00acc1", textDecoration: "none" }}
+                    style={{ color: "#0a192f", textDecoration: "none" }}
                   >
                     {teacher.email}
                   </a>
@@ -292,7 +292,7 @@ export default function TeacherModal({ teacher, onClose }) {
                   <span style={{ fontWeight: 600 }}>Phone:</span>
                   <a
                     href={`tel:${teacher.phone}`}
-                    style={{ color: "#00acc1", textDecoration: "none" }}
+                    style={{ color: "#0a192f", textDecoration: "none" }}
                   >
                     {teacher.phone}
                   </a>

@@ -18,11 +18,11 @@ function formatFullDate(value) {
 export default function NoticesSection({ limit = 4, showEvents = true }) {
   const { data: noticesData, loading: noticesLoading } = usePublicData(
     publicApi.notices,
-    []
+    [],
   );
   const { data: eventsData, loading: eventsLoading } = usePublicData(
     publicApi.events,
-    []
+    [],
   );
 
   const notices = (limit ? noticesData.slice(0, limit) : noticesData) || [];
@@ -79,7 +79,7 @@ export default function NoticesSection({ limit = 4, showEvents = true }) {
                   margin: 0,
                   fontSize: "1.25rem",
                   fontWeight: 800,
-                  color: "#1e293b",
+                  color: "#0a192f",
                   letterSpacing: "0.03em",
                   textTransform: "uppercase",
                   display: "inline-block",
@@ -92,7 +92,7 @@ export default function NoticesSection({ limit = 4, showEvents = true }) {
                     display: "block",
                     width: "40px",
                     height: "3px",
-                    background: "#c53030",
+                    background: "#0a192f",
                     marginTop: "6px",
                     borderRadius: "2px",
                   }}
@@ -138,7 +138,7 @@ export default function NoticesSection({ limit = 4, showEvents = true }) {
             >
               {notices.map((notice, index) => {
                 const dateStr = formatFullDate(
-                  notice.publishedAt || notice.createdAt
+                  notice.publishedAt || notice.createdAt,
                 );
                 const categoryStr = notice.category || "NOTICE";
                 const noticeUrl = `/notices/${notice._id}`;
@@ -189,7 +189,7 @@ export default function NoticesSection({ limit = 4, showEvents = true }) {
                       {dateStr && (
                         <span
                           style={{
-                            background: "#085f7e",
+                            background: "#062b59",
                             color: "#ffffff",
                             fontSize: "12px",
                             fontWeight: 600,
@@ -246,7 +246,7 @@ export default function NoticesSection({ limit = 4, showEvents = true }) {
                     margin: 0,
                     fontSize: "1.25rem",
                     fontWeight: 800,
-                    color: "#1e293b",
+                    color: "#0a192f",
                     letterSpacing: "0.03em",
                     textTransform: "uppercase",
                     display: "inline-block",
@@ -259,7 +259,7 @@ export default function NoticesSection({ limit = 4, showEvents = true }) {
                       display: "block",
                       width: "40px",
                       height: "3px",
-                      background: "#c53030",
+                      background: "#0a192f",
                       marginTop: "6px",
                       borderRadius: "2px",
                     }}
@@ -305,7 +305,7 @@ export default function NoticesSection({ limit = 4, showEvents = true }) {
               >
                 {events.map((event, index) => {
                   const dateStr = formatFullDate(
-                    event.eventDate || event.createdAt
+                    event.eventDate || event.createdAt,
                   );
                   const timeStr = [event.startTime, event.endTime]
                     .filter(Boolean)
@@ -438,7 +438,7 @@ export default function NoticesSection({ limit = 4, showEvents = true }) {
                           {dateStr && (
                             <span
                               style={{
-                                background: "#085f7e",
+                                background: "#062b59",
                                 color: "#ffffff",
                                 fontSize: "11px",
                                 fontWeight: 600,

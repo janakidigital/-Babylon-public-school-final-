@@ -286,7 +286,7 @@ a {
 }
 
 .eyebrow {
-  color: var(--red);
+  color: #0a192f;
   font-size: 12px;
   letter-spacing: 2.1px;
   font-weight: 700;
@@ -1268,7 +1268,7 @@ footer {
   position: absolute;
   top: 0;
   left: 15px;
-  background: var(--red);
+  background: #0a192f;
   color: #fff;
   padding: 10px 13px;
   text-align: center;

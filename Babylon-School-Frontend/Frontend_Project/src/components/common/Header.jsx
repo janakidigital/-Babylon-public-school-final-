@@ -14,6 +14,7 @@ const primaryNav = [
       { label: "Achievements", link: "/achievements" },
       { label: "Facilities", link: "/facilities" },
       { label: "FAQ", link: "/faq" },
+      { label: "Our Learning Partners", link: "/international-partners" },
     ],
   },
   { label: "Academics", link: "/academics" },
@@ -163,7 +164,7 @@ export default function Header() {
                 >
                   {item.label}
                 </NavLink>
-              )
+              ),
             )}
 
             <a

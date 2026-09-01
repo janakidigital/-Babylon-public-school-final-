@@ -125,14 +125,14 @@ export default function HeroSection() {
         <h1>{slide.heading}</h1>
         <p className="hero-description">{slide.description}</p>
 
-        <div className="hero-actions">
-          <Link className="button primary" to="/academics">
-            Explore Academics <span>&rarr;</span>
-          </Link>
-          <Link className="button ghost" to="/about">
-            Discover Babylon
-          </Link>
-        </div>
+       <div className="hero-actions">
+  <Link className="button primary" to="/academics">
+    Explore Academics <span>&rarr;</span>
+  </Link>
+  <Link className="button ghost" to="/about">
+    Discover Babylon
+  </Link>
+</div>
       </div>
 
       {/* Counter */}

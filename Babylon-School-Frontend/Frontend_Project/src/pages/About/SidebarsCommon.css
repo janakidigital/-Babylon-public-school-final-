@@ -1,0 +1,184 @@
+/* About & Admissions Page Layout */
+.about-page-layout,
+.admissions-page-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 40px;
+  padding: 60px 20px;
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+.about-container,
+.admissions-container {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 40px;
+  align-items: start;
+}
+
+.about-main-content,
+.admissions-main-content {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+/* About & Admissions Sidebar */
+.about-sidebar,
+.admissions-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  background: #ffffff;
+  border-radius: 0;
+  overflow: hidden;
+  box-shadow: none;
+  height: fit-content;
+  position: sticky;
+  top: 100px;
+}
+
+.admissions-sidebar {
+  width: 100%;
+  max-width: 320px;
+}
+
+/* Sidebar Header */
+.sidebar-header {
+  padding: 0 0 12px 0;
+  margin: 0;
+  border-bottom: 2px solid #062b59;
+}
+
+.sidebar-header h3 {
+  color: #062b59;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  margin: 0;
+  padding: 0;
+}
+
+/* Sidebar Nav */
+.about-sidebar .sidebar-nav,
+.admissions-sidebar .sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 0;
+  margin-top: 8px;
+}
+
+/* Sidebar Links (same style for both) */
+.about-sidebar .sidebar-link,
+.admissions-sidebar .sidebar-link {
+  display: block;
+  padding: 10px 0;
+  color: #475569;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  border: none;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  background: transparent;
+}
+
+.about-sidebar .sidebar-link:hover,
+.admissions-sidebar .sidebar-link:hover {
+  background: transparent;
+  color: #062b59;
+}
+
+.about-sidebar .sidebar-link.active,
+.admissions-sidebar .sidebar-link.active {
+  background: transparent;
+  color: #c53030;
+  font-weight: 600;
+  border-bottom-color: #c53030;
+  border-bottom-width: 2px;
+}
+
+.about-sidebar .sidebar-link:last-child,
+.admissions-sidebar .sidebar-link:last-child {
+  border-bottom: none;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .about-container,
+  .admissions-container {
+    grid-template-columns: 1fr;
+  }
+
+  .about-sidebar,
+  .admissions-sidebar {
+    position: static;
+    border-radius: 8px;
+  }
+
+  .sidebar-header {
+    padding: 12px 16px;
+    border-bottom: 2px solid #062b59;
+  }
+
+  .sidebar-header h3 {
+    font-size: 1rem;
+  }
+
+  .about-sidebar .sidebar-link,
+  .admissions-sidebar .sidebar-link {
+    padding: 12px 16px;
+    font-size: 0.9rem;
+  }
+
+  .about-sidebar .sidebar-link:hover,
+  .admissions-sidebar .sidebar-link:hover {
+    padding-left: 20px;
+  }
+
+  .about-sidebar .sidebar-link.active,
+  .admissions-sidebar .sidebar-link.active {
+    padding-left: 20px;
+  }
+}
+
+@media (max-width: 600px) {
+  .about-page-layout,
+  .admissions-page-layout {
+    padding: 40px 16px;
+    gap: 24px;
+  }
+
+  .about-sidebar,
+  .admissions-sidebar {
+    border-radius: 6px;
+  }
+
+  .sidebar-header {
+    padding: 10px 14px;
+  }
+
+  .sidebar-header h3 {
+    font-size: 0.95rem;
+  }
+
+  .about-sidebar .sidebar-link,
+  .admissions-sidebar .sidebar-link {
+    padding: 10px 14px;
+    font-size: 0.85rem;
+  }
+
+  .about-sidebar .sidebar-link:hover,
+  .admissions-sidebar .sidebar-link:hover {
+    padding-left: 18px;
+  }
+
+  .about-sidebar .sidebar-link.active,
+  .admissions-sidebar .sidebar-link.active {
+    padding-left: 18px;
+  }
+}

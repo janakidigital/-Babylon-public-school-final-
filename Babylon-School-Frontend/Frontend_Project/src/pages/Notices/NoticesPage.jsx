@@ -28,7 +28,7 @@ function NoticesListAll() {
     const cats = new Set(
       (notices || [])
         .map((n) => String(n.category || "General").trim())
-        .filter(Boolean)
+        .filter(Boolean),
     );
     return ["ALL", ...Array.from(cats)];
   }, [notices]);
@@ -36,13 +36,17 @@ function NoticesListAll() {
   const filteredNotices = useMemo(() => {
     return (notices || []).filter((notice) => {
       if (selectedCategory !== "ALL") {
-        const cat = String(notice.category || "General").trim().toUpperCase();
+        const cat = String(notice.category || "General")
+          .trim()
+          .toUpperCase();
         if (cat !== selectedCategory.toUpperCase()) return false;
       }
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
         const matchesTitle = (notice.title || "").toLowerCase().includes(q);
-        const matchesDesc = (notice.shortDescription || notice.content || "").toLowerCase().includes(q);
+        const matchesDesc = (notice.shortDescription || notice.content || "")
+          .toLowerCase()
+          .includes(q);
         if (!matchesTitle && !matchesDesc) return false;
       }
       return true;
@@ -58,7 +62,10 @@ function NoticesListAll() {
         pageKey="notices"
       />
 
-      <section className="listing-page shell" style={{ maxWidth: "1000px", margin: "0 auto", padding: "40px 20px" }}>
+      <section
+        className="listing-page shell"
+        style={{ maxWidth: "1000px", margin: "0 auto", padding: "40px 20px" }}
+      >
         <div className="center-heading" style={{ marginBottom: "32px" }}>
           <p className="eyebrow">STAY INFORMED</p>
           <h2>All Notices & Announcements</h2>
@@ -110,7 +117,7 @@ function NoticesListAll() {
                     type="button"
                     onClick={() => setSelectedCategory(cat)}
                     style={{
-                      background: isActive ? "#085f7e" : "#f1f5f9",
+                      background: isActive ? "#1a365d" : "#f1f5f9",
                       color: isActive ? "#ffffff" : "#334155",
                       border: "none",
                       borderRadius: "999px",
@@ -132,7 +139,9 @@ function NoticesListAll() {
 
         {/* Notices Listing */}
         {loading ? (
-          <p style={{ textAlign: "center", color: "#64748b", margin: "40px 0" }}>
+          <p
+            style={{ textAlign: "center", color: "#64748b", margin: "40px 0" }}
+          >
             Loading notices...
           </p>
         ) : filteredNotices.length === 0 ? (
@@ -153,8 +162,12 @@ function NoticesListAll() {
             }}
           >
             {filteredNotices.map((notice) => {
-              const dateStr = formatFullDate(notice.publishedAt || notice.createdAt);
-              const dateParts = formatDateParts(notice.publishedAt || notice.createdAt);
+              const dateStr = formatFullDate(
+                notice.publishedAt || notice.createdAt,
+              );
+              const dateParts = formatDateParts(
+                notice.publishedAt || notice.createdAt,
+              );
               const categoryStr = notice.category || "NOTICE";
               const attachment = notice.attachment;
 
@@ -176,18 +189,28 @@ function NoticesListAll() {
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.transform = "translateY(-2px)";
-                    e.currentTarget.style.boxShadow = "0 8px 20px rgba(0,0,0,0.08)";
+                    e.currentTarget.style.boxShadow =
+                      "0 8px 20px rgba(0,0,0,0.08)";
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.transform = "translateY(0)";
-                    e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.04)";
+                    e.currentTarget.style.boxShadow =
+                      "0 2px 8px rgba(0,0,0,0.04)";
                   }}
                 >
-                  <div style={{ display: "flex", alignItems: "flex-start", gap: "18px", flex: 1, minWidth: "260px" }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "flex-start",
+                      gap: "18px",
+                      flex: 1,
+                      minWidth: "260px",
+                    }}
+                  >
                     {/* Date Block */}
                     <div
                       style={{
-                        background: "#085f7e",
+                        background: "#062b59",
                         color: "#ffffff",
                         borderRadius: "10px",
                         padding: "10px 14px",
@@ -196,17 +219,37 @@ function NoticesListAll() {
                         minWidth: "60px",
                       }}
                     >
-                      <strong style={{ display: "block", fontSize: "1.25rem", lineHeight: 1 }}>
+                      <strong
+                        style={{
+                          display: "block",
+                          fontSize: "1.25rem",
+                          lineHeight: 1,
+                        }}
+                      >
                         {dateParts.day}
                       </strong>
-                      <span style={{ fontSize: "0.75rem", textTransform: "uppercase", fontWeight: 600 }}>
+                      <span
+                        style={{
+                          fontSize: "0.75rem",
+                          textTransform: "uppercase",
+                          fontWeight: 600,
+                        }}
+                      >
                         {dateParts.month}
                       </span>
                     </div>
 
                     {/* Info */}
                     <div style={{ flex: 1 }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px", flexWrap: "wrap" }}>
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "8px",
+                          marginBottom: "6px",
+                          flexWrap: "wrap",
+                        }}
+                      >
                         <span
                           style={{
                             background: "#c53030",
@@ -236,14 +279,25 @@ function NoticesListAll() {
                           display: "block",
                           marginBottom: notice.shortDescription ? "6px" : "0",
                         }}
-                        onMouseEnter={(e) => (e.currentTarget.style.color = "#c53030")}
-                        onMouseLeave={(e) => (e.currentTarget.style.color = "#1e293b")}
+                        onMouseEnter={(e) =>
+                          (e.currentTarget.style.color = "#c53030")
+                        }
+                        onMouseLeave={(e) =>
+                          (e.currentTarget.style.color = "#1e293b")
+                        }
                       >
                         {notice.title}
                       </Link>
 
                       {notice.shortDescription && (
-                        <p style={{ margin: 0, fontSize: "0.9rem", color: "#475569", lineHeight: 1.5 }}>
+                        <p
+                          style={{
+                            margin: 0,
+                            fontSize: "0.9rem",
+                            color: "#475569",
+                            lineHeight: 1.5,
+                          }}
+                        >
                           {notice.shortDescription}
                         </p>
                       )}
@@ -251,7 +305,14 @@ function NoticesListAll() {
                   </div>
 
                   {/* Right Actions */}
-                  <div style={{ display: "flex", alignItems: "center", gap: "12px", flexShrink: 0 }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "12px",
+                      flexShrink: 0,
+                    }}
+                  >
                     {attachment && (
                       <a
                         href={mediaUrl(attachment)}
@@ -271,14 +332,16 @@ function NoticesListAll() {
                           gap: "4px",
                         }}
                       >
-                        {attachment.toLowerCase().endsWith(".pdf") ? "📄 PDF" : "🖼️ Image"}
+                        {attachment.toLowerCase().endsWith(".pdf")
+                          ? "📄 PDF"
+                          : "🖼️ Image"}
                       </a>
                     )}
 
                     <Link
                       to={`/notices/${notice._id}`}
                       style={{
-                        background: "#085f7e",
+                        background: "#062b59",
                         color: "#ffffff",
                         borderRadius: "6px",
                         padding: "6px 14px",
@@ -359,8 +422,7 @@ export default function NoticesPage() {
 
   // Detect attachment type
   const attachment = notice.attachment;
-  const isImage =
-    attachment && /\.(jpg|jpeg|png|webp|gif)$/i.test(attachment);
+  const isImage = attachment && /\.(jpg|jpeg|png|webp|gif)$/i.test(attachment);
   const isPdf =
     attachment &&
     (/\.pdf$/i.test(attachment) ||
