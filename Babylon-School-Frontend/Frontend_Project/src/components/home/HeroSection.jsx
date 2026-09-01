@@ -70,7 +70,7 @@ export default function HeroSection() {
         setIsTransitioning(false);
       }, 350);
     },
-    [current]
+    [current],
   );
 
   const next = useCallback(() => {
@@ -104,14 +104,14 @@ export default function HeroSection() {
     <section className="hero" id="home">
       {/* Single video background */}
       <video
-  ref={videoRef}
-  className="hero-video-bg"
-  src="https://res.cloudinary.com/hjjxysan/video/upload/v1788272714/videoPlay_zx3gc8.mp4"
-  autoPlay
-  muted
-  loop
-  playsInline
-/>
+        ref={videoRef}
+        className="hero-video-bg"
+        src="https://res.cloudinary.com/hjjxysan/video/upload/v1788272714/videoPlay_zx3gc8.mp4"
+        autoPlay
+        muted
+        loop
+        playsInline
+      />
 
       <div className="hero-shade" />
 
@@ -125,14 +125,14 @@ export default function HeroSection() {
         <h1>{slide.heading}</h1>
         <p className="hero-description">{slide.description}</p>
 
-       <div className="hero-actions">
-  <Link className="button primary" to="/academics">
-    Explore Academics <span>&rarr;</span>
-  </Link>
-  <Link className="button ghost" to="/about">
-    Discover Babylon
-  </Link>
-</div>
+        <div className="hero-actions">
+          <Link className="button primary" to="/academics">
+            Explore Academics <span>&rarr;</span>
+          </Link>
+          <Link className="button ghost" to="/about">
+            Discover Babylon
+          </Link>
+        </div>
       </div>
 
       {/* Counter */}
