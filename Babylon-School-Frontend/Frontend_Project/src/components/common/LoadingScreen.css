@@ -1,36 +1,97 @@
-.loading-screen {
+.splash-screen {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 14px;
-  padding: 40px 16px;
+  background: #ffffff;
+  padding: 24px;
 }
 
-.loading-screen--full {
-  min-height: 100vh;
-  width: 100%;
-  background: #f1f5f9;
+.splash-screen--full {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 99999;
+  background: #ffffff;
 }
 
-.loading-screen__spinner {
-  width: 36px;
-  height: 36px;
-  border: 3px solid #e2e8f0;
-  border-top-color: #063b78;
-  border-radius: 50%;
-  animation: loading-spin 0.7s linear infinite;
+.splash-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  animation: splashFadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-.loading-screen__message {
-  margin: 0;
-  font-size: 14px;
-  color: #64748b;
-  font-family: "DM Sans", system-ui, sans-serif;
-}
-
-@keyframes loading-spin {
-  to {
-    transform: rotate(360deg);
+@keyframes splashFadeIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.92);
   }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.splash-logo-wrapper {
+  margin-bottom: 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.splash-logo {
+  width: 280px;
+  max-width: 80vw;
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 16px rgba(0, 0, 0, 0.05));
+}
+
+.splash-loader-bar {
+  width: 190px;
+  height: 3.5px;
+  background: #f1f5f9;
+  border-radius: 999px;
+  overflow: hidden;
+  position: relative;
+  margin-bottom: 12px;
+}
+
+.splash-loader-fill {
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(90deg, #c92635, #041f45, #c92635);
+  border-radius: 999px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  animation: splashLoad 1.2s ease-in-out infinite;
+}
+
+@keyframes splashLoad {
+  0% {
+    left: -50%;
+    width: 30%;
+  }
+  50% {
+    left: 30%;
+    width: 60%;
+  }
+  100% {
+    left: 100%;
+    width: 30%;
+  }
+}
+
+.splash-message {
+  font-size: 13px;
+  font-weight: 500;
+  color: #64748b;
+  letter-spacing: 0.4px;
+  margin: 0;
+  font-family: system-ui, -apple-system, sans-serif;
 }

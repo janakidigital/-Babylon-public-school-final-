@@ -10,12 +10,12 @@ export default function App() {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    const t = setTimeout(() => setReady(true), 500);
+    const t = setTimeout(() => setReady(true), 1000);
     return () => clearTimeout(t);
   }, []);
 
   if (!ready) {
-    return <LoadingScreen message="Loading website..." variant="dark" />;
+    return <LoadingScreen fullPage message="Babylon National School" />;
   }
 
   return (
