@@ -1,6 +1,7 @@
-/* About & Admissions Page Layout */
+/* About, Admissions & Notices Page Layout */
 .about-page-layout,
-.admissions-page-layout {
+.admissions-page-layout,
+.notices-page-layout {
   display: grid;
   grid-template-columns: 1fr;
   gap: 40px;
@@ -10,7 +11,8 @@
 }
 
 .about-container,
-.admissions-container {
+.admissions-container,
+.notices-container {
   display: grid;
   grid-template-columns: 280px 1fr;
   gap: 40px;
@@ -18,15 +20,17 @@
 }
 
 .about-main-content,
-.admissions-main-content {
+.admissions-main-content,
+.notices-main-content {
   display: flex;
   flex-direction: column;
   gap: 40px;
 }
 
-/* About & Admissions Sidebar */
+/* About, Admissions & Notices Sidebar */
 .about-sidebar,
-.admissions-sidebar {
+.admissions-sidebar,
+.notices-sidebar {
   display: flex;
   flex-direction: column;
   gap: 0;
@@ -39,7 +43,8 @@
   top: 100px;
 }
 
-.admissions-sidebar {
+.admissions-sidebar,
+.notices-sidebar {
   width: 100%;
   max-width: 320px;
 }
@@ -63,7 +68,8 @@
 
 /* Sidebar Nav */
 .about-sidebar .sidebar-nav,
-.admissions-sidebar .sidebar-nav {
+.admissions-sidebar .sidebar-nav,
+.notices-sidebar .sidebar-nav {
   display: flex;
   flex-direction: column;
   gap: 0;
@@ -71,9 +77,10 @@
   margin-top: 8px;
 }
 
-/* Sidebar Links (same style for both) */
+/* Sidebar Links (same style for all) */
 .about-sidebar .sidebar-link,
-.admissions-sidebar .sidebar-link {
+.admissions-sidebar .sidebar-link,
+.notices-sidebar .sidebar-link {
   display: block;
   padding: 10px 0;
   color: #475569;
@@ -88,13 +95,15 @@
 }
 
 .about-sidebar .sidebar-link:hover,
-.admissions-sidebar .sidebar-link:hover {
+.admissions-sidebar .sidebar-link:hover,
+.notices-sidebar .sidebar-link:hover {
   background: transparent;
   color: #062b59;
 }
 
 .about-sidebar .sidebar-link.active,
-.admissions-sidebar .sidebar-link.active {
+.admissions-sidebar .sidebar-link.active,
+.notices-sidebar .sidebar-link.active {
   background: transparent;
   color: #c53030;
   font-weight: 600;
@@ -103,19 +112,22 @@
 }
 
 .about-sidebar .sidebar-link:last-child,
-.admissions-sidebar .sidebar-link:last-child {
+.admissions-sidebar .sidebar-link:last-child,
+.notices-sidebar .sidebar-link:last-child {
   border-bottom: none;
 }
 
 /* Responsive */
 @media (max-width: 900px) {
   .about-container,
-  .admissions-container {
+  .admissions-container,
+  .notices-container {
     grid-template-columns: 1fr;
   }
 
   .about-sidebar,
-  .admissions-sidebar {
+  .admissions-sidebar,
+  .notices-sidebar {
     position: static;
     border-radius: 8px;
   }
@@ -130,31 +142,36 @@
   }
 
   .about-sidebar .sidebar-link,
-  .admissions-sidebar .sidebar-link {
+  .admissions-sidebar .sidebar-link,
+  .notices-sidebar .sidebar-link {
     padding: 12px 16px;
     font-size: 0.9rem;
   }
 
   .about-sidebar .sidebar-link:hover,
-  .admissions-sidebar .sidebar-link:hover {
+  .admissions-sidebar .sidebar-link:hover,
+  .notices-sidebar .sidebar-link:hover {
     padding-left: 20px;
   }
 
   .about-sidebar .sidebar-link.active,
-  .admissions-sidebar .sidebar-link.active {
+  .admissions-sidebar .sidebar-link.active,
+  .notices-sidebar .sidebar-link.active {
     padding-left: 20px;
   }
 }
 
 @media (max-width: 600px) {
   .about-page-layout,
-  .admissions-page-layout {
+  .admissions-page-layout,
+  .notices-page-layout {
     padding: 40px 16px;
     gap: 24px;
   }
 
   .about-sidebar,
-  .admissions-sidebar {
+  .admissions-sidebar,
+  .notices-sidebar {
     border-radius: 6px;
   }
 
@@ -167,18 +184,21 @@
   }
 
   .about-sidebar .sidebar-link,
-  .admissions-sidebar .sidebar-link {
+  .admissions-sidebar .sidebar-link,
+  .notices-sidebar .sidebar-link {
     padding: 10px 14px;
     font-size: 0.85rem;
   }
 
   .about-sidebar .sidebar-link:hover,
-  .admissions-sidebar .sidebar-link:hover {
+  .admissions-sidebar .sidebar-link:hover,
+  .notices-sidebar .sidebar-link:hover {
     padding-left: 18px;
   }
 
   .about-sidebar .sidebar-link.active,
-  .admissions-sidebar .sidebar-link.active {
+  .admissions-sidebar .sidebar-link.active,
+  .notices-sidebar .sidebar-link.active {
     padding-left: 18px;
   }
 }

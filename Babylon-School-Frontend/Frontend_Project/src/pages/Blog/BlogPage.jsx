@@ -1,11 +1,13 @@
 import PageBanner from "../../components/common/PageBanner";
 import ContentCards from "../../components/shared/ContentCards";
+import NoticesSidebar from "../../components/shared/NoticesSidebar";
 import EmptyState from "../../components/common/EmptyState";
 import { publicApi } from "../../services/api";
 import usePublicData from "../../hooks/usePublicData";
 
 export default function BlogPage() {
   const { data, loading } = usePublicData(publicApi.news, []);
+
   return (
     <>
       <PageBanner
@@ -14,18 +16,27 @@ export default function BlogPage() {
         image="banner/inner_banner_1.jpg"
         pageKey="news"
       />
-      <section className="listing-page shell">
-        {loading ? (
-          <p>Loading news...</p>
-        ) : data.length === 0 ? (
-          <EmptyState
-            title="No news yet"
-            text="Stories published from the admin panel will appear here."
-          />
-        ) : (
-          <ContentCards items={data} type="post" />
-        )}
-      </section>
+
+      <div className="notices-page-layout">
+        <div className="notices-container">
+          <NoticesSidebar currentPage="blog" />
+
+          <div className="notices-main-content">
+            <section className="listing-page">
+              {loading ? (
+                <p>Loading news...</p>
+              ) : data.length === 0 ? (
+                <EmptyState
+                  title="No news yet"
+                  text="Stories published from the admin panel will appear here."
+                />
+              ) : (
+                <ContentCards items={data} type="post" />
+              )}
+            </section>
+          </div>
+        </div>
+      </div>
     </>
   );
 }
