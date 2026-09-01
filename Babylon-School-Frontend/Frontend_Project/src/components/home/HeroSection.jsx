@@ -104,14 +104,14 @@ export default function HeroSection() {
     <section className="hero" id="home">
       {/* Single video background */}
       <video
-        ref={videoRef}
-        className="hero-video-bg"
-        src={`${assetPath}banner/videoPlay.mp4`}
-        autoPlay
-        muted
-        loop
-        playsInline
-      />
+  ref={videoRef}
+  className="hero-video-bg"
+  src="https://res.cloudinary.com/hjjxysan/video/upload/v1788272714/videoPlay_zx3gc8.mp4"
+  autoPlay
+  muted
+  loop
+  playsInline
+/>
 
       <div className="hero-shade" />
 

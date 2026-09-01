@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { publicApi } from "../../services/api";
 import { mediaUrl } from "../../lib/media";
 import usePublicData from "../../hooks/usePublicData";
@@ -15,13 +15,23 @@ export default function TestimonialsSection() {
 
   const total = data.length;
 
-  const goTo = (index) => {
-    if (total === 0) return;
-    setCurrent((index + total) % total);
-  };
+  const goTo = useCallback(
+    (index) => {
+      if (total === 0) return;
+      setCurrent((index + total) % total);
+    },
+    [total],
+  );
 
   const prev = () => goTo(current - 1);
-  const next = () => goTo(current + 1);
+  const next = useCallback(() => goTo(current + 1), [current, goTo]);
+
+  // Auto-scroll every 4 seconds
+  useEffect(() => {
+    if (total <= 1) return;
+    const timer = setInterval(next, 4000);
+    return () => clearInterval(timer);
+  }, [next, total]);
 
   return (
     <section className="testimonials shell">

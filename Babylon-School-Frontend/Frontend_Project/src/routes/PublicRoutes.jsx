@@ -30,7 +30,7 @@ import AchievementsPage from "../pages/Achievements/AchievementsPage";
 import FaqPage from "../pages/FAQ/FaqPage";
 import ContactPage from "../pages/Contact/ContactPage";
 import DownloadsPage from "../pages/Downloads/DownloadsPage";
-import LoginPage from "../pages/Auth/LoginPage";
+// import LoginPage from "../pages/Auth/LoginPage";
 // import SignupPage from '../pages/Auth/SignupPage';
 // import DashboardPage from '../pages/Dashboard/DashboardPage';
 import NotFoundPage from "../pages/NotFound/NotFoundPage";
@@ -281,14 +281,14 @@ export default function PublicRoutes() {
               </PageTransition>
             }
           />
-          <Route
+          {/* <Route
             path="/login"
             element={
               <PageTransition>
                 <LoginPage />
               </PageTransition>
             }
-          />
+          /> */}
 
           {/* <Route path="/dashboard" element={<PageTransition><DashboardPage /></PageTransition>} /> */}
 

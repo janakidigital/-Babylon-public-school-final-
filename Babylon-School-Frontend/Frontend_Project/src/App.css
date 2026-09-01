@@ -3023,25 +3023,7 @@ footer {
   filter: grayscale(0) brightness(1);
 }
 
-/* Animated pin overlay on hover */
-.footer-map-wrapper::after {
-  content: "📍 View Map";
-  position: absolute;
-  inset: 0;
-  background: rgba(6, 31, 62, 0.65);
-  backdrop-filter: blur(2px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 13px;
-  font-weight: 700;
-  color: #f6c457;
-  letter-spacing: 0.04em;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  pointer-events: none;
-  border-radius: 8px;
-}
+
 
 .footer-map-wrapper:hover::after {
   opacity: 1;
@@ -3740,4 +3722,23 @@ article:has(.notice-title-link) {
     text-align: center;
     padding: 14px 20px;
   }
+}
+
+.footer-map-wrapper {
+  position: relative;
+  width: 180px;
+  height: 180px;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.footer-map-wrapper iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  border-radius: 6px;
+  display: block;
+  /* Remove this if it exists: */
+  /* pointer-events: none; */
 }

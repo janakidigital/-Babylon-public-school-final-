@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import principalImg from "../../assets/principal.png";
 import chairmanImg from "../../assets/chairperson.png";
 
@@ -29,17 +29,28 @@ export default function LeadershipMessageSection() {
   const [current, setCurrent] = useState(0);
   const [fading, setFading] = useState(false);
 
-  const goTo = (index) => {
-    if (index === current || fading) return;
-    setFading(true);
-    setTimeout(() => {
-      setCurrent(index);
-      setFading(false);
-    }, 280);
-  };
+  const goTo = useCallback(
+    (index) => {
+      if (index === current || fading) return;
+      setFading(true);
+      setTimeout(() => {
+        setCurrent(index);
+        setFading(false);
+      }, 280);
+    },
+    [current, fading],
+  );
 
   const prev = () => goTo(current === 0 ? MESSAGES.length - 1 : current - 1);
-  const next = () => goTo(current === MESSAGES.length - 1 ? 0 : current + 1);
+  const next = useCallback(() => {
+    goTo(current === MESSAGES.length - 1 ? 0 : current + 1);
+  }, [current, goTo]);
+
+  // Auto-scroll every 7 seconds
+  useEffect(() => {
+    const timer = setInterval(next, 7000);
+    return () => clearInterval(timer);
+  }, [next]);
 
   const message = MESSAGES[current];
 
