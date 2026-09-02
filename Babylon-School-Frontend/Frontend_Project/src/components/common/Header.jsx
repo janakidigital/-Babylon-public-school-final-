@@ -19,12 +19,25 @@ const primaryNav = [
   },
   { label: "Academics", link: "/academics" },
   {
-    label: "Notices",
+    label: "Information Center",
     link: "/notices",
     children: [
       { label: "Notices", link: "/notices" },
       { label: "News & Blog", link: "/blog" },
       { label: "Events", link: "/events" },
+      {
+        label: "ECA",
+        children: [
+          {
+            label: "Enhancing ECA",
+            link: "/information-center/eca/enhancing-eca",
+          },
+          {
+            label: "Extra Curricular Activities",
+            link: "/information-center/eca/extra-curricular-activities",
+          },
+        ],
+      },
     ],
   },
   { label: "Gallery", link: "/gallery" },
@@ -43,10 +56,15 @@ const primaryNav = [
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState(null);
+  const [openSubGroup, setOpenSubGroup] = useState("ECA");
   const { settings } = useSite();
 
   const toggleDropdown = (label) => {
     setOpenDropdown((prev) => (prev === label ? null : label));
+  };
+
+  const toggleSubGroup = (label) => {
+    setOpenSubGroup((prev) => (prev === label ? null : label));
   };
 
   const closeMenu = () => {
@@ -139,18 +157,63 @@ export default function Header() {
                       openDropdown === item.label ? "show" : ""
                     }`}
                   >
-                    {item.children.map((child) => (
-                      <NavLink
-                        key={child.link}
-                        to={child.link}
-                        className={({ isActive }) =>
-                          isActive ? "dropdown-link active" : "dropdown-link"
-                        }
-                        onClick={closeMenu}
-                      >
-                        {child.label}
-                      </NavLink>
-                    ))}
+                    {item.children.map((child) =>
+                      child.children ? (
+                        <div
+                          key={child.label}
+                          className={`nav-subgroup ${
+                            openSubGroup === child.label ? "open" : ""
+                          }`}
+                        >
+                          <button
+                            type="button"
+                            className="dropdown-sub-toggle"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              toggleSubGroup(child.label);
+                            }}
+                            aria-expanded={openSubGroup === child.label}
+                          >
+                            <span>{child.label}</span>
+                            <span className="sub-arrow">
+                              {openSubGroup === child.label ? "▴" : "▾"}
+                            </span>
+                          </button>
+                          <div
+                            className={`dropdown-submenu ${
+                              openSubGroup === child.label ? "show" : ""
+                            }`}
+                          >
+                            {child.children.map((subChild) => (
+                              <NavLink
+                                key={subChild.link}
+                                to={subChild.link}
+                                className={({ isActive }) =>
+                                  isActive
+                                    ? "dropdown-sub-link active"
+                                    : "dropdown-sub-link"
+                                }
+                                onClick={closeMenu}
+                              >
+                                {subChild.label}
+                              </NavLink>
+                            ))}
+                          </div>
+                        </div>
+                      ) : (
+                        <NavLink
+                          key={child.link}
+                          to={child.link}
+                          className={({ isActive }) =>
+                            isActive ? "dropdown-link active" : "dropdown-link"
+                          }
+                          onClick={closeMenu}
+                        >
+                          {child.label}
+                        </NavLink>
+                      )
+                    )}
                   </div>
                 </div>
               ) : (
@@ -164,7 +227,7 @@ export default function Header() {
                 >
                   {item.label}
                 </NavLink>
-              ),
+              )
             )}
 
             <a

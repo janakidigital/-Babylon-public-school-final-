@@ -65,22 +65,43 @@ export const resources = {
   },
 
   gallery: {
-  label: "Gallery",
-  endpoint: "/gallery",
-  image: true,
-  multiple: true,
-  fields: [
-    ["title", "Title"],
-    [
-      "type",
-      "Type",
-      "select",
-      ["Photos", "Videos"],
+    label: "Gallery",
+    endpoint: "/gallery",
+    image: true,
+    multiple: true,
+    fields: [
+      ["title", "Title"],
+      [
+        "type",
+        "Type",
+        "select",
+        ["Photos", "Videos"],
+      ],
+      ["description", "Description", "textarea"],
+      ["videoUrls", "Video URLs", "textarea"],
     ],
-    ["description", "Description", "textarea"],
-    ["videoUrls", "Video URLs", "textarea"],
-  ],
-},
+  },
+
+  eca: {
+    label: "ECA (Activities & Clubs)",
+    endpoint: "/eca",
+    image: true,
+    multiple: true,
+    fields: [
+      ["title", "Title / Activity Name"],
+      [
+        "category",
+        "Category",
+        "select",
+        ["Enhancing ECA", "Extra Curricular Activities", "General ECA"],
+      ],
+      ["shortDescription", "Short Lead / Summary"],
+      ["description", "Full Description", "textarea"],
+      ["tags", "Tags / Keywords (comma separated)"],
+      ["displayOrder", "Display Order", "number"],
+      ["isFeatured", "Featured", "checkbox"],
+    ],
+  },
 
   faculty: {
     label: "Our Team",

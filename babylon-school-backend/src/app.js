@@ -24,6 +24,7 @@ const userRoutes = require("./routes/user.routes");
 const downloadRoutes = require("./routes/download.routes");
 const errorHandler = require("./middleware/error.middleware");
 const posterRoutes = require("./routes/poster.routes");
+const ecaRoutes = require("./routes/eca.routes");
 
 const app = express();
 
@@ -60,6 +61,7 @@ app.use("/api/v1/downloads", downloadRoutes);
 // Career applications admin + public application submission
 app.use("/api/v1/career-applications", careerApplicationRoutes);
 app.use("/api/v1/posters", posterRoutes);
+app.use("/api/v1/eca", ecaRoutes);
 // Error handler (centralized)
 app.use(errorHandler);
 

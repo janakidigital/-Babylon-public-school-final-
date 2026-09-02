@@ -2325,6 +2325,74 @@ footer {
   font-weight: 600;
 }
 
+/* Nested Dropdown / Subgroup (ECA Accordion) */
+.nav-subgroup {
+  margin: 4px 0;
+}
+
+.dropdown-sub-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 10px 16px;
+  color: #021a39;
+  background: transparent;
+  border: none;
+  font-size: 14.5px;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s ease;
+}
+
+.dropdown-sub-toggle:hover,
+.nav-subgroup.open .dropdown-sub-toggle {
+  background: #f0fdfa;
+  color: #0d9488;
+}
+
+.sub-arrow {
+  font-size: 13px;
+  margin-left: 8px;
+  color: #0d9488;
+  font-weight: bold;
+}
+
+.dropdown-submenu {
+  display: none;
+  padding-left: 10px;
+  margin: 4px 0 6px 12px;
+  border-left: 2px solid rgba(13, 148, 136, 0.25);
+}
+
+.dropdown-submenu.show,
+.nav-subgroup.open .dropdown-submenu {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.dropdown-sub-link {
+  display: block;
+  padding: 8px 12px;
+  font-size: 13.5px;
+  color: #475569;
+  text-decoration: none;
+  border-radius: 6px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.dropdown-sub-link:hover,
+.dropdown-sub-link.active {
+  background: #f0fdfa;
+  color: #0d9488;
+  font-weight: 600;
+  padding-left: 16px;
+}
+
 /* =========================================
    TABLET (max-width: 900px)
 ========================================= */
@@ -3293,9 +3361,10 @@ footer {
 
 .leadership-grid {
   display: grid;
-  grid-template-columns: 260px 1fr;
-  gap: 50px;
+  grid-template-columns: 260px minmax(280px, 540px);
+  gap: 48px;
   align-items: center;
+  justify-content: center;
 }
 
 .leadership-photo {
@@ -3348,7 +3417,6 @@ footer {
   font-size: 15.5px;
   line-height: 1.8;
   margin: 0 0 24px;
-  max-width: 480px;
 }
 
 .leadership-meta {

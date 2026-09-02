@@ -5,24 +5,21 @@ export default function NoticesSidebar({ currentPage = "notices" }) {
 
   // Determine active page based on route
   const getActivePage = () => {
+    const path = location.pathname;
+    if (path === "/notices" || path.startsWith("/notices/")) return "notices";
+    if (path === "/blog" || path.startsWith("/blog/")) return "blog";
+    if (path === "/events" || path.startsWith("/events/")) return "events";
     if (
-      currentPage === "notices" ||
-      location.pathname === "/notices" ||
-      location.pathname.startsWith("/notices/")
+      path === "/information-center/eca/enhancing-eca" ||
+      path === "/eca/enhancing-eca"
     )
-      return "notices";
+      return "enhancing-eca";
     if (
-      currentPage === "blog" ||
-      location.pathname === "/blog" ||
-      location.pathname.startsWith("/blog/")
+      path === "/information-center/eca/extra-curricular-activities" ||
+      path === "/eca/extra-curricular-activities" ||
+      path === "/eca"
     )
-      return "blog";
-    if (
-      currentPage === "events" ||
-      location.pathname === "/events" ||
-      location.pathname.startsWith("/events/")
-    )
-      return "events";
+      return "extra-curricular-activities";
     return currentPage;
   };
 
@@ -31,7 +28,7 @@ export default function NoticesSidebar({ currentPage = "notices" }) {
   return (
     <aside className="notices-sidebar">
       <div className="sidebar-header">
-        <h3>Notices</h3>
+        <h3>Information Center</h3>
       </div>
 
       <nav className="sidebar-nav">
@@ -52,6 +49,22 @@ export default function NoticesSidebar({ currentPage = "notices" }) {
           className={`sidebar-link ${activePage === "events" ? "active" : ""}`}
         >
           Events
+        </Link>
+        <Link
+          to="/information-center/eca/enhancing-eca"
+          className={`sidebar-link ${
+            activePage === "enhancing-eca" ? "active" : ""
+          }`}
+        >
+          Enhancing ECA
+        </Link>
+        <Link
+          to="/information-center/eca/extra-curricular-activities"
+          className={`sidebar-link ${
+            activePage === "extra-curricular-activities" ? "active" : ""
+          }`}
+        >
+          Extra Curricular Activities
         </Link>
       </nav>
     </aside>

@@ -30,6 +30,8 @@ import AchievementsPage from "../pages/Achievements/AchievementsPage";
 import FaqPage from "../pages/FAQ/FaqPage";
 import ContactPage from "../pages/Contact/ContactPage";
 import DownloadsPage from "../pages/Downloads/DownloadsPage";
+import EnhancingEcaPage from "../pages/ECA/EnhancingEcaPage";
+import ExtraCurricularPage from "../pages/ECA/ExtraCurricularPage";
 // import LoginPage from "../pages/Auth/LoginPage";
 // import SignupPage from '../pages/Auth/SignupPage';
 // import DashboardPage from '../pages/Dashboard/DashboardPage';
@@ -146,10 +148,74 @@ export default function PublicRoutes() {
             }
           />
           <Route
+            path="/information-center"
+            element={
+              <PageTransition>
+                <NoticesPage />
+              </PageTransition>
+            }
+          />
+          <Route
+            path="/information-center/notices"
+            element={
+              <PageTransition>
+                <NoticesPage />
+              </PageTransition>
+            }
+          />
+          <Route
             path="/notices/:id"
             element={
               <PageTransition>
                 <NoticesPage />
+              </PageTransition>
+            }
+          />
+          <Route
+            path="/information-center/notices/:id"
+            element={
+              <PageTransition>
+                <NoticesPage />
+              </PageTransition>
+            }
+          />
+          <Route
+            path="/information-center/eca/enhancing-eca"
+            element={
+              <PageTransition>
+                <EnhancingEcaPage />
+              </PageTransition>
+            }
+          />
+          <Route
+            path="/eca/enhancing-eca"
+            element={
+              <PageTransition>
+                <EnhancingEcaPage />
+              </PageTransition>
+            }
+          />
+          <Route
+            path="/information-center/eca/extra-curricular-activities"
+            element={
+              <PageTransition>
+                <ExtraCurricularPage />
+              </PageTransition>
+            }
+          />
+          <Route
+            path="/eca/extra-curricular-activities"
+            element={
+              <PageTransition>
+                <ExtraCurricularPage />
+              </PageTransition>
+            }
+          />
+          <Route
+            path="/eca"
+            element={
+              <PageTransition>
+                <ExtraCurricularPage />
               </PageTransition>
             }
           />

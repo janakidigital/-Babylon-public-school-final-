@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import toast from "react-hot-toast";
 import { useNavigate, useLocation } from "react-router-dom";
 import {
@@ -131,6 +131,11 @@ function ResourceEditor({ resourceKey, onBack }) {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(true);
   const [selectedType, setSelectedType] = useState("");
+  // New-file local previews (before upload)
+  const [newFilePreviews, setNewFilePreviews] = useState([]);
+  const fileInputRef = React.useRef(null);
+  // Track which files are actually queued (parallel to previews)
+  const pendingFilesRef = React.useRef([]);
 
   const formValues = useMemo(() => {
     if (!editing) return blank(config);
@@ -171,7 +176,39 @@ function ResourceEditor({ resourceKey, onBack }) {
     setSelectedType(
       item.mediaType || item.type || item.category || (resourceKey === "gallery" ? "Photos" : "")
     );
+    // Clear any stale previews when opening a new/different item
+    setNewFilePreviews([]);
+    pendingFilesRef.current = [];
+    if (fileInputRef.current) fileInputRef.current.value = "";
   };
+
+  /* Handle newly selected files — build object URL previews */
+  function handleFileChange(e) {
+    const files = Array.from(e.target.files || []);
+    pendingFilesRef.current = files;
+    const previews = files.map((f) => ({
+      name: f.name,
+      objectUrl: URL.createObjectURL(f),
+    }));
+    setNewFilePreviews(previews);
+  }
+
+  /* Remove one file from the pending new-file list */
+  function removePendingFile(index) {
+    // Revoke the object URL to free memory
+    URL.revokeObjectURL(newFilePreviews[index].objectUrl);
+    const updatedPreviews = newFilePreviews.filter((_, i) => i !== index);
+    const updatedFiles = pendingFilesRef.current.filter((_, i) => i !== index);
+    pendingFilesRef.current = updatedFiles;
+    setNewFilePreviews(updatedPreviews);
+
+    // Rebuild the FileList on the input using a DataTransfer
+    if (fileInputRef.current) {
+      const dt = new DataTransfer();
+      updatedFiles.forEach((f) => dt.items.add(f));
+      fileInputRef.current.files = dt.files;
+    }
+  }
 
   async function save(event) {
     event.preventDefault();
@@ -258,7 +295,7 @@ function ResourceEditor({ resourceKey, onBack }) {
         : Object.fromEntries(form.entries());
 
     try {
-      await api(
+      const savedRes = await api(
         `${config.endpoint}${editing?._id ? `/${editing._id}` : ""}`,
         {
           method: editing?._id ? "PUT" : "POST",
@@ -266,17 +303,26 @@ function ResourceEditor({ resourceKey, onBack }) {
         },
       );
 
-      setEditing(null);
-      setSelectedType("");
-      setMessage(`${config.label} saved successfully.`);
+      // Clear new-file previews and input
+      newFilePreviews.forEach((p) => URL.revokeObjectURL(p.objectUrl));
+      setNewFilePreviews([]);
+      pendingFilesRef.current = [];
+      if (fileInputRef.current) fileInputRef.current.value = "";
 
+      setMessage(`${config.label} saved successfully.`);
       toast.success(`${config.label} saved successfully.`);
 
-      window.dispatchEvent(
-        new CustomEvent("site-data-updated"),
-      );
+      window.dispatchEvent(new CustomEvent("site-data-updated"));
 
-      load();
+      // Re-fetch list then re-open the saved item so images show immediately
+      const updatedItem = savedRes?.data || null;
+      await load();
+      if (updatedItem) {
+        openEditor(updatedItem);
+      } else {
+        setEditing(null);
+        setSelectedType("");
+      }
     } catch (err) {
       setMessage(err.message);
       toast.error(err.message || "An error occurred");
@@ -482,6 +528,14 @@ function ResourceEditor({ resourceKey, onBack }) {
                       defaultValue={
                         formValues[key] || ""
                       }
+                      rows={
+                        key === "description" ? 10 : 4
+                      }
+                      style={
+                        key === "description"
+                          ? { whiteSpace: "pre-wrap" }
+                          : undefined
+                      }
                       required={[
                         "title",
                         "name",
@@ -530,6 +584,7 @@ function ResourceEditor({ resourceKey, onBack }) {
                 : "Image upload"}
 
               <input
+                ref={fileInputRef}
                 name="image"
                 type="file"
                 accept={
@@ -538,6 +593,7 @@ function ResourceEditor({ resourceKey, onBack }) {
                     : "image/*,.jpg,.jpeg,.png,.webp,.avif"
                 }
                 multiple={!!config.multiple}
+                onChange={handleFileChange}
               />
 
               {editing?.image &&
@@ -574,8 +630,97 @@ function ResourceEditor({ resourceKey, onBack }) {
                     color: "#666",
                   }}
                 >
-                  You can select 15+ images at once
+                  You can select 20+ images at once
                 </small>
+              )}
+
+              {/* NEW FILES PREVIEW — images chosen but not yet uploaded */}
+              {!editingIsVideo && newFilePreviews.length > 0 && (
+                <div style={{ marginTop: "16px" }}>
+                  <p
+                    style={{
+                      fontSize: "13px",
+                      fontWeight: 600,
+                      marginBottom: "10px",
+                      color: "#1a4731",
+                      background: "#f0fdf4",
+                      padding: "6px 10px",
+                      borderRadius: "6px",
+                      border: "1px solid #bbf7d0",
+                    }}
+                  >
+                    ✅ {newFilePreviews.length} new image{newFilePreviews.length > 1 ? "s" : ""} selected — click × to remove before saving
+                  </p>
+                  <div
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns: "repeat(auto-fill, minmax(100px, 1fr))",
+                      gap: "10px",
+                    }}
+                  >
+                    {newFilePreviews.map((preview, idx) => (
+                      <div
+                        key={idx}
+                        style={{
+                          position: "relative",
+                          border: "2px solid #22c55e",
+                          borderRadius: "8px",
+                          overflow: "hidden",
+                        }}
+                      >
+                        <img
+                          src={preview.objectUrl}
+                          alt={preview.name}
+                          style={{
+                            width: "100%",
+                            height: "90px",
+                            objectFit: "cover",
+                            display: "block",
+                          }}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => removePendingFile(idx)}
+                          style={{
+                            position: "absolute",
+                            top: "4px",
+                            right: "4px",
+                            background: "#c53030",
+                            color: "white",
+                            border: "none",
+                            borderRadius: "4px",
+                            width: "22px",
+                            height: "22px",
+                            fontSize: "14px",
+                            cursor: "pointer",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            lineHeight: 1,
+                          }}
+                          title="Remove this image"
+                        >
+                          ×
+                        </button>
+                        <p
+                          style={{
+                            fontSize: "10px",
+                            color: "#166534",
+                            background: "rgba(240,253,244,0.9)",
+                            margin: 0,
+                            padding: "2px 4px",
+                            whiteSpace: "nowrap",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                          }}
+                          title={preview.name}
+                        >
+                          {preview.name}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               )}
 
               {/* Existing images for Photo albums */}
@@ -602,7 +747,13 @@ function ResourceEditor({ resourceKey, onBack }) {
                         gap: "12px",
                       }}
                     >
-                      {editing.images.map((img, index) => (
+                      {editing.images.map((img, index) => {
+                        const src = mediaUrl(
+                          typeof img === "string" ? img : img?.url
+                        );
+                        const caption =
+                          typeof img === "object" ? img?.caption : "";
+                        return (
                         <div
                           key={index}
                           style={{
@@ -613,8 +764,8 @@ function ResourceEditor({ resourceKey, onBack }) {
                           }}
                         >
                           <img
-                            src={img.url}
-                            alt={img.caption || `Image ${index + 1}`}
+                            src={src}
+                            alt={caption || `Image ${index + 1}`}
                             style={{
                               width: "100%",
                               height: "90px",
@@ -648,7 +799,8 @@ function ResourceEditor({ resourceKey, onBack }) {
                             ×
                           </button>
                         </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   </div>
                 )}
@@ -2779,6 +2931,8 @@ function getAdminNavIcon(key) {
       return <Bell size={18} />;
     case "gallery":
       return <ImageIcon size={18} />;
+    case "eca":
+      return <Trophy size={18} />;
     case "faculty":
       return <Users size={18} />;
     case "facility":
