@@ -4164,3 +4164,64 @@ article:has(.notice-title-link) {
     height: 40px;
   }
 }
+
+
+
+
+
+/* Awards/Partners Section - Single Image */
+.awards-partners-section {
+  background: #f8f9fa;
+  padding: 15px 0; /* Reduced from 40px to 15px */
+  border-top: 1px solid #e9ecef;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.awards-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 5px 0; /* Reduced from 10px to 5px */
+}
+
+.awards-image {
+  max-width: 100%;
+  height: auto;
+  max-height: 100px; /* Slightly reduced from 120px */
+  width: auto;
+  filter: grayscale(100%);
+  -webkit-filter: grayscale(100%);
+  transition: filter 0.5s ease, -webkit-filter 0.5s ease, transform 0.3s ease;
+  opacity: 0.7;
+  cursor: default;
+  object-fit: contain;
+}
+
+/* On hover - show original colors */
+.awards-image:hover {
+  filter: grayscale(0%);
+  -webkit-filter: grayscale(0%);
+  opacity: 1;
+  transform: scale(1.05);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .awards-partners-section {
+    padding: 10px 15px; /* Further reduced for mobile */
+  }
+  
+  .awards-image {
+    max-height: 70px;
+  }
+}
+
+@media (max-width: 480px) {
+  .awards-partners-section {
+    padding: 8px 10px;
+  }
+  
+  .awards-image {
+    max-height: 50px;
+  }
+}
