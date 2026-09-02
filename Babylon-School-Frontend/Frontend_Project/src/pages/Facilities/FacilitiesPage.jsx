@@ -1,5 +1,30 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
+import { 
+  ArrowRight, 
+  ArrowLeft, 
+  Share2, 
+  ChevronDown,
+  MapPin,
+  Clock,
+  BookOpen,
+  FlaskConical,
+  Music,
+  Palette,
+  Computer,
+  Dumbbell,
+  Globe,
+  Sparkles,
+  GraduationCap,
+  Building2,
+  Bus,
+  Coffee,
+  Heart,
+  Library,
+  Mic2,
+  School,
+  Zap
+} from "lucide-react";
 import PageBanner from "../../components/common/PageBanner";
 import AboutSidebar from "../../components/shared/AboutSidebar";
 import EmptyState from "../../components/common/EmptyState";
@@ -12,6 +37,7 @@ import "../About/SidebarsCommon.css";
 export default function FacilitiesPage() {
   const { id } = useParams();
   const [isExpanded, setIsExpanded] = useState(false);
+  const gridRef = useRef(null);
 
   const { data, loading } = usePublicData(publicApi.facilities, []);
 
@@ -21,7 +47,12 @@ export default function FacilitiesPage() {
 
   const selectedFacility = id ? items.find((item) => item._id === id) : null;
 
-  // ~5–6 lines threshold for detail view
+  useEffect(() => {
+    if (id && gridRef.current) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }, [id]);
+
   const DESCRIPTION_LIMIT = 280;
   const fullDescription =
     selectedFacility?.description ||
@@ -31,6 +62,28 @@ export default function FacilitiesPage() {
     isExpanded || !isLong
       ? fullDescription
       : fullDescription.slice(0, DESCRIPTION_LIMIT).trim() + "...";
+
+  // Get icon based on facility type
+  const getFacilityIcon = (title) => {
+    const lowerTitle = title?.toLowerCase() || "";
+    if (lowerTitle.includes("library")) return Library;
+    if (lowerTitle.includes("lab") || lowerTitle.includes("science")) return FlaskConical;
+    if (lowerTitle.includes("sport") || lowerTitle.includes("gym")) return Dumbbell;
+    if (lowerTitle.includes("music")) return Music;
+    if (lowerTitle.includes("art")) return Palette;
+    if (lowerTitle.includes("computer") || lowerTitle.includes("tech")) return Computer;
+    if (lowerTitle.includes("language")) return Globe;
+    if (lowerTitle.includes("math")) return Sparkles;
+    if (lowerTitle.includes("playground")) return Zap;
+    if (lowerTitle.includes("auditorium") || lowerTitle.includes("theater")) return Mic2;
+    if (lowerTitle.includes("cafeteria") || lowerTitle.includes("dining")) return Coffee;
+    if (lowerTitle.includes("medical") || lowerTitle.includes("health")) return Heart;
+    if (lowerTitle.includes("transport") || lowerTitle.includes("bus")) return Bus;
+    if (lowerTitle.includes("classroom")) return School;
+    return Building2;
+  };
+
+  const IconComponent = getFacilityIcon(selectedFacility?.title);
 
   return (
     <>
@@ -49,99 +102,109 @@ export default function FacilitiesPage() {
         <div className="about-container">
           <AboutSidebar currentPage="facilities" />
           <div className="about-main-content">
-            <section className="listing-page">
+            <section className="listing-page" ref={gridRef}>
               {loading ? (
-                <p>Loading facilities...</p>
+                <div className="facilities-loading">
+                  <div className="loading-spinner"></div>
+                  <p>Loading amazing spaces...</p>
+                </div>
               ) : id ? (
                 // =========================
-                // SINGLE FACILITY DETAIL (card)
+                // SINGLE FACILITY DETAIL
                 // =========================
                 selectedFacility ? (
-                  <div style={{ maxWidth: "900px", margin: "0 auto" }}>
-                    <div
-                      style={{
-                        background: "#fff",
-                        borderRadius: "20px",
-                        overflow: "hidden",
-                        boxShadow: "0 8px 30px rgba(0,0,0,0.08)",
-                        border: "1px solid rgba(0,0,0,0.04)",
-                      }}
-                    >
-                      <img
-                        src={mediaUrl(
-                          selectedFacility.image,
-                          `${assetPath}courses/courses_1.jpg`,
-                        )}
-                        alt={selectedFacility.title || ""}
-                        style={{
-                          width: "100%",
-                          height: "420px",
-                          objectFit: "cover",
-                          display: "block",
-                        }}
-                      />
-
-                      <div style={{ padding: "2.25rem 2.5rem 2.5rem" }}>
-                        <p
-                          className="eyebrow"
-                          style={{ marginBottom: "0.5rem" }}
-                        >
-                          OUR FACILITY
-                        </p>
-
-                        <h2
-                          style={{
-                            margin: "0 0 1.25rem",
-                            color: "#1a3c6e",
-                            fontSize: "1.75rem",
-                            lineHeight: 1.3,
-                          }}
-                        >
-                          {selectedFacility.title}
-                        </h2>
-
-                        <p
-                          style={{
-                            color: "#555",
-                            lineHeight: 1.75,
-                            fontSize: "1.05rem",
-                            margin: 0,
-                            whiteSpace: "pre-line",
-                          }}
-                        >
-                          {displayDescription}
-                        </p>
-
-                        {isLong && (
-                          <button
-                            type="button"
-                            onClick={() => setIsExpanded((prev) => !prev)}
-                            style={{
-                              background: "none",
-                              border: "none",
-                              padding: 0,
-                              marginTop: "0.75rem",
-                              color: "#1a3c6e",
-                              fontWeight: 600,
-                              fontSize: "0.95rem",
-                              cursor: "pointer",
-                              textDecoration: "underline",
-                              textUnderlineOffset: "3px",
-                            }}
-                          >
-                            {isExpanded ? "Show less" : "more..."}
-                          </button>
-                        )}
-
-                        <div style={{ marginTop: "2rem" }}>
-                          <Link
-                            to="/facilities"
-                            className="button"
-                            style={{ display: "inline-block" }}
-                          >
-                            ← Back to Facilities
-                          </Link>
+                  <div className="facility-detail-premium">
+                    <div className="facility-detail-grid">
+                      <div className="facility-detail-image-wrapper">
+                        <div className="facility-detail-badge">
+                          {IconComponent && <IconComponent size={18} />}
+                          <span>{selectedFacility.category || "Facility"}</span>
                         </div>
+                        <img
+                          src={mediaUrl(
+                            selectedFacility.image,
+                            `${assetPath}courses/courses_1.jpg`,
+                          )}
+                          alt={selectedFacility.title || ""}
+                          className="facility-detail-image-main"
+                        />
+                        <div className="facility-detail-image-shapes">
+                          <div className="shape-circle shape-1"></div>
+                          <div className="shape-circle shape-2"></div>
+                        </div>
+                      </div>
+
+                      <div className="facility-detail-info">
+                        <div className="facility-detail-header">
+                          <span className="facility-detail-eyebrow">✦ Facility</span>
+                          <h1>{selectedFacility.title}</h1>
+                          <div className="facility-detail-meta">
+                            <span className="meta-item">
+                              <MapPin size={16} />
+                              {selectedFacility.location || "Main Campus"}
+                            </span>
+                            <span className="meta-item">
+                              <Clock size={16} />
+                              {selectedFacility.hours || "8:00 AM - 4:00 PM"}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="facility-detail-body">
+                          <p className="facility-detail-description">
+                            {displayDescription}
+                          </p>
+
+                          {isLong && (
+                            <button
+                              type="button"
+                              className="read-more-btn-modern"
+                              onClick={() => setIsExpanded((prev) => !prev)}
+                            >
+                              <span>{isExpanded ? "Show Less" : "Read More"}</span>
+                              <ChevronDown 
+                                size={18} 
+                                className={`arrow-icon ${isExpanded ? "rotated" : ""}`}
+                              />
+                            </button>
+                          )}
+                        </div>
+
+                        <div className="facility-detail-actions">
+                          <Link to="/facilities" className="btn-back-modern">
+                            <ArrowLeft size={18} />
+                            Back to All Facilities
+                          </Link>
+                          {/* <button className="btn-share-modern">
+                            <Share2 size={18} />
+                            Share
+                          </button> */}
+                        </div>
+
+                        {/* Related Facilities */}
+                        {items.length > 1 && (
+                          <div className="facility-related">
+                            <h4>Explore Other Facilities</h4>
+                            <div className="related-grid">
+                              {items
+                                .filter((item) => item._id !== selectedFacility._id)
+                                .slice(0, 3)
+                                .map((item) => {
+                                  const Icon = getFacilityIcon(item.title);
+                                  return (
+                                    <Link
+                                      key={item._id}
+                                      to={`/facilities/${item._id}`}
+                                      className="related-item"
+                                    >
+                                      <Icon size={16} />
+                                      <span className="related-name">{item.title}</span>
+                                    </Link>
+                                  );
+                                })}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -150,132 +213,92 @@ export default function FacilitiesPage() {
                 )
               ) : (
                 // =========================
-                // ALL FACILITIES – proper cards (mobile friendly)
+                // ALL FACILITIES - Modern Grid (Smaller Cards)
                 // =========================
                 <>
-                  <div className="center-heading">
-                    <p className="eyebrow">OUR CAMPUS</p>
-                    <h2>Everything students need to thrive.</h2>
+                  <div className="facilities-hero-modern">
+                    <div className="facilities-hero-content">
+                      <span className="hero-badge">✦ Our Campus</span>
+                      <h2 className="hero-title">
+                        World-class facilities for
+                        <span className="hero-highlight"> every learner</span>
+                      </h2>
+                      <p className="hero-subtitle">
+                        Discover our thoughtfully designed spaces that inspire
+                        creativity, foster collaboration, and support holistic
+                        development.
+                      </p>
+                      <div className="hero-stats">
+                        <div className="hero-stat">
+                          <span className="stat-number">{items.length}+</span>
+                          <span className="stat-label">Facilities</span>
+                        </div>
+                        <div className="hero-stat">
+                          <span className="stat-number">100%</span>
+                          <span className="stat-label">Accessible</span>
+                        </div>
+                        <div className="hero-stat">
+                          <span className="stat-number">24/7</span>
+                          <span className="stat-label">Support</span>
+                        </div>
+                      </div>
+                    </div>
                   </div>
 
                   {items.length === 0 ? (
                     <EmptyState title="No facilities listed" />
                   ) : (
-                    <div
-                      className="facility-grid"
-                      style={{
-                        display: "grid",
-                        gridTemplateColumns:
-                          "repeat(auto-fill, minmax(280px, 1fr))",
-                        gap: "1.75rem",
-                        marginTop: "2rem",
-                      }}
-                    >
+                    <div className="facility-grid-modern">
                       {items.map((item, index) => {
+                        const Icon = getFacilityIcon(item.title);
                         const shortDesc =
                           item.description ||
                           "Thoughtfully equipped spaces that support meaningful learning and wellbeing.";
                         const truncated =
-                          shortDesc.length > 120
-                            ? shortDesc.slice(0, 120).trim() + "..."
+                          shortDesc.length > 100
+                            ? shortDesc.slice(0, 100).trim() + "..."
                             : shortDesc;
 
                         return (
                           <Link
                             key={item._id || item.title}
                             to={`/facilities/${item._id}`}
-                            style={{
-                              textDecoration: "none",
-                              color: "inherit",
-                              display: "block",
-                              height: "100%",
-                            }}
+                            className="facility-card-modern"
+                            style={{ animationDelay: `${index * 0.08}s` }}
                           >
-                            <article
-                              style={{
-                                background: "#fff",
-                                borderRadius: "16px",
-                                overflow: "hidden",
-                                boxShadow: "0 6px 20px rgba(0,0,0,0.07)",
-                                border: "1px solid rgba(0,0,0,0.05)",
-                                height: "100%",
-                                display: "flex",
-                                flexDirection: "column",
-                                transition:
-                                  "transform 0.2s ease, box-shadow 0.2s ease",
-                                cursor: "pointer",
-                              }}
-                              onMouseEnter={(e) => {
-                                e.currentTarget.style.transform =
-                                  "translateY(-4px)";
-                                e.currentTarget.style.boxShadow =
-                                  "0 12px 28px rgba(0,0,0,0.12)";
-                              }}
-                              onMouseLeave={(e) => {
-                                e.currentTarget.style.transform =
-                                  "translateY(0)";
-                                e.currentTarget.style.boxShadow =
-                                  "0 6px 20px rgba(0,0,0,0.07)";
-                              }}
-                            >
-                              {/* Image */}
-                              <div
-                                style={{
-                                  width: "100%",
-                                  height: "200px",
-                                  overflow: "hidden",
-                                  flexShrink: 0,
-                                }}
-                              >
-                                <img
-                                  src={mediaUrl(
-                                    item.image,
-                                    `${assetPath}courses/courses_${(index % 6) + 1}.jpg`,
-                                  )}
-                                  alt={item.title || ""}
-                                  style={{
-                                    width: "100%",
-                                    height: "100%",
-                                    objectFit: "cover",
-                                    display: "block",
-                                  }}
-                                />
+                            <div className="card-image-wrapper">
+                              <div className="card-image-overlay">
+                                <div className="card-hover-content">
+                                  <ArrowRight size={20} />
+                                  <span className="card-hover-text">Explore</span>
+                                </div>
                               </div>
-
-                              {/* Content */}
-                              <div
-                                style={{
-                                  padding: "1.25rem 1.35rem 1.5rem",
-                                  display: "flex",
-                                  flexDirection: "column",
-                                  flexGrow: 1,
-                                }}
-                              >
-                                <h3
-                                  style={{
-                                    margin: "0 0 0.6rem",
-                                    color: "#1a3c6e",
-                                    fontSize: "1.2rem",
-                                    fontWeight: 700,
-                                    lineHeight: 1.3,
-                                  }}
-                                >
-                                  {item.title}
-                                </h3>
-
-                                <p
-                                  style={{
-                                    margin: 0,
-                                    color: "#555",
-                                    fontSize: "0.95rem",
-                                    lineHeight: 1.6,
-                                    flexGrow: 1,
-                                  }}
-                                >
-                                  {truncated}
-                                </p>
+                              <img
+                                src={mediaUrl(
+                                  item.image,
+                                  `${assetPath}courses/courses_${(index % 6) + 1}.jpg`,
+                                )}
+                                alt={item.title || ""}
+                                className="card-image"
+                              />
+                              <div className="card-badge">
+                                <Icon size={18} />
                               </div>
-                            </article>
+                            </div>
+
+                            <div className="card-content">
+                              <h3 className="card-title">{item.title}</h3>
+                              <p className="card-description">{truncated}</p>
+                              <div className="card-footer">
+                                <span className="card-read-more">
+                                  Learn More
+                                  <ArrowRight size={16} />
+                                </span>
+                                <span className="card-number">
+                                  {String(index + 1).padStart(2, "0")}
+                                </span>
+                              </div>
+                            </div>
                           </Link>
                         );
                       })}

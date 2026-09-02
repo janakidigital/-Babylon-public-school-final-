@@ -1,4 +1,24 @@
 import { Link } from "react-router-dom";
+import { 
+  BookOpen, 
+  FlaskConical, 
+  Music, 
+  Palette, 
+  Computer, 
+  Dumbbell,
+  Globe,
+  Sparkles,
+  Building2,
+  Bus,
+  Coffee,
+  Heart,
+  Library,
+  Mic2,
+  School,
+  Zap,
+  ArrowRight,
+  ChevronRight
+} from "lucide-react";
 import { useSite } from "../../context/SiteContext";
 import usePublicData from "../../hooks/usePublicData";
 import { publicApi } from "../../services/api";
@@ -16,127 +36,94 @@ export default function WhyChooseUsSection() {
   const { home } = useSite();
   const section = home?.whyChooseUs || {};
 
-  return (
-    <section
-      className="why-choose-us shell"
-      style={{ padding: "5rem 0" }}
-    >
-      {/* Section Heading */}
-      <div className="center-heading">
-        <p className="eyebrow">
-          {section.eyebrow || "OUR FACILITIES"}
-        </p>
+  const displayItems = items.slice(0, 6);
+  const hasMore = items.length > 6;
 
-        <h2>
+  // Get icon based on facility type
+  const getFacilityIcon = (title) => {
+    const lowerTitle = title?.toLowerCase() || "";
+    if (lowerTitle.includes("library")) return Library;
+    if (lowerTitle.includes("lab") || lowerTitle.includes("science")) return FlaskConical;
+    if (lowerTitle.includes("sport") || lowerTitle.includes("gym")) return Dumbbell;
+    if (lowerTitle.includes("music")) return Music;
+    if (lowerTitle.includes("art")) return Palette;
+    if (lowerTitle.includes("computer") || lowerTitle.includes("tech")) return Computer;
+    if (lowerTitle.includes("language")) return Globe;
+    if (lowerTitle.includes("math")) return Sparkles;
+    if (lowerTitle.includes("playground")) return Zap;
+    if (lowerTitle.includes("auditorium") || lowerTitle.includes("theater")) return Mic2;
+    if (lowerTitle.includes("cafeteria") || lowerTitle.includes("dining")) return Coffee;
+    if (lowerTitle.includes("medical") || lowerTitle.includes("health")) return Heart;
+    if (lowerTitle.includes("transport") || lowerTitle.includes("bus")) return Bus;
+    if (lowerTitle.includes("classroom")) return School;
+    return Building2;
+  };
+
+  return (
+    <section className="why-choose-us-modern shell">
+      {/* Section Heading */}
+      <div className="why-choose-header">
+        <span className="section-badge"> Why Choose Us</span>
+        <h2 className="section-title">
           {section.title || "Why Choose Babylon School?"}
         </h2>
-
-        <p>
+        <p className="section-subtitle">
           {section.description ||
             "We provide a supportive environment for students to learn and grow."}
         </p>
       </div>
 
       {loading ? (
-        <p style={{ textAlign: "center", marginTop: "2rem" }}>
-          Loading facilities...
-        </p>
+        <div className="facilities-loading">
+          <div className="loading-spinner"></div>
+          <p>Loading amazing spaces...</p>
+        </div>
       ) : items.length === 0 ? (
         <EmptyState title="No facilities listed" />
       ) : (
         <>
-          <style>{`
-            .why-choose-us .facility-grid {
-              display: grid !important;
-              grid-template-columns: repeat(2, 1fr) !important;
-              gap: 0.9rem !important;
-              margin-top: 2.5rem;
-            }
-
-            @media (min-width: 900px) {
-              .why-choose-us .facility-grid {
-                grid-template-columns: repeat(3, 1fr) !important;
-                gap: 1.5rem !important;
-              }
-            }
-          `}</style>
-
-          <div className="facility-grid">
-            {items.map((item, index) => (
-              <Link
-                key={item._id || item.title}
-                to={`/facilities/${item._id}`}
-                style={{
-                  textDecoration: "none",
-                  color: "inherit",
-                  display: "block",
-                  height: "100%",
-                }}
-              >
-                <article
-                  style={{
-                    backgroundColor: "#fff",
-                    borderRadius: "14px",
-                    overflow: "hidden",
-                    boxShadow: "0 4px 18px rgba(0,0,0,0.07)",
-                    transition: "transform 0.2s ease, box-shadow 0.2s ease",
-                    cursor: "pointer",
-                    height: "100%",
-                    display: "flex",
-                    flexDirection: "column",
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.transform = "translateY(-5px)";
-                    e.currentTarget.style.boxShadow =
-                      "0 8px 25px rgba(0,0,0,0.12)";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = "translateY(0)";
-                    e.currentTarget.style.boxShadow =
-                      "0 4px 18px rgba(0,0,0,0.07)";
-                  }}
+          <div className="facility-grid-modern">
+            {displayItems.map((item, index) => {
+              const Icon = getFacilityIcon(item.title);
+              return (
+                <Link
+                  key={item._id || item.title}
+                  to={`/facilities/${item._id}`}
+                  className="facility-card-mini"
+                  style={{ animationDelay: `${index * 0.06}s` }}
                 >
-                  {/* Facility Image */}
-                  <img
-                    src={mediaUrl(
-                      item.image,
-                      `${assetPath}courses/courses_${(index % 6) + 1}.jpg`
-                    )}
-                    alt={item.title || ""}
-                    style={{
-                      width: "100%",
-                      height: "150px",
-                      objectFit: "cover",
-                      display: "block",
-                    }}
-                  />
-
-                  {/* Facility Name */}
-                  <div
-                    style={{
-                      padding: "0.85rem 1rem",
-                      textAlign: "center",
-                      flexGrow: 1,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <h3
-                      style={{
-                        margin: 0,
-                        fontSize: "1rem",
-                        color: "#1a3c6e",
-                        lineHeight: 1.3,
-                      }}
-                    >
-                      {item.title}
-                    </h3>
+                  <div className="facility-card-mini-image">
+                    <img
+                      src={mediaUrl(
+                        item.image,
+                        `${assetPath}courses/courses_${(index % 6) + 1}.jpg`
+                      )}
+                      alt={item.title || ""}
+                    />
+                    <div className="facility-card-mini-overlay">
+                      <ArrowRight size={18} />
+                    </div>
                   </div>
-                </article>
-              </Link>
-            ))}
+                  <div className="facility-card-mini-content">
+                    <div className="facility-card-mini-icon">
+                      <Icon size={16} />
+                    </div>
+                    <h3 className="facility-card-mini-title">{item.title}</h3>
+                  </div>
+                </Link>
+              );
+            })}
           </div>
+
+          {/* View All Button */}
+          {hasMore && (
+            <div className="why-choose-footer">
+              <Link to="/facilities" className="btn-view-all-facilities">
+                View All Facilities
+                <ChevronRight size={18} />
+              </Link>
+            </div>
+          )}
         </>
       )}
     </section>

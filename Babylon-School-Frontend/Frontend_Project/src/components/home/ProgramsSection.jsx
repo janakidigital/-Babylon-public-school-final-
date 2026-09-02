@@ -1,4 +1,14 @@
 import { Link } from "react-router-dom";
+import { 
+  ArrowRight, 
+  BookOpen, 
+  GraduationCap, 
+  Users, 
+  Sparkles,
+  Clock,
+  Award,
+  ChevronRight
+} from "lucide-react";
 import { publicApi } from "../../services/api";
 import { mediaUrl } from "../../lib/media";
 import usePublicData from "../../hooks/usePublicData";
@@ -11,6 +21,28 @@ export default function ProgramsSection() {
   const preview = data.slice(0, 6);
   const hasMore = data.length > 5;
 
+  // Get icon based on program type
+  const getProgramIcon = (title) => {
+    const lowerTitle = title?.toLowerCase() || "";
+    if (lowerTitle.includes("kindergarten") || lowerTitle.includes("pg") || lowerTitle.includes("pre")) return Sparkles;
+    if (lowerTitle.includes("primary") || lowerTitle.includes("elementary")) return BookOpen;
+    if (lowerTitle.includes("secondary") || lowerTitle.includes("high")) return GraduationCap;
+    if (lowerTitle.includes("science")) return BookOpen;
+    if (lowerTitle.includes("math")) return BookOpen;
+    if (lowerTitle.includes("language")) return BookOpen;
+    return BookOpen;
+  };
+
+  // Get color based on level
+  const getLevelColor = (level) => {
+    const lowerLevel = level?.toLowerCase() || "";
+    if (lowerLevel.includes("pre") || lowerLevel.includes("pg") || lowerLevel.includes("kindergarten")) return "#f39c12";
+    if (lowerLevel.includes("primary") || lowerLevel.includes("elementary")) return "#3498db";
+    if (lowerLevel.includes("secondary") || lowerLevel.includes("high")) return "#9b59b6";
+    if (lowerLevel.includes("lower")) return "#2ecc71";
+    return "#1a3c6e";
+  };
+
   const items = preview.map((program, index) => ({
     ...program,
     text: program.shortDescription || program.description || "",
@@ -19,21 +51,25 @@ export default function ProgramsSection() {
       `${assetPath}courses/courses_${(index % 3) + 1}.jpg`
     ),
     href: program._id ? `/course-details/${program._id}` : "/academics",
+    icon: getProgramIcon(program.title),
+    level: program.level || "Program",
+    levelColor: getLevelColor(program.level),
   }));
 
   return (
-    <section className="program-section" id="programs">
+    <section className="programs-section-modern" id="programs">
       <div className="shell">
-        <div className="section-heading">
-          <div>
-            <p className="eyebrow">OUR ACADEMICS</p>
-            <h2>
+        {/* Section Header */}
+        <div className="programs-header">
+          <div className="programs-header-left">
+            <span className="section-badge"> Our Academics</span>
+            <h2 className="section-title">
               Learning for every
               <br />
               stage of life.
             </h2>
           </div>
-          <p>
+          <p className="section-description">
             A co-ed English medium school from PG to secondary level, with
             programmes designed so students thrive from their first years
             through graduation.
@@ -41,143 +77,68 @@ export default function ProgramsSection() {
         </div>
 
         {loading ? (
-          <p>Loading programmes...</p>
+          <div className="programs-loading">
+            <div className="loading-spinner"></div>
+            <p>Loading programmes...</p>
+          </div>
         ) : items.length === 0 ? (
           <EmptyState title="Programmes coming soon" />
         ) : (
           <>
-            <style>{`
-              .program-section .program-grid {
-                display: grid !important;
-                grid-template-columns: repeat(2, 1fr) !important;
-                gap: 0.9rem !important;
-                margin-top: 1.75rem;
-              }
-
-              @media (min-width: 900px) {
-                .program-section .program-grid {
-                  grid-template-columns: repeat(3, 1fr) !important;
-                  gap: 1.15rem !important;
-                  max-width: 980px;
-                  margin-left: auto;
-                  margin-right: auto;
-                }
-              }
-
-              /* Card = image only, text overlays on top */
-              .program-section .program-card {
-                position: relative !important;
-                border-radius: 14px !important;
-                overflow: hidden !important;
-                box-shadow: 0 6px 18px rgba(0,0,0,0.1) !important;
-                aspect-ratio: 4 / 3 !important;
-                background: #0b1f3a !important;
-                display: block !important;
-                height: auto !important;
-                min-height: unset !important;
-              }
-
-              .program-section .program-card img {
-                width: 100% !important;
-                height: 100% !important;
-                object-fit: cover !important;
-                display: block !important;
-                position: absolute !important;
-                inset: 0 !important;
-              }
-
-              /* Soft gradient – no solid blue block */
-              .program-section .program-card::after {
-                content: "" !important;
-                position: absolute !important;
-                inset: 0 !important;
-                background: linear-gradient(
-                  to top,
-                  rgba(8, 22, 48, 0.95) 0%,
-                  rgba(8, 22, 48, 0.65) 40%,
-                  rgba(8, 22, 48, 0.2) 65%,
-                  transparent 100%
-                ) !important;
-                z-index: 1 !important;
-                pointer-events: none !important;
-              }
-
-              .program-section .program-number {
-                position: absolute !important;
-                top: 0.6rem !important;
-                right: 0.75rem !important;
-                color: rgba(255,255,255,0.75) !important;
-                font-size: 0.8rem !important;
-                font-weight: 600 !important;
-                z-index: 3 !important;
-              }
-
-              /* Text sits on the image, not in a separate panel */
-              .program-section .program-content {
-                position: absolute !important;
-                left: 0 !important;
-                right: 0 !important;
-                bottom: 0 !important;
-                padding: 0.85rem 0.95rem 1rem !important;
-                background: transparent !important;
-                z-index: 2 !important;
-                margin: 0 !important;
-                height: auto !important;
-                min-height: unset !important;
-              }
-
-              .program-section .program-content h3 {
-                margin: 0 0 0.2rem !important;
-                font-size: 0.95rem !important;
-                font-weight: 700 !important;
-                line-height: 1.25 !important;
-                color: #fff !important;
-              }
-
-              .program-section .program-content p {
-                margin: 0 0 0.45rem !important;
-                font-size: 0.75rem !important;
-                line-height: 1.35 !important;
-                color: rgba(255,255,255,0.88) !important;
-                display: -webkit-box !important;
-                -webkit-line-clamp: 2 !important;
-                -webkit-box-orient: vertical !important;
-                overflow: hidden !important;
-              }
-
-              .program-section .program-content a {
-                color: #f5c542 !important;
-                font-size: 0.8rem !important;
-                font-weight: 600 !important;
-                text-decoration: none !important;
-              }
-            `}</style>
-
-            <div className="program-grid">
-              {items.map((program, index) => (
-                <article
-                  className="program-card"
-                  key={program._id || program.title}
-                >
-                  <img src={program.image} alt={program.title || ""} />
-                  <div className="program-number">0{index + 1}</div>
-                  <div className="program-content">
-                    <h3>{program.title}</h3>
-                    <p>{program.text}</p>
-                    <Link to={program.href}>
-                      Explore <span>&rarr;</span>
-                    </Link>
-                  </div>
-                </article>
-              ))}
+            {/* Program Grid */}
+            <div className="programs-grid-modern">
+              {items.map((program, index) => {
+                const Icon = program.icon;
+                return (
+                  <Link
+                    key={program._id || program.title}
+                    to={program.href}
+                    className="program-card-modern"
+                    style={{ animationDelay: `${index * 0.08}s` }}
+                  >
+                    <div className="program-card-image">
+                      <img src={program.image} alt={program.title || ""} />
+                      <div className="program-card-overlay">
+                        <div className="program-card-icon">
+                          <Icon size={24} />
+                        </div>
+                        <span className="program-card-explore">
+                          Explore <ArrowRight size={16} />
+                        </span>
+                      </div>
+                    </div>
+                    <div className="program-card-content">
+                      <div className="program-card-header">
+                        <span className="program-number">0{index + 1}</span>
+                        <span 
+                          className="program-level"
+                          style={{ 
+                            backgroundColor: `${program.levelColor}15`,
+                            color: program.levelColor
+                          }}
+                        >
+                          {program.level}
+                        </span>
+                      </div>
+                      <h3 className="program-title">{program.title}</h3>
+                      <p className="program-description">{program.text}</p>
+                      <span className="program-link">
+                        Learn More <ChevronRight size={16} />
+                      </span>
+                    </div>
+                  </Link>
+                );
+              })}
             </div>
 
+            {/* View All Button */}
             {hasMore && (
-              <p style={{ textAlign: "center", marginTop: "1.75rem" }}>
-                <Link className="text-link" to="/academics">
-                  View all programmes <b>&rarr;</b>
+              <div className="programs-footer">
+                <Link to="/academics" className="btn-view-all">
+                  View All Programmes
+                  <ArrowRight size={18} />
                 </Link>
-              </p>
+              </div>
             )}
           </>
         )}
