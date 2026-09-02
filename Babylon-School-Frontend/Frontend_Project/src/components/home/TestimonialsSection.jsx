@@ -37,7 +37,7 @@ export default function TestimonialsSection() {
     <section className="testimonials shell">
       <div className="center-heading">
         <p className="eyebrow">OUR COMMUNITY</p>
-        <h2>What parents & students say</h2>
+        <h2>Hear from Our Valued Parents</h2>
       </div>
 
       {loading ? (
@@ -46,29 +46,50 @@ export default function TestimonialsSection() {
         <EmptyState title="No testimonials yet" />
       ) : (
         <div className="testimonial-slider">
-          {/* Current testimonial */}
           <div className="testimonial-slide">
-            <blockquote key={data[current]._id || data[current].name}>
-              <p className="testimonial-message">“{data[current].message}”</p>
-
-              <div className="testimonial-footer">
-                {data[current].image && (
-                  <img
-                    src={mediaUrl(data[current].image)}
-                    alt={data[current].name}
-                    className="testimonial-avatar"
-                  />
-                )}
-                <div className="testimonial-meta">
-                  <span className="testimonial-name">{data[current].name}</span>
-                  {data[current].designation && (
-                    <span className="testimonial-role">
-                      {data[current].designation}
-                    </span>
-                  )}
-                </div>
+            {/* Left content */}
+            <div className="testimonial-content">
+              <div className="quote-icon">
+                <span>”</span>
               </div>
-            </blockquote>
+
+              <h3 className="testimonial-question">
+                {data[current].question || "What are your expectation for the school in preparing students for challenges in a globalized world?"}
+              </h3>
+
+              <p className="testimonial-message">
+                {data[current].message}
+              </p>
+
+              <div className="testimonial-meta">
+                <span className="testimonial-name">{data[current].name}</span>
+                {data[current].designation && (
+                  <span className="testimonial-role">
+                    {data[current].designation}
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* Right side – large circular image + shapes */}
+            <div className="testimonial-image-wrap">
+              <div className="shape shape-green" />
+              <div className="shape shape-blue" />
+
+              {/* Image is always rendered */}
+              <img
+                src={
+                  data[current].image
+                    ? mediaUrl(data[current].image)
+                    : "/images/default-avatar.png"
+                }
+                alt={data[current].name || "Parent"}
+                className="testimonial-avatar-large"
+                onError={(e) => {
+                  e.currentTarget.src = "/images/default-avatar.png";
+                }}
+              />
+            </div>
           </div>
 
           {/* Navigation */}
@@ -82,18 +103,6 @@ export default function TestimonialsSection() {
               >
                 ‹
               </button>
-
-              <div className="testimonial-dots">
-                {data.map((_, index) => (
-                  <button
-                    key={index}
-                    type="button"
-                    className={`dot ${index === current ? "active" : ""}`}
-                    onClick={() => goTo(index)}
-                    aria-label={`Go to testimonial ${index + 1}`}
-                  />
-                ))}
-              </div>
 
               <button
                 type="button"
