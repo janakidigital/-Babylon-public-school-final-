@@ -3764,3 +3764,24 @@ article:has(.notice-title-link) {
   /* Remove this if it exists: */
   /* pointer-events: none; */
 }
+
+
+.about-us-box {
+  background: #f8f9fa;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 2.5rem 2rem;
+  margin-bottom: 3.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+}
+
+.about-us-box .about-us-heading {
+  margin-bottom: 0;
+}
+
+.about-us-box .about-us-heading p:last-child {
+  max-width: 720px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.7;
+}

@@ -2,10 +2,10 @@ import { useState } from "react";
 import { useSite } from "../../context/SiteContext";
 
 const DEFAULT_VISION =
-  "To become a leading educational institution that inspires excellence, innovation and lifelong learning.";
+  "The vision of our school is to provide an inclusive and dynamic learning environment where students can thrive both academically and personally. We aim to foster a love of learning in our students and equip them with the skills and knowledge they need to succeed in the 21st century. Our focus is on developing critical thinking, creativity, collaboration, and communication skills that will enable our students to become lifelong learners and effective problem-solvers. We strive to create a school culture that values diversity, promotes positive relationships, and encourages a growth mindset. Our ultimate goal is to prepare our students to be responsible, compassionate, and engaged citizens who will make a positive impact in their communities and the world.";
 
 const DEFAULT_MISSION =
-  "To provide quality education that develops knowledgeable, skilled and responsible individuals.";
+  "Our mission is to provide a quality education that prepares students to become responsible, productive, and ethical members of society. We strive to create a learning environment that fosters academic excellence, social and emotional growth, and a commitment to lifelong learning. We are dedicated to promoting diversity, inclusivity, and respect for all individuals, and we seek to cultivate a strong sense of community and citizenship among our students.";
 
 const DEFAULT_GOALS = [
   "To cultivate, recognize, and respect the opinions and contributions of children, parents, and teachers.",
@@ -18,6 +18,9 @@ const DEFAULT_GOALS = [
   "The school aims to accord the type of education that can meet the individual and collective needs of learners and make them self-confident, self-disciplined, and self-reliant by stressing value education, career guidance, social works, leadership training, and extra-curricular activities.",
   "Babylon National School envisions an educational institute “Par Excellence” that is academically solid, socially relevant, and value-oriented.",
 ];
+
+const ABOUT_US_TEXT =
+  "We are a community of passionate educators dedicated since 1996 to providing a dynamic and engaging learning environment for all our students. We are located at Shantinagar, Kathmandu. Our team of experienced teachers works tirelessly to inspire and motivate students to achieve their full potential. We strive to create a welcoming and inclusive school culture that fosters a love of learning, creativity, and collaboration. We are committed to empowering students to become lifelong learners who are equipped with the 21st-century skills and knowledge they need to succeed in a rapidly changing world.";
 
 function getText(value, fallback) {
   if (!value) return fallback;
@@ -65,17 +68,10 @@ function renderContent(text) {
 }
 
 export default function AboutPossibilities() {
-  const { about } = useSite();
-
-  const visionText = getText(about?.vision, DEFAULT_VISION);
-  const missionText = getText(about?.mission, DEFAULT_MISSION);
-
-  const goals =
-    Array.isArray(about?.goals) && about.goals.length > 0
-      ? about.goals
-      : Array.isArray(about?.goal) && about.goal.length > 0
-      ? about.goal
-      : DEFAULT_GOALS;
+  // Always show the default values (ignore SiteContext data)
+  const visionText = DEFAULT_VISION;
+  const missionText = DEFAULT_MISSION;
+  const goals = DEFAULT_GOALS;
 
   const possibilities = [
     { id: "vision", title: "Vision", content: visionText },
@@ -86,6 +82,16 @@ export default function AboutPossibilities() {
   return (
     <section className="possibilities" aria-labelledby="possibilities-heading">
       <div className="shell">
+        {/* About Us – separate boxed section */}
+        <div className="about-us-box">
+          <header className="center-heading about-us-heading">
+            {/* <p className="eyebrow">ABOUT US</p> */}
+            <h2 id="about-us-heading">About Us</h2>
+            <p>{ABOUT_US_TEXT}</p>
+          </header>
+        </div>
+
+        {/* Our Difference section */}
         <header className="center-heading">
           <p className="eyebrow">OUR DIFFERENCE</p>
           <h2 id="possibilities-heading">Unlimited possibilities</h2>
