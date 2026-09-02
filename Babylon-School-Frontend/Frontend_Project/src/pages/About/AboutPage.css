@@ -336,15 +336,27 @@
   font-style: normal;
 }
 
-.philosophy-dual-columns {
+.philosophy-showcase-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 2rem;
+  gap: 1.5rem;
+  align-items: stretch;
 }
 
-@media (min-width: 768px) {
-  .philosophy-dual-columns {
+@media (min-width: 680px) and (max-width: 991px) {
+  .philosophy-showcase-grid {
     grid-template-columns: 1fr 1fr;
+  }
+
+  .philosophy-award-card {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (min-width: 992px) {
+  .philosophy-showcase-grid {
+    grid-template-columns: 1fr 1fr 1.1fr;
+    gap: 1.5rem;
   }
 }
 
@@ -363,7 +375,7 @@
 }
 
 .philosophy-col-header h3 {
-  font-size: 1.2rem;
+  font-size: 1.15rem;
   color: #021a39;
   margin: 0;
   font-weight: 700;
@@ -375,18 +387,19 @@
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.65rem;
+  flex: 1;
 }
 
 .philosophy-list-modern li {
   display: flex;
   align-items: flex-start;
-  gap: 0.75rem;
+  gap: 0.65rem;
   background: #f8fafc;
-  padding: 0.85rem 1rem;
+  padding: 0.75rem 0.9rem;
   border-radius: 10px;
-  font-size: 0.9rem;
-  line-height: 1.45;
+  font-size: 0.88rem;
+  line-height: 1.4;
   color: #334155;
   border: 1px solid rgba(2, 26, 57, 0.04);
   transition: all 0.2s ease;
@@ -398,16 +411,328 @@
   transform: translateX(3px);
 }
 
-.list-badge-icon {
+/* ---------------------------------------------------------
+   5. BRITISH COUNCIL AWARD SHOWCASE CARD
+   --------------------------------------------------------- */
+.philosophy-award-card {
+  background: #ffffff;
+  border: 1px solid rgba(2, 26, 57, 0.1);
+  border-radius: 14px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 0 4px 16px rgba(2, 26, 57, 0.04);
+  position: relative;
+  overflow: hidden;
+}
+
+.philosophy-award-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #cf2027, #021a39);
+}
+
+.award-card-header {
+  margin-bottom: 0.85rem;
+}
+
+.award-header-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: #fee2e2;
   color: #cf2027;
-  font-size: 1rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  padding: 0.25rem 0.6rem;
+  border-radius: 20px;
+  margin-bottom: 0.45rem;
+}
+
+.award-card-header h3 {
+  font-size: 1.05rem;
+  color: #021a39;
+  font-weight: 700;
+  line-height: 1.3;
+  margin: 0 0 0.25rem;
+}
+
+.award-year-tag {
+  font-size: 0.78rem;
+  color: #64748b;
+  font-weight: 600;
+}
+
+/* Dual Gallery Images */
+.award-dual-gallery {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin: 0.75rem 0 1rem;
+}
+
+.award-thumb-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  outline: none;
+}
+
+.award-img-container {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  background: #f8fafc;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid rgba(2, 26, 57, 0.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  transition: all 0.25s ease;
+}
+
+.award-thumb-box:hover .award-img-container,
+.award-thumb-box:focus .award-img-container {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(2, 26, 57, 0.12);
+  border-color: rgba(207, 32, 39, 0.35);
+}
+
+.award-thumb-img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+.trophy-fit {
+  object-fit: cover;
+  object-position: center top;
+}
+
+.cert-fit {
+  object-fit: contain;
+  background: #ffffff;
+  padding: 4px;
+}
+
+.award-thumb-box:hover .award-thumb-img {
+  transform: scale(1.04);
+}
+
+.award-hover-hint {
+  position: absolute;
+  inset: 0;
+  background: rgba(2, 26, 57, 0.6);
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.award-thumb-box:hover .award-hover-hint,
+.award-thumb-box:focus .award-hover-hint {
+  opacity: 1;
+}
+
+.award-caption {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #475569;
+  margin-top: 0.4rem;
+  text-align: center;
+}
+
+/* Note box */
+.award-note-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  background: #f8fafc;
+  border-left: 3px solid #cf2027;
+  border-radius: 0 8px 8px 0;
+  padding: 0.6rem 0.75rem;
+}
+
+.award-note-icon {
+  color: #cf2027;
   flex-shrink: 0;
   margin-top: 2px;
 }
 
-.list-badge-star {
-  color: #d97706;
-  font-size: 1rem;
-  flex-shrink: 0;
-  margin-top: 2px;
+.award-note-box p {
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: #334155;
+  margin: 0;
+}
+
+/* ---------------------------------------------------------
+   6. LIGHTBOX MODAL
+   --------------------------------------------------------- */
+.award-lightbox-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(2, 26, 57, 0.85);
+  backdrop-filter: blur(6px);
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem;
+  animation: awardFadeIn 0.2s ease-out;
+}
+
+@keyframes awardFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.award-lightbox-modal {
+  position: relative;
+  background: #ffffff;
+  border-radius: 14px;
+  overflow: hidden;
+  max-width: 540px;
+  width: 100%;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.35);
+  animation: awardSlideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes awardSlideUp {
+  from {
+    transform: translateY(20px) scale(0.97);
+  }
+  to {
+    transform: translateY(0) scale(1);
+  }
+}
+
+.award-lightbox-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: rgba(2, 26, 57, 0.8);
+  color: #ffffff;
+  border: none;
+  border-radius: 50%;
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  transition: all 0.2s ease;
+}
+
+.award-lightbox-close:hover {
+  background: #cf2027;
+  transform: rotate(90deg);
+}
+
+.award-lightbox-img-wrap {
+  flex: 1;
+  min-height: 0;
+  background: #0f172a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.award-lightbox-img {
+  max-width: 100%;
+  max-height: 65vh;
+  object-fit: contain;
+  border-radius: 6px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.award-lightbox-info {
+  padding: 0.9rem 1.25rem;
+  background: #ffffff;
+  border-top: 1px solid #f1f5f9;
+}
+
+.award-lightbox-info h4 {
+  font-size: 0.95rem;
+  color: #021a39;
+  font-weight: 700;
+  margin: 0 0 0.2rem;
+}
+
+.award-lightbox-info p {
+  font-size: 0.8rem;
+  color: #64748b;
+  margin: 0;
+}
+
+/* ---------------------------------------------------------
+   7. MOBILE RESPONSIVE TWEAKS
+   --------------------------------------------------------- */
+@media (max-width: 679px) {
+  .about-philosophy-section {
+    padding: 1.4rem 1rem;
+    border-radius: 12px;
+  }
+
+  .philosophy-intro-box {
+    padding: 1rem;
+    margin-bottom: 1.4rem;
+  }
+
+  .philosophy-intro-box p {
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+
+  .philosophy-showcase-grid {
+    gap: 1.5rem;
+  }
+
+  .philosophy-list-modern li {
+    font-size: 0.84rem;
+    padding: 0.7rem 0.8rem;
+  }
+
+  .philosophy-award-card {
+    padding: 1rem;
+  }
+
+  .award-dual-gallery {
+    gap: 0.5rem;
+  }
+
+  .award-img-container {
+    aspect-ratio: 3 / 4;
+  }
+
+  .award-lightbox-modal {
+    max-width: 95vw;
+  }
+
+  .award-lightbox-img {
+    max-height: 55vh;
+  }
 }

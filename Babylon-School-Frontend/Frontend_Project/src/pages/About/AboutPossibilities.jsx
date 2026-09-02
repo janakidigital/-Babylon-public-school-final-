@@ -12,6 +12,9 @@ import {
   BookOpen,
   Lightbulb,
   Globe,
+  Award,
+  Compass,
+  HeartHandshake,
 } from "lucide-react";
 
 const GOALS = [
@@ -19,37 +22,55 @@ const GOALS = [
     icon: Users,
     title: "Community & Mutual Respect",
     description:
-      "Cultivate, recognize, and respect the active opinions and contributions of children, parents, and teachers.",
+      "To cultivate, recognize, and respect the opinions and contributions of children, parents, and teachers.",
   },
   {
     icon: ShieldCheck,
     title: "Safe & Nurturing Environment",
     description:
-      "Provide a safe learning space where individual uniqueness is celebrated and diversity is deeply valued.",
+      "To provide a safe, nurturing environment for learning where individuality is recognized and diversity is celebrated.",
   },
   {
     icon: Brain,
     title: "Holistic Potential",
     description:
-      "Encourage the full development of each child’s practical, cognitive, physical, social, and moral faculties.",
+      "To provide instruction that encourages the full development of each child’s practical, cognitive, physical, social, and moral faculties.",
   },
   {
     icon: BookOpen,
     title: "Stimulating Curriculum",
     description:
-      "Deliver an intellectually stimulating, developmentally appropriate, and socially relevant curriculum.",
+      "To present a curriculum that is intellectually stimulating and developmentally appropriate.",
   },
   {
     icon: Lightbulb,
     title: "Critical Thinking & Creativity",
     description:
-      "Foster student initiative, self-discipline, inquisitive inquiry, and creative approaches to problem-solving.",
+      "To foster student initiative, self-discipline, inquisitive inquiry, and creative approaches to problem-solving.",
   },
   {
     icon: Globe,
     title: "Good Citizenship & Leadership",
     description:
-      "Nurture leadership potential and civic awareness through community service, extracurriculars, and value education.",
+      "To foster the values of good citizenship through community service, civic awareness, and the development of leadership potential.",
+  },
+  {
+    icon: Award,
+    title: "Meeting Modern Challenges",
+    description:
+      "Committed to its dictum “Knowledge, Wisdom and Education Par Excellence”, for students who are determined to meet the challenges posed by the brutal advance of scientism, modernism, and post-modernism.",
+  },
+  {
+    icon: Compass,
+    title: "Self-Reliance & Value Growth",
+    description:
+      "The school aims to accord the type of education that can meet the individual and collective needs of learners and make them self–confident, self-disciplined, and self–reliant by stressing value education, career guidance, social works, leadership training, and extra-curricular activities.",
+  },
+  {
+    icon: HeartHandshake,
+    title: "Institute Par Excellence",
+    description:
+      "Babylon National School envisions an establishment of an educational institute “Par Excellence” academically solid, socially relevant, and value-oriented.",
   },
 ];
 
@@ -62,12 +83,8 @@ export default function AboutPossibilities() {
       {/* 1. Heritage & Welcome Story Card */}
       <section className="about-hero-card">
         <p className="eyebrow">ABOUT BABYLON NATIONAL SCHOOL</p>
-        <h2>A Legacy of Educational Excellence & Holistic Growth</h2>
         <p className="about-hero-lead">
-          Founded in 1996 in Shantinagar, Kathmandu, Babylon National School has grown into
-          one of the region's premier educational institutions. We are a passionate community
-          of educators committed to nurturing young minds with 21st-century skills, high moral
-          values, and boundless curiosity.
+          We are a community of passionate educators dedicated since 1996 to providing a dynamic and engaging learning environment for all our students. We are located at Shantinagar, Kathmandu. Our team of experienced teachers works tirelessly to inspire and motivate students to achieve their full potential. We strive to create a welcoming and inclusive school culture that fosters a love of learning, creativity, and collaboration. We are committed to empowering students to become lifelong learners who are equipped with the 21st-century skills and knowledge they need to succeed in a rapidly changing world.
         </p>
 
         {/* Feature Badges */}
