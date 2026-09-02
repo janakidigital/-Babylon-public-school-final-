@@ -1,60 +1,73 @@
-const philosophy = {
-  description:
-    "We are open to broaden academic outreach of young learners into the zenith of the global standard of 21st century. We basically believe in the uniqueness of the child and try accordingly to explore the uniqueness in a full scale without overbearing their creativity. Our teaching teams assume and nurture them to respect the opinions of others, draw logical conclusions of critical questions by using their own senses, ingenuity, and inquisitiveness in a fearless environment. We duly respect the diversity of cultures in school. We maintain inclusiveness while treating a child so that he/she would feel the importance of social equity and equality in the learning process. We provide individual care to the students so that they would feel the importance of self-respect, self-discovery, and inclusion.",
+import React from "react";
 
-  approach: [
-    "High expectations for all students.",
-    "Small and personalized classrooms.",
-    "Use of technology to enhance learning.",
-    "Recognition and application of learning styles.",
-    "Increased instructional time.",
-    "Highly qualified staff and faculties.",
-    "Parents as partners.",
-  ],
+const APPROACH_ITEMS = [
+  "High academic and moral expectations for all students.",
+  "Small, personalized classrooms ensuring individual care.",
+  "Thoughtful integration of modern technology in daily learning.",
+  "Recognition and adaptation to distinct student learning styles.",
+  "Focused and meaningful instructional time.",
+  "Experienced, highly qualified staff and passionate mentors.",
+  "Parents actively engaged as collaborative educational partners.",
+];
 
-  principles: [
-    "Learning is a lifelong process.",
-    "Every individual is capable of excellence.",
-    "Every individual is smart with immense potential.",
-    "Learning from mistakes.",
-    "Collaborative and cooperative learning.",
-  ],
-};
+const GUIDING_PRINCIPLES = [
+  "Learning is an inspiring, lifelong journey.",
+  "Every individual is capable of achieving personal excellence.",
+  "Every student possesses unique intelligence and immense potential.",
+  "Mistakes are viewed as valuable opportunities for growth.",
+  "Collaborative, cooperative teamwork fuels authentic discovery.",
+];
 
 export default function AboutStats() {
   return (
-    <section className="about-stats">
-      <div className="shell">
-        <div className="center-heading">
-          <p className="eyebrow light">OUR PHILOSOPHY</p>
-          <h2>Learning with purpose, growing with confidence.</h2>
-        </div>
+    <section className="about-philosophy-section">
+      <div className="about-section-header">
+        <p className="eyebrow">OUR PHILOSOPHY</p>
+        <h2>Learning with purpose, growing with confidence.</h2>
+      </div>
 
-        {/* New elegant card for the description */}
-        <div className="philosophy-card">
-          <p className="philosophy-quote">
-            {philosophy.description}
-          </p>
-        </div>
+      {/* Philosophy Context Card */}
+      <div className="philosophy-intro-box">
+        <p>
+          We believe in the uniqueness of every child and actively explore that individuality
+          without overbearing their innate creativity. Our educators nurture students to think
+          critically, express their voices with confidence, respect diverse cultures, and
+          develop self-respect through personalized guidance.
+        </p>
+      </div>
 
-        <div className="philosophy-grid">
-          <div className="philosophy-column">
-            <h3>Our Approach</h3>
-            <ul className="philosophy-list">
-              {philosophy.approach.map((item) => (
-                <li key={item}>{item}</li>
-              ))}
-            </ul>
+      {/* 2-Column Approach & Guiding Principles */}
+      <div className="philosophy-dual-columns">
+        {/* Column 1: Our Approach */}
+        <div className="philosophy-col">
+          <div className="philosophy-col-header">
+            <span aria-hidden="true" style={{ fontSize: "1.3rem" }}>📋</span>
+            <h3>Our Educational Approach</h3>
           </div>
+          <ul className="philosophy-list-modern">
+            {APPROACH_ITEMS.map((item, idx) => (
+              <li key={idx}>
+                <span className="list-badge-icon" aria-hidden="true">✓</span>
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
 
-          <div className="philosophy-column">
+        {/* Column 2: Our Guiding Principles */}
+        <div className="philosophy-col">
+          <div className="philosophy-col-header">
+            <span aria-hidden="true" style={{ fontSize: "1.3rem" }}>✨</span>
             <h3>Our Guiding Principles</h3>
-            <ul className="philosophy-list">
-              {philosophy.principles.map((item) => (
-                <li key={item}>{item}</li>
-              ))}
-            </ul>
           </div>
+          <ul className="philosophy-list-modern">
+            {GUIDING_PRINCIPLES.map((item, idx) => (
+              <li key={idx}>
+                <span className="list-badge-star" aria-hidden="true">★</span>
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
     </section>

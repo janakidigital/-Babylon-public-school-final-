@@ -1,118 +1,154 @@
-import { useState } from "react";
-import { useSite } from "../../context/SiteContext";
+import React from "react";
 
-const DEFAULT_VISION =
-  "The vision of our school is to provide an inclusive and dynamic learning environment where students can thrive both academically and personally. We aim to foster a love of learning in our students and equip them with the skills and knowledge they need to succeed in the 21st century. Our focus is on developing critical thinking, creativity, collaboration, and communication skills that will enable our students to become lifelong learners and effective problem-solvers. We strive to create a school culture that values diversity, promotes positive relationships, and encourages a growth mindset. Our ultimate goal is to prepare our students to be responsible, compassionate, and engaged citizens who will make a positive impact in their communities and the world.";
-
-const DEFAULT_MISSION =
-  "Our mission is to provide a quality education that prepares students to become responsible, productive, and ethical members of society. We strive to create a learning environment that fosters academic excellence, social and emotional growth, and a commitment to lifelong learning. We are dedicated to promoting diversity, inclusivity, and respect for all individuals, and we seek to cultivate a strong sense of community and citizenship among our students.";
-
-const DEFAULT_GOALS = [
-  "To cultivate, recognize, and respect the opinions and contributions of children, parents, and teachers.",
-  "To provide a safe, nurturing environment for learning where individuality is recognized and diversity is celebrated.",
-  "To provide instruction that encourages the development of each child’s practical, cognitive, physical, social, and moral potential.",
-  "To present a curriculum that is intellectually stimulating and developmentally appropriate.",
-  "To encourage initiative, self-discipline, critical thinking, and creative approaches to problem-solving.",
-  "To foster the values of good citizenship through community service, civic awareness, and the development of leadership potential.",
-  "Committed to its dictum “Knowledge, Wisdom and Education Par Excellence”, for students who are determined to meet the challenges posed by the brutal advance of scientism, modernism, and post-modernism.",
-  "The school aims to accord the type of education that can meet the individual and collective needs of learners and make them self-confident, self-disciplined, and self-reliant by stressing value education, career guidance, social works, leadership training, and extra-curricular activities.",
-  "Babylon National School envisions an educational institute “Par Excellence” that is academically solid, socially relevant, and value-oriented.",
+const GOALS = [
+  {
+    icon: "🤝",
+    title: "Community & Mutual Respect",
+    description:
+      "Cultivate, recognize, and respect the active opinions and contributions of children, parents, and teachers.",
+  },
+  {
+    icon: "🛡️",
+    title: "Safe & Nurturing Environment",
+    description:
+      "Provide a safe learning space where individual uniqueness is celebrated and diversity is deeply valued.",
+  },
+  {
+    icon: "🧠",
+    title: "Holistic Potential",
+    description:
+      "Encourage the full development of each child’s practical, cognitive, physical, social, and moral faculties.",
+  },
+  {
+    icon: "📖",
+    title: "Stimulating Curriculum",
+    description:
+      "Deliver an intellectually stimulating, developmentally appropriate, and socially relevant curriculum.",
+  },
+  {
+    icon: "💡",
+    title: "Critical Thinking & Creativity",
+    description:
+      "Foster student initiative, self-discipline, inquisitive inquiry, and creative approaches to problem-solving.",
+  },
+  {
+    icon: "🌍",
+    title: "Good Citizenship & Leadership",
+    description:
+      "Nurture leadership potential and civic awareness through community service, extracurriculars, and value education.",
+  },
 ];
 
-const ABOUT_US_TEXT =
-  "We are a community of passionate educators dedicated since 1996 to providing a dynamic and engaging learning environment for all our students. We are located at Shantinagar, Kathmandu. Our team of experienced teachers works tirelessly to inspire and motivate students to achieve their full potential. We strive to create a welcoming and inclusive school culture that fosters a love of learning, creativity, and collaboration. We are committed to empowering students to become lifelong learners who are equipped with the 21st-century skills and knowledge they need to succeed in a rapidly changing world.";
-
-function getText(value, fallback) {
-  if (!value) return fallback;
-  if (typeof value === "string") return value;
-  if (typeof value === "object") {
-    return value.description || value.text || value.content || fallback;
-  }
-  return fallback;
-}
-
-function GoalsList({ goals }) {
-  const [expanded, setExpanded] = useState(false);
-  const INITIAL_COUNT = 5; // show first 5 items
-
-  const visibleGoals = expanded ? goals : goals.slice(0, INITIAL_COUNT);
-  const hasMore = goals.length > INITIAL_COUNT;
-
-  return (
-    <>
-      <ul className="possibility-list">
-        {visibleGoals.map((item, index) => (
-          <li key={index}>{item}</li>
-        ))}
-      </ul>
-
-      {hasMore && (
-        <button
-          type="button"
-          className="show-more-btn"
-          onClick={() => setExpanded((prev) => !prev)}
-          aria-expanded={expanded}
-        >
-          {expanded ? "Show less" : `Show more (${goals.length - INITIAL_COUNT} more)`}
-        </button>
-      )}
-    </>
-  );
-}
-
-function renderContent(text) {
-  if (Array.isArray(text)) {
-    return <GoalsList goals={text} />;
-  }
-  return <p>{text}</p>;
-}
-
 export default function AboutPossibilities() {
-  // Always show the default values (ignore SiteContext data)
-  const visionText = DEFAULT_VISION;
-  const missionText = DEFAULT_MISSION;
-  const goals = DEFAULT_GOALS;
-
-  const possibilities = [
-    { id: "vision", title: "Vision", content: visionText },
-    { id: "mission", title: "Mission", content: missionText },
-    { id: "goals", title: "Our Goals", content: goals },
-  ];
+  const currentYear = new Date().getFullYear();
+  const yearsLegacy = currentYear >= 1996 ? currentYear - 1996 : 30;
 
   return (
-    <section className="possibilities" aria-labelledby="possibilities-heading">
-      <div className="shell">
-        {/* About Us – separate boxed section */}
-        <div className="about-us-box">
-          <header className="center-heading about-us-heading">
-            {/* <p className="eyebrow">ABOUT US</p> */}
-            <h2 id="about-us-heading">About Us</h2>
-            <p>{ABOUT_US_TEXT}</p>
-          </header>
+    <div className="about-page-wrapper">
+      {/* 1. Heritage & Welcome Story Card */}
+      <section className="about-hero-card">
+        <p className="eyebrow">ABOUT BABYLON NATIONAL SCHOOL</p>
+        <h2>A Legacy of Educational Excellence & Holistic Growth</h2>
+        <p className="about-hero-lead">
+          Founded in 1996 in Shantinagar, Kathmandu, Babylon National School has grown into
+          one of the region's premier educational institutions. We are a passionate community
+          of educators committed to nurturing young minds with 21st-century skills, high moral
+          values, and boundless curiosity.
+        </p>
+
+        {/* Feature Badges */}
+        <div className="about-badge-row">
+          <span className="about-pill-badge">🏛️ Est. 1996 A.D.</span>
+          <span className="about-pill-badge">📍 Shantinagar, Kathmandu</span>
+          <span className="about-pill-badge">🎓 PG to Class 10 (Secondary)</span>
+          <span className="about-pill-badge">🌟 English Medium Co-Educational</span>
         </div>
 
-        {/* Our Difference section */}
-        <header className="center-heading">
-          <p className="eyebrow">OUR DIFFERENCE</p>
-          <h2 id="possibilities-heading">Unlimited possibilities</h2>
-          <p>
-            A supportive school experience that sees each child as an individual
-            with potential.
-          </p>
-        </header>
+        {/* Quick Stats Bar */}
+        <div className="about-stats-bar">
+          <div className="about-stat-item">
+            <span className="about-stat-number">{yearsLegacy}+</span>
+            <span className="about-stat-label">Years of Excellence</span>
+          </div>
+          <div className="about-stat-item">
+            <span className="about-stat-number">1000+</span>
+            <span className="about-stat-label">Students Enrolled</span>
+          </div>
+          <div className="about-stat-item">
+            <span className="about-stat-number">30+</span>
+            <span className="about-stat-label">Expert Educators</span>
+          </div>
+          <div className="about-stat-item">
+            <span className="about-stat-number">100%</span>
+            <span className="about-stat-label">Board Pass Rate</span>
+          </div>
+        </div>
+      </section>
 
-        <div className="possibility-grid">
-          {possibilities.map((item, index) => (
-            <article key={item.id} className="possibility-card">
-              <span className="possibility-number" aria-hidden="true">
-                {String(index + 1).padStart(2, "0")}
-              </span>
-              <h3>{item.title}</h3>
-              {renderContent(item.content)}
-            </article>
+      {/* 2. Vision & Mission Cards */}
+      <section className="about-vm-section">
+        <div className="about-section-header">
+          <p className="eyebrow">OUR DIRECTION</p>
+          <h2>Vision & Mission</h2>
+        </div>
+
+        <div className="vision-mission-grid">
+          {/* Vision */}
+          <div className="vm-card vision-card">
+            <div className="vm-card-header">
+              <span className="vm-icon" aria-hidden="true">🔭</span>
+              <h3>Our Vision</h3>
+            </div>
+            <p>
+              To provide an inclusive, dynamic, and fearless learning environment where
+              students thrive both academically and personally. We aim to equip learners
+              with critical thinking, creativity, collaboration, and communication skills to
+              become lifelong problem-solvers and responsible global citizens.
+            </p>
+          </div>
+
+          {/* Mission */}
+          <div className="vm-card mission-card">
+            <div className="vm-card-header">
+              <span className="vm-icon" aria-hidden="true">🎯</span>
+              <h3>Our Mission</h3>
+            </div>
+            <p>
+              To provide quality, value-oriented education that prepares students to become
+              productive, ethical, and compassionate members of society. We foster academic
+              excellence, social-emotional maturity, inclusivity, and a deep-seated respect
+              for cultural diversity and community citizenship.
+            </p>
+          </div>
+        </div>
+
+        {/* Motto Callout Banner */}
+        <div className="about-motto-banner">
+          <span className="motto-tag">OUR GUIDING DICTUM</span>
+          <span className="motto-quote">“Knowledge, Wisdom and Education Par Excellence”</span>
+        </div>
+      </section>
+
+      {/* 3. Thematic Goals Grid */}
+      <section className="about-goals-section">
+        <div className="about-section-header">
+          <p className="eyebrow">OUR COMMITMENT</p>
+          <h2>Institutional Goals</h2>
+        </div>
+
+        <div className="goals-grid">
+          {GOALS.map((goal, index) => (
+            <div key={index} className="goal-card">
+              <div className="goal-card-top">
+                <span className="goal-icon" aria-hidden="true">{goal.icon}</span>
+                <span className="goal-number">0{index + 1}</span>
+              </div>
+              <h4>{goal.title}</h4>
+              <p>{goal.description}</p>
+            </div>
           ))}
         </div>
-      </div>
-    </section>
+      </section>
+    </div>
   );
 }
