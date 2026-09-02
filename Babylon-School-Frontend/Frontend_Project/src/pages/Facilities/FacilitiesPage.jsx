@@ -218,7 +218,7 @@ export default function FacilitiesPage() {
                 <>
                   <div className="facilities-hero-modern">
                     <div className="facilities-hero-content">
-                      <span className="hero-badge">✦ Our Campus</span>
+                      <span className="hero-badge"> Our Campus</span>
                       <h2 className="hero-title">
                         World-class facilities for
                         <span className="hero-highlight"> every learner</span>

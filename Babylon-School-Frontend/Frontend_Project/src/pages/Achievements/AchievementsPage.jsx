@@ -1,8 +1,18 @@
 import { useState } from "react";
+import { 
+  Calendar, 
+  Award, 
+  Trophy, 
+  Star, 
+  Medal, 
+  Sparkles,
+  ChevronDown,
+  ChevronUp,
+  ArrowRight
+} from "lucide-react";
 import PageBanner from "../../components/common/PageBanner";
 import AboutSidebar from "../../components/shared/AboutSidebar";
 import EmptyState from "../../components/common/EmptyState";
-import TestimonialsSection from "../../components/home/TestimonialsSection";
 import { publicApi } from "../../services/api";
 import usePublicData from "../../hooks/usePublicData";
 import { mediaUrl } from "../../lib/media";
@@ -16,6 +26,7 @@ export default function AchievementsPage() {
   );
 
   const [expanded, setExpanded] = useState({});
+  const [hoveredCard, setHoveredCard] = useState(null);
 
   const toggleExpand = (key) => {
     setExpanded((prev) => ({
@@ -25,6 +36,28 @@ export default function AchievementsPage() {
   };
 
   const DESCRIPTION_LIMIT = 140;
+
+  // Get icon based on achievement type
+  const getAchievementIcon = (title, category) => {
+    const text = (title + " " + category).toLowerCase();
+    if (text.includes("first") || text.includes("gold") || text.includes("winner")) return Trophy;
+    if (text.includes("second") || text.includes("silver") || text.includes("runner")) return Medal;
+    if (text.includes("third") || text.includes("bronze")) return Award;
+    if (text.includes("star") || text.includes("excellence") || text.includes("top")) return Star;
+    if (text.includes("record") || text.includes("best") || text.includes("outstanding")) return Sparkles;
+    return Award;
+  };
+
+  // Get color based on achievement type
+  const getAchievementColor = (title, category) => {
+    const text = (title + " " + category).toLowerCase();
+    if (text.includes("first") || text.includes("gold") || text.includes("winner")) return "#f6c457";
+    if (text.includes("second") || text.includes("silver") || text.includes("runner")) return "#9ca3af";
+    if (text.includes("third") || text.includes("bronze")) return "#cd7f32";
+    if (text.includes("star") || text.includes("excellence") || text.includes("top")) return "#e74c3c";
+    if (text.includes("record") || text.includes("best") || text.includes("outstanding")) return "#3498db";
+    return "#c53030";
+  };
 
   return (
     <>
@@ -40,153 +73,121 @@ export default function AchievementsPage() {
           <AboutSidebar currentPage="achievements" />
           <div className="about-main-content">
             <section className="listing-page">
-              <div className="center-heading">
-                <p className="eyebrow">SCHOOL HIGHLIGHTS</p>
-                <h2>Milestones from our community.</h2>
+              <div className="achievements-header">
+                <div className="achievements-header-content">
+                  <span className="achievements-badge"> School Highlights</span>
+                  <h2 className="achievements-title">
+                    Milestones from our <span className="text-highlight">community</span>
+                  </h2>
+                  <p className="achievements-subtitle">
+                    Celebrating the outstanding achievements and awards earned by our students,
+                    faculty, and institution.
+                  </p>
+                </div>
+                <div className="achievements-stats">
+                  <div className="stat-item">
+                    <span className="stat-number">{items.length}+</span>
+                    <span className="stat-label">Achievements</span>
+                  </div>
+                  {/* <div className="stat-divider"></div> */}
+                  
+                </div>
               </div>
 
               {loading ? (
-                <p>Loading achievements...</p>
+                <div className="achievements-loading">
+                  <div className="loading-spinner"></div>
+                  <p>Loading achievements...</p>
+                </div>
               ) : items.length === 0 ? (
                 <EmptyState
                   title="No achievements published"
                   text="Add awards and milestones from the admin dashboard."
                 />
               ) : (
-                <div
-                  className="facility-grid"
-                  style={{
-                    display: "grid",
-                    // Mobile-first: 1 column on small screens
-                    // On wider screens it becomes 2+ columns automatically
-                    gridTemplateColumns:
-                      "repeat(auto-fill, minmax(min(100%, 320px), 1fr))",
-                    gap: "1.5rem",
-                    marginTop: "2rem",
-                    width: "100%",
-                  }}
-                >
+                <div className="achievements-grid-modern">
                   {items.map((item, index) => {
                     const key = item._id || index;
                     const fullText = item.description || item.category || "";
                     const isLong = fullText.length > DESCRIPTION_LIMIT;
                     const isExpanded = !!expanded[key];
-                    const displayText =
-                      isExpanded || !isLong
-                        ? fullText
-                        : fullText.slice(0, DESCRIPTION_LIMIT).trim() + "...";
+                    const displayText = isExpanded || !isLong
+                      ? fullText
+                      : fullText.slice(0, DESCRIPTION_LIMIT).trim() + "...";
+                    
+                    const Icon = getAchievementIcon(item.title, item.category);
+                    const iconColor = getAchievementColor(item.title, item.category);
 
                     return (
                       <article
                         key={key}
-                        style={{
-                          background: "#fff",
-                          borderRadius: "16px",
-                          overflow: "hidden",
-                          boxShadow: "0 6px 20px rgba(0,0,0,0.07)",
-                          border: "1px solid rgba(0,0,0,0.05)",
-                          width: "100%", // full width of the grid cell
-                          maxWidth: "100%",
-                          display: "flex",
-                          flexDirection: "column",
-                          transition:
-                            "transform 0.2s ease, box-shadow 0.2s ease",
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.transform = "translateY(-4px)";
-                          e.currentTarget.style.boxShadow =
-                            "0 12px 28px rgba(0,0,0,0.12)";
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.transform = "translateY(0)";
-                          e.currentTarget.style.boxShadow =
-                            "0 6px 20px rgba(0,0,0,0.07)";
-                        }}
+                        className="achievement-card-modern"
+                        style={{ animationDelay: `${index * 0.06}s` }}
+                        onMouseEnter={() => setHoveredCard(key)}
+                        onMouseLeave={() => setHoveredCard(null)}
                       >
-                        {/* Image */}
-                        <div
-                          style={{
-                            width: "100%",
-                            height: "200px",
-                            overflow: "hidden",
-                            flexShrink: 0,
-                          }}
-                        >
+                        <div className="achievement-card-image">
                           <img
                             src={mediaUrl(
                               item.image,
                               `${assetPath}blog/blog_${(index % 3) + 1}.jpg`,
                             )}
                             alt={item.title || ""}
-                            style={{
-                              width: "100%",
-                              height: "100%",
-                              objectFit: "cover",
-                              display: "block",
-                            }}
                           />
+                          <div className="achievement-card-overlay">
+                            <div className="achievement-card-icon-wrapper">
+                              <Icon size={28} color="#ffffff" />
+                            </div>
+                            {hoveredCard === key && (
+                              <span className="achievement-card-hover-text">
+                                View Achievement
+                              </span>
+                            )}
+                          </div>
+                          <div className="achievement-card-badge">
+                            <Calendar size={12} />
+                            {item.year || new Date().getFullYear()}
+                          </div>
                         </div>
 
-                        {/* Content */}
-                        <div
-                          style={{
-                            padding: "1.25rem 1.35rem 1.5rem",
-                            display: "flex",
-                            flexDirection: "column",
-                            flexGrow: 1,
-                          }}
-                        >
-                          <h3
-                            style={{
-                              margin: "0 0 0.6rem",
-                              color: "#1a3c6e",
-                              fontSize: "1.15rem",
-                              fontWeight: 700,
-                              lineHeight: 1.35,
-                            }}
-                          >
-                            {item.year ? `${item.year} · ` : ""}
-                            {item.title}
-                          </h3>
+                        <div className="achievement-card-content">
+                          <div className="achievement-card-header">
+                            <div className="achievement-card-icon">
+                              <Icon size={18} color={iconColor} />
+                            </div>
+                            <h3 className="achievement-card-title">
+                              {item.title}
+                            </h3>
+                          </div>
 
                           {fullText && (
                             <>
-                              <p
-                                style={{
-                                  margin: 0,
-                                  color: "#555",
-                                  fontSize: "0.95rem",
-                                  lineHeight: 1.6,
-                                  flexGrow: 1,
-                                  whiteSpace: "pre-line",
-                                }}
-                              >
+                              <p className="achievement-card-description-bold">
                                 {displayText}
                               </p>
 
                               {isLong && (
                                 <button
                                   type="button"
+                                  className="achievement-read-more"
                                   onClick={() => toggleExpand(key)}
-                                  style={{
-                                    background: "none",
-                                    border: "none",
-                                    padding: 0,
-                                    marginTop: "0.6rem",
-                                    color: "#1a3c6e",
-                                    fontWeight: 600,
-                                    fontSize: "0.9rem",
-                                    cursor: "pointer",
-                                    textDecoration: "underline",
-                                    textUnderlineOffset: "3px",
-                                    alignSelf: "flex-start",
-                                  }}
                                 >
-                                  {isExpanded ? "Show less" : "more..."}
+                                  <span>{isExpanded ? "Show Less" : "Read More"}</span>
+                                  {isExpanded ? (
+                                    <ChevronUp size={16} />
+                                  ) : (
+                                    <ChevronDown size={16} />
+                                  )}
                                 </button>
                               )}
                             </>
                           )}
+
+                          <div className="achievement-card-footer">
+                            <span className="achievement-category">
+                              {item.category || "Achievement"}
+                            </span>
+                          </div>
                         </div>
                       </article>
                     );
@@ -194,8 +195,6 @@ export default function AchievementsPage() {
                 </div>
               )}
             </section>
-
-            <TestimonialsSection />
           </div>
         </div>
       </section>
