@@ -9,6 +9,7 @@ import StudentLifeSection from '../../components/home/StudentLifeSection';
 import TestimonialsSection from '../../components/home/TestimonialsSection';
 import NoticesSection from '../../components/home/NoticesSection';
 import ContactSection from '../../components/home/ContactSection';
+import BlogPage from '../Blog/BlogPage';
 
 export default function HomePage() {
   return (
@@ -19,10 +20,10 @@ export default function HomePage() {
       <AboutSection />
       <ProgramsSection />
       <WhyChooseUsSection />
+      <BlogPage />
       <StudentLifeSection />
       {/* <HighlightsSection /> */}
       <TestimonialsSection />
       <ContactSection />
-    </>
-  )
+    </>)
 }
