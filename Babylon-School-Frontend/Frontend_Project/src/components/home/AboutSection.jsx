@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { Target, Lightbulb, HeartHandshake, ArrowRight } from "lucide-react";
 import { useSite } from "../../context/SiteContext";
 import { assetPath } from "../../data/content";
 
@@ -54,7 +55,9 @@ export default function AboutSection() {
             {/* Quick Pillars Grid */}
             <div className="home-about-pillars">
               <div className="pillar-item">
-                <div className="pillar-icon" aria-hidden="true">🎯</div>
+                <div className="pillar-icon" aria-hidden="true">
+                  <Target size={24} color="#cf2027" />
+                </div>
                 <div className="pillar-info">
                   <h4>Individual Care</h4>
                   <p>Small, personalized classrooms that celebrate every child's unique talents.</p>
@@ -62,7 +65,9 @@ export default function AboutSection() {
               </div>
 
               <div className="pillar-item">
-                <div className="pillar-icon" aria-hidden="true">💡</div>
+                <div className="pillar-icon" aria-hidden="true">
+                  <Lightbulb size={24} color="#cf2027" />
+                </div>
                 <div className="pillar-info">
                   <h4>21st Century Skills</h4>
                   <p>Blending technology, practical inquiry, and creative problem-solving.</p>
@@ -70,7 +75,9 @@ export default function AboutSection() {
               </div>
 
               <div className="pillar-item">
-                <div className="pillar-icon" aria-hidden="true">🤝</div>
+                <div className="pillar-icon" aria-hidden="true">
+                  <HeartHandshake size={24} color="#cf2027" />
+                </div>
                 <div className="pillar-info">
                   <h4>Value-Based Growth</h4>
                   <p>Fostering discipline, empathy, leadership, and lifelong curiosity.</p>
@@ -82,7 +89,7 @@ export default function AboutSection() {
             <div className="home-about-actions">
               <Link to="/about" className="btn btn-primary home-about-btn">
                 <span>Discover Our Full Story & Philosophy</span>
-                <span className="btn-arrow" aria-hidden="true">&rarr;</span>
+                <ArrowRight size={18} className="btn-arrow" aria-hidden="true" />
               </Link>
             </div>
           </div>

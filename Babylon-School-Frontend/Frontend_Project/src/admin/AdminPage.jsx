@@ -1,6 +1,38 @@
 import { useEffect, useMemo, useState } from "react";
 import toast from "react-hot-toast";
 import { useNavigate, useLocation } from "react-router-dom";
+import {
+  LayoutDashboard,
+  Settings,
+  GraduationCap,
+  Newspaper,
+  Calendar,
+  Bell,
+  Image as ImageIcon,
+  Users,
+  Building2,
+  Trophy,
+  MessageSquareQuote,
+  HelpCircle,
+  Briefcase,
+  Download,
+  FileImage,
+  ClipboardList,
+  Mail,
+  UserCheck,
+  ShieldCheck,
+  Menu,
+  ExternalLink,
+  LogOut,
+  Layers,
+  FileText,
+  Clock,
+  FolderKanban,
+  ArrowLeft,
+  Plus,
+  Save,
+  X,
+} from "lucide-react";
 import { api } from "../services/api";
 import { slugify, mediaUrl } from "../lib/media";
 import { assetPath } from "../data/content";
@@ -316,15 +348,14 @@ function ResourceEditor({ resourceKey, onBack }) {
   return (
     <section className="admin-resource">
       <div className="admin-resource-head">
-        <button
-          type="button"
-          className="admin-back"
-          onClick={onBack}
-        >
-          ← Dashboard
-        </button>
-
         <div>
+          <button
+            type="button"
+            className="admin-back"
+            onClick={onBack}
+          >
+            <ArrowLeft size={16} /> Dashboard
+          </button>
           <p className="eyebrow">CONTENT EDITOR</p>
           <h2>{config.label}</h2>
         </div>
@@ -334,7 +365,7 @@ function ResourceEditor({ resourceKey, onBack }) {
           className="button primary"
           onClick={() => openEditor({})}
         >
-          Add {config.label.slice(0, -1)}
+          <Plus size={16} /> Add {config.label.slice(0, -1)}
         </button>
       </div>
 
@@ -1120,10 +1151,10 @@ function SiteSettingsEditor({ onBack }) {
   return (
     <section className="admin-resource">
       <div className="admin-resource-head">
-        <button type="button" className="admin-back" onClick={onBack}>
-          ← Dashboard
-        </button>
         <div>
+          <button type="button" className="admin-back" onClick={onBack}>
+            <ArrowLeft size={16} /> Dashboard
+          </button>
           <p className="eyebrow">SITE CONFIGURATION</p>
           <h2>Site Settings</h2>
         </div>
@@ -1617,10 +1648,10 @@ function SingletonEditor({ singletonKey, onBack }) {
   return (
     <section className="admin-resource">
       <div className="admin-resource-head">
-        <button type="button" className="admin-back" onClick={onBack}>
-          ← Dashboard
-        </button>
         <div>
+          <button type="button" className="admin-back" onClick={onBack}>
+            <ArrowLeft size={16} /> Dashboard
+          </button>
           <p className="eyebrow">SITE SETTINGS</p>
           <h2>{config.label}</h2>
         </div>
@@ -1741,10 +1772,10 @@ function Inbox({ endpoint, title, fields, onBack }) {
   return (
     <section className="admin-resource">
       <div className="admin-resource-head">
-        <button type="button" className="admin-back" onClick={onBack}>
-          ← Dashboard
-        </button>
         <div>
+          <button type="button" className="admin-back" onClick={onBack}>
+            <ArrowLeft size={16} /> Dashboard
+          </button>
           <p className="eyebrow">INBOX</p>
           <h2>{title}</h2>
         </div>
@@ -2623,10 +2654,10 @@ function AdminUsers({ onBack }) {
   return (
     <section className="admin-resource">
       <div className="admin-resource-head">
-        <button type="button" className="admin-back" onClick={onBack}>
-          ← Dashboard
-        </button>
         <div>
+          <button type="button" className="admin-back" onClick={onBack}>
+            <ArrowLeft size={16} /> Dashboard
+          </button>
           <p className="eyebrow">SUPER ADMIN</p>
           <h2>Admin Users</h2>
         </div>
@@ -2635,7 +2666,7 @@ function AdminUsers({ onBack }) {
           className="button primary"
           onClick={() => openEditor({})}
         >
-          Add New Admin
+          <Plus size={16} /> Add New Admin
         </button>
       </div>
 
@@ -2732,29 +2763,74 @@ function AdminUsers({ onBack }) {
    SIDEBAR + TOP BAR
 ========================================================= */
 
+function getAdminNavIcon(key) {
+  switch (key) {
+    case null:
+      return <LayoutDashboard size={18} />;
+    case "settings":
+      return <Settings size={18} />;
+    case "programs":
+      return <GraduationCap size={18} />;
+    case "news":
+      return <Newspaper size={18} />;
+    case "events":
+      return <Calendar size={18} />;
+    case "notices":
+      return <Bell size={18} />;
+    case "gallery":
+      return <ImageIcon size={18} />;
+    case "faculty":
+      return <Users size={18} />;
+    case "facility":
+      return <Building2 size={18} />;
+    case "achievements":
+      return <Trophy size={18} />;
+    case "testimonials":
+      return <MessageSquareQuote size={18} />;
+    case "faqs":
+      return <HelpCircle size={18} />;
+    case "careers":
+      return <Briefcase size={18} />;
+    case "downloads":
+      return <Download size={18} />;
+    case "posters":
+      return <FileImage size={18} />;
+    case "admissions":
+      return <ClipboardList size={18} />;
+    case "contacts":
+      return <Mail size={18} />;
+    case "career-apps":
+      return <UserCheck size={18} />;
+    case "admin-users":
+      return <ShieldCheck size={18} />;
+    default:
+      return <FolderKanban size={18} />;
+  }
+}
+
 function AdminSidebar({ user, view, setView, onLogout, open, onClose }) {
   const navItems = [
-    { key: null, label: "Dashboard", icon: "🏠" },
+    { key: null, label: "Dashboard", icon: getAdminNavIcon(null) },
     ...Object.entries(singletons).map(([key, config]) => ({
       key,
       label: config.label,
-      icon: "📌",
+      icon: getAdminNavIcon(key),
     })),
     ...Object.entries(resources).map(([key, config]) => ({
       key,
       label: config.label,
-      icon: "📁",
+      icon: getAdminNavIcon(key),
     })),
-    { key: "admissions", label: "Admissions", icon: "📋" },
-    { key: "contacts", label: "Contact inbox", icon: "✉️" },
-    { key: "career-apps", label: "Career applications", icon: "💼" },
+    { key: "admissions", label: "Admissions", icon: getAdminNavIcon("admissions") },
+    { key: "contacts", label: "Contact inbox", icon: getAdminNavIcon("contacts") },
+    { key: "career-apps", label: "Career applications", icon: getAdminNavIcon("career-apps") },
   ];
 
   if (user.role === "superAdmin") {
     navItems.push({
       key: "admin-users",
       label: "Manage Admins",
-      icon: "⭐",
+      icon: getAdminNavIcon("admin-users"),
     });
   }
 
@@ -2818,7 +2894,7 @@ function AdminTopbar({ user, title, onLogout, onMenuToggle }) {
           onClick={onMenuToggle}
           aria-label="Toggle menu"
         >
-          ☰
+          <Menu size={18} />
         </button>
         <h1 className="admin-topbar-title">{title}</h1>
       </div>
@@ -2832,14 +2908,14 @@ function AdminTopbar({ user, title, onLogout, onMenuToggle }) {
           target="_blank"
           rel="noreferrer"
         >
-          <span>🔗</span> View Site
+          <ExternalLink size={15} /> View Site
         </a>
         <button
           type="button"
           className="admin-topbar-btn logout"
           onClick={onLogout}
         >
-          <span>→</span> Logout
+          <LogOut size={15} /> Logout
         </button>
       </div>
     </header>
@@ -2973,7 +3049,9 @@ function DashboardOverview({ user, setView }) {
             font: "inherit",
           }}
         >
-          <div className="admin-stat-icon blue">👥</div>
+          <div className="admin-stat-icon blue">
+            <Layers size={22} />
+          </div>
           <div className="admin-stat-body">
             <strong>{display(stats.content)}</strong>
             <span>Content items</span>
@@ -2992,7 +3070,9 @@ function DashboardOverview({ user, setView }) {
             font: "inherit",
           }}
         >
-          <div className="admin-stat-icon gray">👤</div>
+          <div className="admin-stat-icon gray">
+            <Users size={22} />
+          </div>
           <div className="admin-stat-body">
             <strong>{display(stats.staff)}</strong>
             <span>Staff</span>
@@ -3011,7 +3091,9 @@ function DashboardOverview({ user, setView }) {
             font: "inherit",
           }}
         >
-          <div className="admin-stat-icon amber">📅</div>
+          <div className="admin-stat-icon amber">
+            <Calendar size={22} />
+          </div>
           <div className="admin-stat-body">
             <strong>{display(stats.events)}</strong>
             <span>Events</span>
@@ -3030,7 +3112,9 @@ function DashboardOverview({ user, setView }) {
             font: "inherit",
           }}
         >
-          <div className="admin-stat-icon pink">📝</div>
+          <div className="admin-stat-icon pink">
+            <Newspaper size={22} />
+          </div>
           <div className="admin-stat-body">
             <strong>{display(stats.blog)}</strong>
             <span>Blog Posts</span>
@@ -3049,7 +3133,9 @@ function DashboardOverview({ user, setView }) {
             font: "inherit",
           }}
         >
-          <div className="admin-stat-icon green">📄</div>
+          <div className="admin-stat-icon green">
+            <FileText size={22} />
+          </div>
           <div className="admin-stat-body">
             <strong>{display(stats.documents)}</strong>
             <span>Documents</span>
@@ -3068,7 +3154,9 @@ function DashboardOverview({ user, setView }) {
             font: "inherit",
           }}
         >
-          <div className="admin-stat-icon orange">☑</div>
+          <div className="admin-stat-icon orange">
+            <Clock size={22} />
+          </div>
           <div className="admin-stat-body">
             <strong>{display(stats.pending)}</strong>
             <span>Pending Requests</span>

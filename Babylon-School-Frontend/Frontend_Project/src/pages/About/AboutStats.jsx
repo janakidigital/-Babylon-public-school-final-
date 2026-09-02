@@ -1,4 +1,5 @@
 import React from "react";
+import { ClipboardCheck, Sparkles, CheckCircle2, Star } from "lucide-react";
 
 const APPROACH_ITEMS = [
   "High academic and moral expectations for all students.",
@@ -41,13 +42,13 @@ export default function AboutStats() {
         {/* Column 1: Our Approach */}
         <div className="philosophy-col">
           <div className="philosophy-col-header">
-            <span aria-hidden="true" style={{ fontSize: "1.3rem" }}>📋</span>
+            <ClipboardCheck size={22} color="#021a39" />
             <h3>Our Educational Approach</h3>
           </div>
           <ul className="philosophy-list-modern">
             {APPROACH_ITEMS.map((item, idx) => (
               <li key={idx}>
-                <span className="list-badge-icon" aria-hidden="true">✓</span>
+                <CheckCircle2 size={18} color="#cf2027" className="flex-shrink-0" />
                 <span>{item}</span>
               </li>
             ))}
@@ -57,13 +58,13 @@ export default function AboutStats() {
         {/* Column 2: Our Guiding Principles */}
         <div className="philosophy-col">
           <div className="philosophy-col-header">
-            <span aria-hidden="true" style={{ fontSize: "1.3rem" }}>✨</span>
+            <Sparkles size={22} color="#021a39" />
             <h3>Our Guiding Principles</h3>
           </div>
           <ul className="philosophy-list-modern">
             {GUIDING_PRINCIPLES.map((item, idx) => (
               <li key={idx}>
-                <span className="list-badge-star" aria-hidden="true">★</span>
+                <Star size={18} color="#d97706" className="flex-shrink-0" />
                 <span>{item}</span>
               </li>
             ))}
