@@ -115,6 +115,8 @@ export default function LoginPage() {
           </div>
         </motion.div>
       </div>
+
+      <p className="login-company-credit">Developed by : Janaki Digital Solution</p>
     </div>
   );
 }

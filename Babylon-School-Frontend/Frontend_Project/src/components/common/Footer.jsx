@@ -140,6 +140,9 @@ export default function Footer() {
       <div className="shell copyright">
         &copy; {new Date().getFullYear()}{" "}
         {settings.schoolName || "Babylon National School"}. All rights reserved.
+        <span className="footer-company-credit">
+          Developed by : Janaki Digital Solution
+        </span>
       </div>
     </footer>
   );

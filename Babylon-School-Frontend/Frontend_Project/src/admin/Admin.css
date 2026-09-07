@@ -33,9 +33,13 @@
   font-family: var(--admin-sans);
 }
 
+.admin-login-content {
+  width: min(440px, 100%);
+}
+
 .admin-login form {
   background: #fff;
-  width: min(440px, 100%);
+  width: 100%;
   padding: 40px 40px 36px;
   border-radius: 16px;
   display: flex;
@@ -191,6 +195,15 @@
 .admin-login .button:disabled {
   opacity: 0.7;
   cursor: not-allowed;
+}
+
+.admin-company-credit {
+  margin: 14px 0 0;
+  color: #cbd5e1;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-align: center;
 }
 
 /* ---------- Shell / Layout ---------- */
@@ -481,6 +494,18 @@
   overflow-x: hidden;
   overflow-y: auto;
   min-height: 0;
+}
+
+.admin-footer {
+  flex-shrink: 0;
+  padding: 10px 32px;
+  border-top: 1px solid var(--admin-line);
+  background: #fff;
+  color: var(--admin-muted);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-align: right;
 }
 
 /* ---------- Dashboard overview ---------- */
@@ -1060,6 +1085,11 @@
   .admin-content {
     overflow-y: visible;
     padding: 20px 18px 40px;
+  }
+
+  .admin-footer {
+    padding: 12px 18px;
+    text-align: center;
   }
 
   .admin-form {

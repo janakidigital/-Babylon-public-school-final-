@@ -84,7 +84,8 @@ function Login({ onLogin }) {
 
   return (
     <main className="admin-login">
-      <form onSubmit={submit}>
+      <div className="admin-login-content">
+        <form onSubmit={submit}>
         <div className="admin-login-logo">
           <SchoolLogo />
         </div>
@@ -114,7 +115,9 @@ function Login({ onLogin }) {
         </button>
 
         <a href="/">Return to website</a>
-      </form>
+        </form>
+        <p className="admin-company-credit">Developed by Janaki Digital Solution</p>
+      </div>
     </main>
   );
 }
@@ -3490,6 +3493,7 @@ export default function AdminPage() {
           onMenuToggle={() => setSidebarOpen((o) => !o)}
         />
         <div className="admin-content">{content}</div>
+        <div className="admin-footer">Developed by : Janaki Digital Solution</div>
       </div>
     </div>
   );
