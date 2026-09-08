@@ -1,8 +1,12 @@
+import { normalizeUploadBody, resolveMediaUrl, resolveMediaUrls } from "./media";
+
 const API_BASE = import.meta.env.VITE_API_URL || "/api/v1";
+export const mediaUrl = value => resolveMediaUrl(value, API_BASE);
 
 export async function api(path, options = {}) {
   const headers = { ...(options.headers || {}) };
-  const isFormData = options.body instanceof FormData;
+  const body = normalizeUploadBody(options.body, API_BASE);
+  const isFormData = body instanceof FormData;
   if (options.body && !isFormData && !headers["Content-Type"])
     headers["Content-Type"] = "application/json";
   const response = await fetch(`${API_BASE}${path}`, {
@@ -10,11 +14,11 @@ export async function api(path, options = {}) {
     ...options,
     headers,
     body:
-      options.body && !isFormData ? JSON.stringify(options.body) : options.body,
+      body && !isFormData ? JSON.stringify(body) : body,
   });
   const payload = await response.json().catch(() => ({}));
   if (!response.ok) throw new Error(payload.message || "Something went wrong");
-  return payload;
+  return resolveMediaUrls(payload, API_BASE);
 }
 
 export const publicApi = {

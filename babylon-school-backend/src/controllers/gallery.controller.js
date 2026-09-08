@@ -1,5 +1,6 @@
+const { updateWithMediaCleanup, deleteWithMediaCleanup } = require("../services/mediaCleanup.service");
 const Gallery = require("../models/gallery.model");
-const { uploadToCloudinary } = require("../services/storage.service");
+const { uploadToLocal } = require("../services/storage.service");
 
 // ======================================================
 // GET ALL ALBUMS
@@ -110,7 +111,7 @@ const createGalleryItem = async (req, res) => {
       if (imageFiles.length > 0) {
         const uploaded = await Promise.all(
           imageFiles.map((file) =>
-            uploadToCloudinary(file.buffer, "babylon-school/gallery", file.mimetype)
+            uploadToLocal(file, "babylon-school/gallery")
           ),
         );
         images = uploaded.map((img) => ({
@@ -143,7 +144,7 @@ const createGalleryItem = async (req, res) => {
       if (videoFiles.length > 0) {
         const uploaded = await Promise.all(
           videoFiles.map((file) =>
-            uploadToCloudinary(file.buffer, "babylon-school/gallery/videos", file.mimetype || "video/mp4")
+            uploadToLocal(file, "babylon-school/gallery/videos")
           ),
         );
         uploadedVideos = uploaded.map((vid) => ({
@@ -268,7 +269,7 @@ const updateGalleryItem = async (req, res) => {
       if (imageFiles.length > 0) {
         const uploaded = await Promise.all(
           imageFiles.map((file) =>
-            uploadToCloudinary(file.buffer, "babylon-school/gallery", file.mimetype)
+            uploadToLocal(file, "babylon-school/gallery")
           ),
         );
 
@@ -311,7 +312,7 @@ const updateGalleryItem = async (req, res) => {
       if (videoFiles.length > 0) {
         const uploaded = await Promise.all(
           videoFiles.map((file) =>
-            uploadToCloudinary(file.buffer, "babylon-school/gallery/videos", file.mimetype || "video/mp4")
+            uploadToLocal(file, "babylon-school/gallery/videos")
           ),
         );
         uploadedVideos = uploaded.map((vid) => ({
@@ -340,7 +341,7 @@ const updateGalleryItem = async (req, res) => {
     } else if (payload.videos && payload.videos.length > 0) {
       payload.coverImage = payload.videos[0].url;
     } else {
-      payload.coverImage = album.coverImage || "";
+      payload.coverImage = "";
     }
 
     // Clean fields that should not be saved directly to model
@@ -350,14 +351,14 @@ const updateGalleryItem = async (req, res) => {
     delete payload.videoUrls;
     delete payload.type;
 
-    const updatedAlbum = await Gallery.findByIdAndUpdate(
+    const updatedAlbum = await updateWithMediaCleanup(album, () => Gallery.findByIdAndUpdate(
       req.params.id,
       payload,
       {
         new: true,
         runValidators: true,
       },
-    );
+    ));
 
     res.status(200).json({
       success: true,
@@ -388,7 +389,7 @@ const deleteGalleryItem = async (req, res) => {
       });
     }
 
-    await Gallery.findByIdAndDelete(req.params.id);
+    await deleteWithMediaCleanup(() => Gallery.findByIdAndDelete(req.params.id));
 
     res.status(200).json({
       success: true,

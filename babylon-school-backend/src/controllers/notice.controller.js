@@ -1,5 +1,6 @@
+const { updateWithMediaCleanup, deleteWithMediaCleanup } = require("../services/mediaCleanup.service");
 const Notice = require("../models/notice.model");
-const { uploadToCloudinary } = require("../services/storage.service");
+const { uploadToLocal } = require("../services/storage.service");
 
 // ======================================================
 // ALLOWED ATTACHMENT TYPES
@@ -182,11 +183,7 @@ const createNotice = async (req, res) => {
       attachmentName = req.file.originalname;
 
       // Upload
-      const uploadedFile = await uploadToCloudinary(
-        req.file.buffer,
-        "babylon-school/notices",
-        req.file.mimetype
-      );
+      const uploadedFile = await uploadToLocal(req.file, "babylon-school/notices");
 
       attachmentUrl = uploadedFile.url;
 
@@ -357,11 +354,7 @@ const updateNotice = async (req, res) => {
         req.file.mimetype
       );
 
-      const uploadedFile = await uploadToCloudinary(
-        req.file.buffer,
-        "babylon-school/notices",
-        req.file.mimetype
-      );
+      const uploadedFile = await uploadToLocal(req.file, "babylon-school/notices");
 
       payload.attachment = uploadedFile.url;
       payload.attachmentType = attachmentType;
@@ -379,14 +372,14 @@ const updateNotice = async (req, res) => {
     // --------------------------------------------------
 
     const updatedNotice =
-      await Notice.findByIdAndUpdate(
+      await updateWithMediaCleanup(notice, () => Notice.findByIdAndUpdate(
         req.params.id,
         payload,
         {
           new: true,
           runValidators: true,
         }
-      );
+      ));
 
     res.status(200).json({
       success: true,
@@ -443,7 +436,7 @@ const deleteNotice = async (req, res) => {
       });
     }
 
-    await Notice.findByIdAndDelete(req.params.id);
+    await deleteWithMediaCleanup(() => Notice.findByIdAndDelete(req.params.id));
 
     res.status(200).json({
       success: true,

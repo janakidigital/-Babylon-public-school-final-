@@ -2170,7 +2170,7 @@ footer {
   line-height: 1.5;
 }
 
-.admin-table a[href*="cloudinary"],
+.admin-table a[href*="/babylon-school/"],
 .admin-table a[href$=".pdf"],
 .admin-table a[href*=".pdf"] {
   display: inline-flex;
@@ -2182,7 +2182,7 @@ footer {
   color: var(--blue);
 }
 
-.admin-table a[href*="cloudinary"]:hover,
+.admin-table a[href*="/babylon-school/"]:hover,
 .admin-table a[href$=".pdf"]:hover,
 .admin-table a[href*=".pdf"]:hover {
   color: var(--red);

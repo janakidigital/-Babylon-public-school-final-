@@ -1,6 +1,6 @@
 const Career = require("../models/career.model");
 const CareerApplication = require("../models/careerApplication.model");
-const { uploadToCloudinary } = require("../services/storage.service");
+const { uploadToLocal } = require("../services/storage.service");
 
 const getCareers = async (req, res) => {
   try {
@@ -75,7 +75,7 @@ const applyToCareer = async (req, res) => {
 
     let resumeUrl;
     if (req.file) {
-      const uploaded = await uploadToCloudinary(req.file.buffer, "babylon-school/careers");
+      const uploaded = await uploadToLocal(req.file, "babylon-school/careers");
       resumeUrl = uploaded.url;
     }
 

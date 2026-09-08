@@ -1,5 +1,6 @@
+const { updateWithMediaCleanup, deleteWithMediaCleanup } = require("../services/mediaCleanup.service");
 const Achievement = require("../models/achievement.model");
-const { uploadToCloudinary } = require("../services/storage.service");
+const { uploadToLocal } = require("../services/storage.service");
 
 const getAchievements = async (req, res) => {
   try {
@@ -30,7 +31,7 @@ const createAchievement = async (req, res) => {
 
     let imageUrl;
     if (req.file) {
-      const uploaded = await uploadToCloudinary(req.file.buffer, "babylon-school/achievements");
+      const uploaded = await uploadToLocal(req.file, "babylon-school/achievements");
       imageUrl = uploaded.url;
     }
 
@@ -52,11 +53,11 @@ const updateAchievement = async (req, res) => {
     delete payload.image;
 
     if (req.file) {
-      const uploaded = await uploadToCloudinary(req.file.buffer, "babylon-school/achievements");
+      const uploaded = await uploadToLocal(req.file, "babylon-school/achievements");
       payload.image = uploaded.url;
     }
 
-    const updated = await Achievement.findByIdAndUpdate(req.params.id, payload, { new: true, runValidators: true });
+    const updated = await updateWithMediaCleanup(item, () => Achievement.findByIdAndUpdate(req.params.id, payload, { new: true, runValidators: true }));
     res.status(200).json({ success: true, message: "Achievement updated successfully", data: updated });
   } catch (error) {
     console.error("Update achievement error:", error);
@@ -70,7 +71,7 @@ const deleteAchievement = async (req, res) => {
   try {
     const item = await Achievement.findById(req.params.id);
     if (!item) return res.status(404).json({ success: false, message: "Achievement not found" });
-    await Achievement.findByIdAndDelete(req.params.id);
+    await deleteWithMediaCleanup(() => Achievement.findByIdAndDelete(req.params.id));
     res.status(200).json({ success: true, message: "Achievement deleted successfully" });
   } catch (error) {
     console.error("Delete achievement error:", error);

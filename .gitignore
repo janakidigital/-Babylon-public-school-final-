@@ -1,0 +1,22 @@
+# Local configuration and credentials
+.env
+.env.*
+!.env.example
+
+# Dependencies and generated output
+node_modules/
+dist/
+dist-ssr/
+build/
+coverage/
+*.log
+
+# Local database migration backups and temporary test files
+.local-media-backups/
+.storage-*/
+.migration-*/
+
+# Local editor and operating-system files
+.DS_Store
+Thumbs.db
+.idea/

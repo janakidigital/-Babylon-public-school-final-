@@ -32,7 +32,7 @@ const noticeSchema = new mongoose.Schema(
       trim: true,
     },
 
-    // Cloudinary URL
+    // Public URL of the uploaded attachment
     attachment: {
       type: String,
       trim: true,

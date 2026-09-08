@@ -1,3 +1,4 @@
+const { updateWithMediaCleanup, deleteWithMediaCleanup } = require("../services/mediaCleanup.service");
 const About = require("../models/about.model");
 
 // ======================================================
@@ -86,10 +87,10 @@ const updateAbout = async (req, res) => {
         ...payload,
       });
     } else {
-      about = await About.findByIdAndUpdate(about._id, payload, {
+      about = await updateWithMediaCleanup(about, () => About.findByIdAndUpdate(about._id, payload, {
         new: true,
         runValidators: true,
-      });
+      }));
     }
 
     res.status(200).json({
@@ -134,7 +135,7 @@ const deleteAbout = async (req, res) => {
       });
     }
 
-    await About.findByIdAndDelete(about._id);
+    await deleteWithMediaCleanup(() => About.findByIdAndDelete(about._id));
 
     res.status(200).json({
       success: true,

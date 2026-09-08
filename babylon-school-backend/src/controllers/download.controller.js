@@ -1,5 +1,6 @@
+const { updateWithMediaCleanup, deleteWithMediaCleanup } = require("../services/mediaCleanup.service");
 const Download = require("../models/download.model");
-const { uploadToCloudinary } = require("../services/storage.service");
+const { uploadToLocal } = require("../services/storage.service");
 
 // ======================================================
 // GET ALL DOWNLOADS
@@ -43,11 +44,7 @@ const createDownload = async (req, res) => {
     let fileUrl = req.body.file || "";
 
     if (req.file) {
-      const uploadedFile = await uploadToCloudinary(
-        req.file.buffer,
-        "babylon-school/downloads",
-        req.file.mimetype
-      );
+      const uploadedFile = await uploadToLocal(req.file, "babylon-school/downloads");
       fileUrl = uploadedFile.url;
     }
 
@@ -101,19 +98,15 @@ const updateDownload = async (req, res) => {
     delete payload.file;
 
     if (req.file) {
-      const uploadedFile = await uploadToCloudinary(
-        req.file.buffer,
-        "babylon-school/downloads",
-        req.file.mimetype
-      );
+      const uploadedFile = await uploadToLocal(req.file, "babylon-school/downloads");
       payload.file = uploadedFile.url;
     }
 
-    const updatedDownload = await Download.findByIdAndUpdate(
+    const updatedDownload = await updateWithMediaCleanup(download, () => Download.findByIdAndUpdate(
       req.params.id,
       payload,
       { new: true, runValidators: true }
-    );
+    ));
 
     res.status(200).json({
       success: true,
@@ -146,7 +139,7 @@ const deleteDownload = async (req, res) => {
       });
     }
 
-    await Download.findByIdAndDelete(req.params.id);
+    await deleteWithMediaCleanup(() => Download.findByIdAndDelete(req.params.id));
 
     res.status(200).json({
       success: true,

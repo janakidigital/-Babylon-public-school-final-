@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { Link } from "react-router-dom";
-import { assetPath } from "../../data/content";
+import { mediaUrl } from "../../services/api";
 
 const slides = [
   {
@@ -106,7 +106,7 @@ export default function HeroSection() {
       <video
         ref={videoRef}
         className="hero-video-bg"
-        src="https://res.cloudinary.com/hjjxysan/video/upload/v1788272714/videoPlay_zx3gc8.mp4"
+        src={mediaUrl("/babylon-school/gallery/videos/videoPlay_zx3gc8.mp4")}
         autoPlay
         muted
         loop

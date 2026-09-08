@@ -1,5 +1,6 @@
+const { deleteWithMediaCleanup } = require("../services/mediaCleanup.service");
 const CareerApplication = require("../models/careerApplication.model");
-const { uploadToCloudinary } = require("../services/storage.service");
+const { uploadToLocal } = require("../services/storage.service");
 
 // ======================================================
 // CREATE APPLICATION (Public)
@@ -13,7 +14,7 @@ const createApplication = async (req, res) => {
 
     let resumeUrl;
     if (req.file) {
-      const uploaded = await uploadToCloudinary(req.file.buffer, "babylon-school/careers");
+      const uploaded = await uploadToLocal(req.file, "babylon-school/careers");
       resumeUrl = uploaded.url;
     }
 
@@ -67,7 +68,7 @@ const deleteApplication = async (req, res) => {
   try {
     const app = await CareerApplication.findById(req.params.id);
     if (!app) return res.status(404).json({ success: false, message: "Application not found" });
-    await CareerApplication.findByIdAndDelete(req.params.id);
+    await deleteWithMediaCleanup(() => CareerApplication.findByIdAndDelete(req.params.id));
     res.status(200).json({ success: true, message: "Application deleted successfully" });
   } catch (error) {
     console.error("Delete application error:", error);

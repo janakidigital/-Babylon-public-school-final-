@@ -1,5 +1,6 @@
+const { deleteWithMediaCleanup, collectLocalFiles, updateWithMediaCleanup } = require("../services/mediaCleanup.service");
 const ECA = require("../models/eca.model");
-const { uploadToCloudinary } = require("../services/storage.service");
+const { uploadToLocal } = require("../services/storage.service");
 
 function normalizeImageList(images) {
   if (!Array.isArray(images)) return [];
@@ -18,11 +19,7 @@ function normalizeImageList(images) {
 async function uploadEcaFiles(files) {
   const uploadedImages = [];
   for (const file of files) {
-    const result = await uploadToCloudinary(
-      file.buffer,
-      "babylon-school/eca",
-      file.mimetype
-    );
+    const result = await uploadToLocal(file, "babylon-school/eca");
     if (result?.url) {
       uploadedImages.push({
         url: result.url,
@@ -184,6 +181,7 @@ const updateEcaItem = async (req, res) => {
       });
     }
 
+    const previousFiles = collectLocalFiles(item);
     const {
       title,
       category,
@@ -233,11 +231,9 @@ const updateEcaItem = async (req, res) => {
     }
 
     item.images = allImages;
-    if (allImages.length > 0) {
-      item.coverImage = allImages[0].url;
-    }
+    item.coverImage = allImages.length > 0 ? allImages[0].url : "";
 
-    await item.save();
+    await updateWithMediaCleanup(previousFiles, () => item.save());
 
     res.status(200).json({
       success: true,
@@ -267,7 +263,7 @@ const deleteEcaItem = async (req, res) => {
       });
     }
 
-    await ECA.findByIdAndDelete(req.params.id);
+    await deleteWithMediaCleanup(() => ECA.findByIdAndDelete(req.params.id));
 
     res.status(200).json({
       success: true,

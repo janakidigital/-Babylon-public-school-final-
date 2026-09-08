@@ -1,5 +1,6 @@
+const { updateWithMediaCleanup, deleteWithMediaCleanup } = require("../services/mediaCleanup.service");
 const Poster = require("../models/poster.model");
-const { uploadToCloudinary } = require("../services/storage.service");
+const { uploadToLocal } = require("../services/storage.service");
 
 const getPosters = async (req, res) => {
   try {
@@ -19,10 +20,7 @@ const createPoster = async (req, res) => {
     const payload = { ...req.body };
 
     if (req.file) {
-      const uploaded = await uploadToCloudinary(
-        req.file.buffer,
-        "babylon-school/posters"
-      );
+      const uploaded = await uploadToLocal(req.file, "babylon-school/posters");
       payload.image = uploaded.url;
     }
 
@@ -49,13 +47,14 @@ const createPoster = async (req, res) => {
 
 const updatePoster = async (req, res) => {
   try {
+    const previousPoster = await Poster.findById(req.params.id);
+    if (!previousPoster) {
+      return res.status(404).json({ success: false, message: "Poster not found" });
+    }
     const payload = { ...req.body };
 
     if (req.file) {
-      const uploaded = await uploadToCloudinary(
-        req.file.buffer,
-        "babylon-school/posters"
-      );
+      const uploaded = await uploadToLocal(req.file, "babylon-school/posters");
       payload.image = uploaded.url;
     }
 
@@ -64,10 +63,10 @@ const updatePoster = async (req, res) => {
         payload.isActive === "true" || payload.isActive === true;
     }
 
-    const poster = await Poster.findByIdAndUpdate(req.params.id, payload, {
+    const poster = await updateWithMediaCleanup(previousPoster, () => Poster.findByIdAndUpdate(req.params.id, payload, {
       new: true,
       runValidators: true,
-    });
+    }));
 
     if (!poster) {
       return res.status(404).json({
@@ -92,7 +91,7 @@ const updatePoster = async (req, res) => {
 
 const deletePoster = async (req, res) => {
   try {
-    const poster = await Poster.findByIdAndDelete(req.params.id);
+    const poster = await deleteWithMediaCleanup(() => Poster.findByIdAndDelete(req.params.id));
 
     if (!poster) {
       return res.status(404).json({

@@ -1,5 +1,6 @@
+const { updateWithMediaCleanup, deleteWithMediaCleanup } = require("../services/mediaCleanup.service");
 const Program = require("../models/program.model");
-const { uploadToCloudinary } = require("../services/storage.service");
+const { uploadToLocal } = require("../services/storage.service");
 
 // ======================================================
 // GET ALL PROGRAMS
@@ -93,10 +94,7 @@ const createProgram = async (req, res) => {
     let imageUrl;
 
     if (req.file) {
-      const uploadedImage = await uploadToCloudinary(
-        req.file.buffer,
-        "babylon-school/programs"
-      );
+      const uploadedImage = await uploadToLocal(req.file, "babylon-school/programs");
 
       imageUrl = uploadedImage.url;
     }
@@ -207,22 +205,19 @@ const updateProgram = async (req, res) => {
     delete payload.image;
 
     if (req.file) {
-      const uploadedImage = await uploadToCloudinary(
-        req.file.buffer,
-        "babylon-school/programs"
-      );
+      const uploadedImage = await uploadToLocal(req.file, "babylon-school/programs");
 
       payload.image = uploadedImage.url;
     }
 
-    const updatedProgram = await Program.findByIdAndUpdate(
+    const updatedProgram = await updateWithMediaCleanup(program, () => Program.findByIdAndUpdate(
       req.params.id,
       payload,
       {
         new: true,
         runValidators: true,
       }
-    );
+    ));
 
     res.status(200).json({
       success: true,
@@ -280,7 +275,7 @@ const deleteProgram = async (req, res) => {
       });
     }
 
-    await Program.findByIdAndDelete(req.params.id);
+    await deleteWithMediaCleanup(() => Program.findByIdAndDelete(req.params.id));
 
     res.status(200).json({
       success: true,

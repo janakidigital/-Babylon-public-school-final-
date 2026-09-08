@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
+const { UPLOAD_ROOT, UPLOAD_URL_PREFIX } = require("./services/storage.service");
 
 const siteSettingRoutes = require("./routes/siteSetting.routes");
 const homeRoutes = require("./routes/home.routes");
@@ -37,6 +38,19 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+
+// Uploaded images, videos and documents are served from the existing local folders.
+app.use(UPLOAD_URL_PREFIX, express.static(UPLOAD_ROOT, {
+  dotfiles: "deny",
+  index: false,
+  redirect: false,
+  setHeaders(res, filePath) {
+    res.setHeader("X-Content-Type-Options", "nosniff");
+    if (filePath.toLowerCase().endsWith(".svg")) {
+      res.setHeader("Content-Security-Policy", "default-src 'none'; sandbox");
+    }
+  },
+}));
 
 // Routes
 app.use("/api/v1/settings", siteSettingRoutes);

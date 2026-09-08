@@ -1,5 +1,6 @@
+const { updateWithMediaCleanup, deleteWithMediaCleanup } = require("../services/mediaCleanup.service");
 const Testimonial = require("../models/testimonial.model");
-const { uploadToCloudinary } = require("../services/storage.service");
+const { uploadToLocal } = require("../services/storage.service");
 
 // ======================================================
 // GET ALL TESTIMONIALS
@@ -91,10 +92,7 @@ const createTestimonial = async (req, res) => {
     let imageUrl;
 
     if (req.file) {
-      const uploadedImage = await uploadToCloudinary(
-        req.file.buffer,
-        "babylon-school/testimonials"
-      );
+      const uploadedImage = await uploadToLocal(req.file, "babylon-school/testimonials");
 
       imageUrl = uploadedImage.url;
     }
@@ -192,23 +190,20 @@ const updateTestimonial = async (req, res) => {
     delete payload.image;
 
     if (req.file) {
-      const uploadedImage = await uploadToCloudinary(
-        req.file.buffer,
-        "babylon-school/testimonials"
-      );
+      const uploadedImage = await uploadToLocal(req.file, "babylon-school/testimonials");
 
       payload.image = uploadedImage.url;
     }
 
     const updatedTestimonial =
-      await Testimonial.findByIdAndUpdate(
+      await updateWithMediaCleanup(testimonial, () => Testimonial.findByIdAndUpdate(
         req.params.id,
         payload,
         {
           new: true,
           runValidators: true,
         }
-      );
+      ));
 
     res.status(200).json({
       success: true,
@@ -261,7 +256,7 @@ const deleteTestimonial = async (req, res) => {
       });
     }
 
-    await Testimonial.findByIdAndDelete(req.params.id);
+    await deleteWithMediaCleanup(() => Testimonial.findByIdAndDelete(req.params.id));
 
     res.status(200).json({
       success: true,

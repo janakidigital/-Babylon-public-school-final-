@@ -1,0 +1,3 @@
+# Keep local images, videos and documents byte-for-byte intact on every OS.
+babylon-school-backend/src/babylon_image_File/** binary
+*.pdf binary

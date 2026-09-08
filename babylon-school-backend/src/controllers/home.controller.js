@@ -1,3 +1,4 @@
+const { updateWithMediaCleanup, deleteWithMediaCleanup } = require("../services/mediaCleanup.service");
 const Home = require("../models/home.model");
 
 // ======================================================
@@ -84,10 +85,10 @@ const updateHome = async (req, res) => {
         ...payload,
       });
     } else {
-      home = await Home.findByIdAndUpdate(home._id, payload, {
+      home = await updateWithMediaCleanup(home, () => Home.findByIdAndUpdate(home._id, payload, {
         new: true,
         runValidators: true,
-      });
+      }));
     }
 
     res.status(200).json({
@@ -130,7 +131,7 @@ const deleteHome = async (req, res) => {
       });
     }
 
-    await Home.findByIdAndDelete(home._id);
+    await deleteWithMediaCleanup(() => Home.findByIdAndDelete(home._id));
 
     res.status(200).json({
       success: true,

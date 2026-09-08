@@ -1,5 +1,6 @@
+const { updateWithMediaCleanup, deleteWithMediaCleanup } = require("../services/mediaCleanup.service");
 const Faculty = require("../models/faculty.model");
-const { uploadToCloudinary } = require("../services/storage.service");
+const { uploadToLocal } = require("../services/storage.service");
 
 // ======================================================
 // GET ALL FACULTY
@@ -62,7 +63,7 @@ const createFaculty = async (req, res) => {
     let imageUrl;
 
     if (req.file) {
-      const uploadedImage = await uploadToCloudinary(req.file.buffer, "babylon-school/faculty");
+      const uploadedImage = await uploadToLocal(req.file, "babylon-school/faculty");
       imageUrl = uploadedImage.url;
     }
 
@@ -109,11 +110,11 @@ const updateFaculty = async (req, res) => {
     delete payload.image;
 
     if (req.file) {
-      const uploadedImage = await uploadToCloudinary(req.file.buffer, "babylon-school/faculty");
+      const uploadedImage = await uploadToLocal(req.file, "babylon-school/faculty");
       payload.image = uploadedImage.url;
     }
 
-    const updated = await Faculty.findByIdAndUpdate(req.params.id, payload, { new: true, runValidators: true });
+    const updated = await updateWithMediaCleanup(faculty, () => Faculty.findByIdAndUpdate(req.params.id, payload, { new: true, runValidators: true }));
 
     res.status(200).json({ success: true, message: "Faculty updated successfully", data: updated });
   } catch (error) {
@@ -144,7 +145,7 @@ const deleteFaculty = async (req, res) => {
       return res.status(404).json({ success: false, message: "Faculty member not found" });
     }
 
-    await Faculty.findByIdAndDelete(req.params.id);
+    await deleteWithMediaCleanup(() => Faculty.findByIdAndDelete(req.params.id));
 
     res.status(200).json({ success: true, message: "Faculty deleted successfully" });
   } catch (error) {

@@ -2,10 +2,11 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
 const User = require("../models/user.model");
+const { collectLocalFiles, cleanupReplacedFiles, deleteWithMediaCleanup } = require("../services/mediaCleanup.service");
 
 const {
-    uploadToCloudinary,
-    deleteFromCloudinary,
+    uploadToLocal,
+    deleteFromLocal,
 } = require("../services/storage.service");
 
 
@@ -595,23 +596,16 @@ const uploadProfileImage = async (req, res) => {
         }
 
         // ==========================================
-        // DELETE OLD CLOUDINARY IMAGE
+        // KEEP OLD IMAGE UNTIL THE NEW IMAGE IS SAVED
         // ==========================================
 
-        if (user.profileImage?.publicId) {
-            await deleteFromCloudinary(
-                user.profileImage.publicId
-            );
-        }
+        const previousImage = collectLocalFiles(user.profileImage);
 
         // ==========================================
         // UPLOAD NEW IMAGE
         // ==========================================
 
-        const image = await uploadToCloudinary(
-            req.file.buffer,
-            "babylon/users"
-        );
+        const image = await uploadToLocal(req.file, "babylon-school/users");
 
         // ==========================================
         // SAVE IMAGE INFORMATION
@@ -622,7 +616,15 @@ const uploadProfileImage = async (req, res) => {
             publicId: image.publicId,
         };
 
-        await user.save();
+        try {
+            await user.save();
+        } catch (error) {
+            await deleteFromLocal(image.publicId).catch(console.error);
+            throw error;
+        }
+
+        // Cleanup failure must not undo a successfully saved profile.
+        await cleanupReplacedFiles(previousImage, user.profileImage);
 
         return res.status(200).json({
             success: true,
@@ -674,7 +676,7 @@ const deleteProfileImage = async (req, res) => {
         // CHECK IMAGE
         // ==========================================
 
-        if (!user.profileImage?.publicId) {
+        if (!user.profileImage?.publicId && !user.profileImage?.url) {
             return res.status(404).json({
                 success: false,
                 message: "No profile image found",
@@ -682,12 +684,10 @@ const deleteProfileImage = async (req, res) => {
         }
 
         // ==========================================
-        // DELETE FROM CLOUDINARY
+        // KEEP THE FILE UNTIL THE DATABASE UPDATE SUCCEEDS
         // ==========================================
 
-        await deleteFromCloudinary(
-            user.profileImage.publicId
-        );
+        const previousImage = collectLocalFiles(user.profileImage);
 
         // ==========================================
         // REMOVE FROM DATABASE
@@ -699,6 +699,7 @@ const deleteProfileImage = async (req, res) => {
         };
 
         await user.save();
+        await cleanupReplacedFiles(previousImage, user.profileImage);
 
         return res.status(200).json({
             success: true,
@@ -1009,7 +1010,7 @@ const deleteAdmin = async (req, res) => {
             });
         }
 
-        await User.findByIdAndDelete(id);
+        await deleteWithMediaCleanup(() => User.findByIdAndDelete(id));
 
         return res.status(200).json({
             success: true,

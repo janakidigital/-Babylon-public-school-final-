@@ -1,5 +1,6 @@
+const { updateWithMediaCleanup, deleteWithMediaCleanup } = require("../services/mediaCleanup.service");
 const Event = require("../models/event.model");
-const { uploadToCloudinary } = require("../services/storage.service");
+const { uploadToLocal } = require("../services/storage.service");
 
 // ======================================================
 // GET ALL EVENTS
@@ -99,10 +100,7 @@ const createEvent = async (req, res) => {
     let imageUrl;
 
     if (req.file) {
-      const uploadedImage = await uploadToCloudinary(
-        req.file.buffer,
-        "babylon-school/events"
-      );
+      const uploadedImage = await uploadToLocal(req.file, "babylon-school/events");
 
       imageUrl = uploadedImage.url;
     }
@@ -209,22 +207,19 @@ const updateEvent = async (req, res) => {
     delete payload.image;
 
     if (req.file) {
-      const uploadedImage = await uploadToCloudinary(
-        req.file.buffer,
-        "babylon-school/events"
-      );
+      const uploadedImage = await uploadToLocal(req.file, "babylon-school/events");
 
       payload.image = uploadedImage.url;
     }
 
-    const updatedEvent = await Event.findByIdAndUpdate(
+    const updatedEvent = await updateWithMediaCleanup(event, () => Event.findByIdAndUpdate(
       req.params.id,
       payload,
       {
         new: true,
         runValidators: true,
       }
-    );
+    ));
 
     res.status(200).json({
       success: true,
@@ -282,7 +277,7 @@ const deleteEvent = async (req, res) => {
       });
     }
 
-    await Event.findByIdAndDelete(req.params.id);
+    await deleteWithMediaCleanup(() => Event.findByIdAndDelete(req.params.id));
 
     res.status(200).json({
       success: true,

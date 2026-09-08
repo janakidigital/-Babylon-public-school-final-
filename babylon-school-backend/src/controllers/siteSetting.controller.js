@@ -1,5 +1,6 @@
+const { updateWithMediaCleanup } = require("../services/mediaCleanup.service");
 const SiteSetting = require("../models/siteSetting.model");
-const { uploadToCloudinary } = require("../services/storage.service");
+const { uploadToLocal } = require("../services/storage.service");
 
 function parseSettingsBody(req) {
   const body = { ...req.body };
@@ -125,11 +126,7 @@ function parseSettingsBody(req) {
 async function handleFilesUpload(req, payload) {
   if (req.files && Array.isArray(req.files) && req.files.length > 0) {
     for (const file of req.files) {
-      const uploaded = await uploadToCloudinary(
-        file.buffer,
-        "babylon-school/settings",
-        file.mimetype
-      );
+      const uploaded = await uploadToLocal(file, "babylon-school/settings");
       if (file.fieldname === "logo") {
         payload.logo = uploaded.url;
       } else if (file.fieldname === "favicon") {
@@ -158,11 +155,7 @@ async function handleFilesUpload(req, payload) {
       }
     }
   } else if (req.file) {
-    const uploaded = await uploadToCloudinary(
-      req.file.buffer,
-      "babylon-school/settings",
-      req.file.mimetype
-    );
+    const uploaded = await uploadToLocal(req.file, "babylon-school/settings");
     if (req.file.fieldname === "logo") {
       payload.logo = uploaded.url;
     } else if (req.file.fieldname === "favicon") {
@@ -273,10 +266,10 @@ const updateSiteSettings = async (req, res) => {
         };
       }
 
-      settings = await SiteSetting.findByIdAndUpdate(settings._id, mergedPayload, {
+      settings = await updateWithMediaCleanup(settings, () => SiteSetting.findByIdAndUpdate(settings._id, mergedPayload, {
         new: true,
         runValidators: true,
-      });
+      }));
     }
 
     res.status(200).json({

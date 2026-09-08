@@ -1,5 +1,6 @@
+const { updateWithMediaCleanup, deleteWithMediaCleanup } = require("../services/mediaCleanup.service");
 const Facility = require("../models/facility.model");
-const { uploadToCloudinary } = require("../services/storage.service");
+const { uploadToLocal } = require("../services/storage.service");
 
 const getFacilities = async (req, res) => {
   try {
@@ -30,7 +31,7 @@ const createFacility = async (req, res) => {
 
     let imageUrl;
     if (req.file) {
-      const uploaded = await uploadToCloudinary(req.file.buffer, "babylon-school/facilities");
+      const uploaded = await uploadToLocal(req.file, "babylon-school/facilities");
       imageUrl = uploaded.url;
     }
 
@@ -52,11 +53,11 @@ const updateFacility = async (req, res) => {
     delete payload.image;
 
     if (req.file) {
-      const uploaded = await uploadToCloudinary(req.file.buffer, "babylon-school/facilities");
+      const uploaded = await uploadToLocal(req.file, "babylon-school/facilities");
       payload.image = uploaded.url;
     }
 
-    const updated = await Facility.findByIdAndUpdate(req.params.id, payload, { new: true, runValidators: true });
+    const updated = await updateWithMediaCleanup(facility, () => Facility.findByIdAndUpdate(req.params.id, payload, { new: true, runValidators: true }));
     res.status(200).json({ success: true, message: "Facility updated successfully", data: updated });
   } catch (error) {
     console.error("Update facility error:", error);
@@ -70,7 +71,7 @@ const deleteFacility = async (req, res) => {
   try {
     const facility = await Facility.findById(req.params.id);
     if (!facility) return res.status(404).json({ success: false, message: "Facility not found" });
-    await Facility.findByIdAndDelete(req.params.id);
+    await deleteWithMediaCleanup(() => Facility.findByIdAndDelete(req.params.id));
     res.status(200).json({ success: true, message: "Facility deleted successfully" });
   } catch (error) {
     console.error("Delete facility error:", error);

@@ -1,5 +1,6 @@
+const { updateWithMediaCleanup, deleteWithMediaCleanup } = require("../services/mediaCleanup.service");
 const News = require("../models/news.model");
-const { uploadToCloudinary } = require("../services/storage.service");
+const { uploadToLocal } = require("../services/storage.service");
 
 // ======================================================
 // GET ALL NEWS
@@ -99,10 +100,7 @@ const createNews = async (req, res) => {
     let imageUrl;
 
     if (req.file) {
-      const uploadedImage = await uploadToCloudinary(
-        req.file.buffer,
-        "babylon-school/news"
-      );
+      const uploadedImage = await uploadToLocal(req.file, "babylon-school/news");
 
       imageUrl = uploadedImage.url;
     }
@@ -211,22 +209,19 @@ const updateNews = async (req, res) => {
     delete payload.image;
 
     if (req.file) {
-      const uploadedImage = await uploadToCloudinary(
-        req.file.buffer,
-        "babylon-school/news"
-      );
+      const uploadedImage = await uploadToLocal(req.file, "babylon-school/news");
 
       payload.image = uploadedImage.url;
     }
 
-    const updatedNews = await News.findByIdAndUpdate(
+    const updatedNews = await updateWithMediaCleanup(news, () => News.findByIdAndUpdate(
       req.params.id,
       payload,
       {
         new: true,
         runValidators: true,
       }
-    );
+    ));
 
     res.status(200).json({
       success: true,
@@ -284,7 +279,7 @@ const deleteNews = async (req, res) => {
       });
     }
 
-    await News.findByIdAndDelete(req.params.id);
+    await deleteWithMediaCleanup(() => News.findByIdAndDelete(req.params.id));
 
     res.status(200).json({
       success: true,
