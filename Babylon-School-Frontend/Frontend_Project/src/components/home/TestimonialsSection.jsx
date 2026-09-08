@@ -54,7 +54,7 @@ export default function TestimonialsSection() {
               </div>
 
               <h3 className="testimonial-question">
-                {data[current].question || "What are your expectation for the school in preparing students for challenges in a globalized world?"}
+                {data[current].question }
               </h3>
 
               <p className="testimonial-message">
