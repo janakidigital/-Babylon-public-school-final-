@@ -77,45 +77,50 @@ export default function HeroSection() {
     goTo((current + 1) % slides.length);
   }, [current, goTo]);
 
-  // Auto-play text slides
   useEffect(() => {
     timerRef.current = setInterval(next, 5500);
     return () => clearInterval(timerRef.current);
   }, [next]);
 
-  // Ensure video keeps playing
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
 
     const tryPlay = () => {
+      video.muted = true;
+      video.defaultMuted = true;
+      video.playsInline = true;
       video.play().catch(() => {});
     };
 
     tryPlay();
     video.addEventListener("loadeddata", tryPlay);
+    video.addEventListener("canplay", tryPlay);
 
-    return () => video.removeEventListener("loadeddata", tryPlay);
+    return () => {
+      video.removeEventListener("loadeddata", tryPlay);
+      video.removeEventListener("canplay", tryPlay);
+    };
   }, []);
 
   const slide = slides[current];
 
   return (
     <section className="hero" id="home">
-      {/* Single video background */}
       <video
         ref={videoRef}
         className="hero-video-bg"
         src={mediaUrl("/babylon-school/gallery/videos/videoPlay_zx3gc8.mp4")}
         autoPlay
         muted
+        defaultMuted
         loop
         playsInline
+        preload="auto"
       />
 
       <div className="hero-shade" />
 
-      {/* Content */}
       <div
         className={`shell hero-content ${
           isTransitioning ? "fade-out" : "fade-in"
@@ -134,11 +139,6 @@ export default function HeroSection() {
           </Link>
         </div>
       </div>
-
-      {/* Counter */}
-      {/* <div className="hero-mark">
-        0{current + 1} <span />
-      </div> */}
     </section>
   );
 }
