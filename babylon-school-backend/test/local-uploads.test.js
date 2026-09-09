@@ -240,6 +240,71 @@ for (const [model, route, dateField, fileField] of [
   });
 }
 
+test("news/blog: type persists through uploads, public reads and edits without changing the date or category", async t => {
+  const writes = mockWrites(t, "news");
+  const News = require("../src/models/news.model");
+  const created = await submit("news", "POST", {
+    ...fields, postType: "blog", category: "School Activities", publishedAt: "2026-07-16",
+  }, [{}]);
+  assert.equal(created.status, 201, JSON.stringify(created.body));
+  const record = new News(writes[0]);
+  await record.validate();
+  assert.equal(record.postType, "blog");
+  assert.equal(record.category, "School Activities");
+
+  t.mock.method(News, "find", filter => ({ sort: async order => {
+    assert.deepEqual(filter, { isActive: true, isPublished: true });
+    assert.deepEqual(order, { publishedAt: -1, createdAt: -1 });
+    return [record];
+  } }));
+  t.mock.method(News, "findOne", async () => record);
+  const listing = await fetch(`${origin}/api/v1/news`);
+  assert.equal((await listing.json()).data[0].postType, "blog");
+  const detail = await fetch(`${origin}/api/v1/news/${record._id}`);
+  assert.equal((await detail.json()).data.postType, "blog");
+
+  const edited = await submit("news/test-id", "PUT", { title: "Edited blog" }, []);
+  assert.equal(edited.status, 200, JSON.stringify(edited.body));
+  assert.equal(edited.body.data.postType, "blog");
+  for (const postType of ["news", "blog"]) {
+    const changed = await submit("news/test-id", "PUT", { postType }, []);
+    assert.equal(changed.status, 200, JSON.stringify(changed.body));
+    assert.equal(changed.body.data.postType, postType);
+    for (const field of ["category", "publishedAt", "content", "image"]) {
+      assert.equal(changed.body.data[field], created.body.data[field]);
+    }
+  }
+});
+
+test("news/blog: older records and requests without a type default to News", async t => {
+  mockWrites(t, "news");
+  const News = require("../src/models/news.model");
+  const created = await submit("news", "POST", fields, []);
+  assert.equal(created.status, 201, JSON.stringify(created.body));
+  assert.equal(created.body.data.postType, "news");
+  const legacy = News.hydrate({ ...fields, category: "Blog" });
+  assert.equal(legacy.toJSON().postType, "news");
+  assert.equal(legacy.category, "Blog");
+});
+
+test("news/blog: invalid types are rejected before storing content or uploaded images", async t => {
+  const writes = mockWrites(t, "news");
+  const News = require("../src/models/news.model");
+  t.mock.method(console, "error", () => {});
+  const folder = path.join(UPLOAD_ROOT, "news");
+  const beforeFiles = fs.existsSync(folder) ? fs.readdirSync(folder) : [];
+  for (const postType of ["", "other", "Blog", "news,blog"]) {
+    await assert.rejects(new News({ ...fields, postType }).validate(), { name: "ValidationError" });
+    for (const method of ["POST", "PUT"]) {
+      const result = await submit(`news${method === "PUT" ? "/test-id" : ""}`, method, { ...fields, postType }, [{}]);
+      assert.equal(result.status, 400, JSON.stringify(result.body));
+      assert.match(result.body.message, /Post type must be News or Blog/);
+    }
+  }
+  assert.equal(writes.length, 0);
+  assert.deepEqual(fs.existsSync(folder) ? fs.readdirSync(folder) : [], beforeFiles);
+});
+
 test("events: creating an event requires a date", async t => {
   const writes = mockWrites(t, "event");
   t.mock.method(console, "error", () => {});

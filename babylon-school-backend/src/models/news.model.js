@@ -14,6 +14,13 @@ const newsSchema = new mongoose.Schema(
       trim: true,
     },
 
+    postType: {
+      type: String,
+      enum: ["news", "blog"],
+      default: "news",
+      required: true,
+    },
+
     slug: {
       type: String,
       required: true,

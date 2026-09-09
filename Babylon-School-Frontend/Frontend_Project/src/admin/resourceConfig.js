@@ -1,3 +1,5 @@
+import { POST_TYPES } from "../lib/postType";
+
 export const resources = {
   programs: {
     label: "Programmes",
@@ -16,11 +18,13 @@ export const resources = {
 
   news: {
     label: "News/Blog",
+    singularLabel: "News/Blog post",
     endpoint: "/news",
     dateField: "publishedAt",
     image: true,
     fields: [
       ["title", "Title"],
+      ["postType", "Post type", "select", POST_TYPES],
       ["publishedAt", "Published date", "date"],
       ["slug", "Slug (optional)"],
       ["shortDescription", "Short description"],

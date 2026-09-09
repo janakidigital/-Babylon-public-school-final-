@@ -6,6 +6,7 @@ import EmptyState from "../../components/common/EmptyState";
 import { publicApi } from "../../services/api";
 import usePublicData from "../../hooks/usePublicData";
 import { formatDateParts } from "../../lib/format";
+import { getPostTypeLabel } from "../../lib/postType";
 
 export default function BlogDetailsPage() {
   const { id } = useParams();
@@ -18,7 +19,7 @@ export default function BlogDetailsPage() {
   if (loading) {
     return (
       <>
-        <PageBanner eyebrow="NEWS" title="Loading..." image="banner/inner_banner_1.jpg" />
+        <PageBanner eyebrow="NEWS & BLOG" title="Loading..." image="banner/inner_banner_1.jpg" />
         <section className="shell listing-page">
           <p>Loading story...</p>
         </section>
@@ -29,11 +30,11 @@ export default function BlogDetailsPage() {
   if (!post) {
     return (
       <>
-        <PageBanner eyebrow="NEWS" title="Story not found." image="banner/inner_banner_1.jpg" />
+        <PageBanner eyebrow="NEWS & BLOG" title="Story not found." image="banner/inner_banner_1.jpg" />
         <section className="shell listing-page">
           <EmptyState title="This story is not available" />
           <Link className="text-link" to="/blog">
-            Back to news <b>&rarr;</b>
+            Back to News & Blog <b>&rarr;</b>
           </Link>
         </section>
       </>
@@ -44,7 +45,7 @@ export default function BlogDetailsPage() {
   return (
     <>
       <PageBanner
-        eyebrow={post.category || "SCHOOL STORY"}
+        eyebrow={`${getPostTypeLabel(post)}${post.category ? ` · ${post.category}` : ""}`}
         title={post.title}
         image={post.image || "banner/inner_banner_1.jpg"}
       />

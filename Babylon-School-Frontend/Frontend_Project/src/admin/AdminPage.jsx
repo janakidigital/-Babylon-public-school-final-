@@ -37,6 +37,7 @@ import { api } from "../services/api";
 import { slugify, mediaUrl } from "../lib/media";
 import { formatCalendarDate } from "../lib/format";
 import { richTextToPlainText } from "../lib/richText";
+import { getPostType, getPostTypeLabel } from "../lib/postType";
 import RichTextEditor from "./RichTextEditor";
 import { assetPath } from "../data/content";
 import { resources, singletons } from "./resourceConfig";
@@ -418,7 +419,7 @@ function ResourceEditor({ resourceKey, onBack }) {
           className="button primary"
           onClick={() => openEditor({})}
         >
-          <Plus size={16} /> Add {config.label.slice(0, -1)}
+          <Plus size={16} /> Add {config.singularLabel || config.label.slice(0, -1)}
         </button>
       </div>
 
@@ -435,28 +436,28 @@ function ResourceEditor({ resourceKey, onBack }) {
           {config.fields.map(
             ([key, label, type = "text", options]) => {
               if (type === "select") {
+                const isPostType = resourceKey === "news" && key === "postType";
                 return (
                   <label key={key}>
                     {label}
 
                     <select
                       name={key}
-                      value={selectedType}
-                      onChange={(e) => setSelectedType(e.target.value)}
+                      {...(isPostType
+                        ? { defaultValue: getPostType(formValues) }
+                        : { value: selectedType, onChange: (e) => setSelectedType(e.target.value) })}
                       required
                     >
                       <option value="">
-                        — Select category —
+                        — Select {label.toLowerCase()} —
                       </option>
 
-                      {(options || []).map((opt) => (
-                        <option
-                          key={opt}
-                          value={opt}
-                        >
-                          {opt}
-                        </option>
-                      ))}
+                      {(options || []).map((opt) => {
+                        const value = typeof opt === "string" ? opt : opt.value;
+                        return <option key={value} value={value}>
+                          {typeof opt === "string" ? opt : opt.label}
+                        </option>;
+                      })}
                     </select>
                   </label>
                 );
@@ -1014,6 +1015,8 @@ function ResourceEditor({ resourceKey, onBack }) {
                     <h3>
                       {item.title || item.name || item.question}
                     </h3>
+
+                    {resourceKey === "news" && <p>Type: {getPostTypeLabel(item)}</p>}
 
                     <p>
                       {richTextToPlainText(item.shortDescription ||
@@ -3289,7 +3292,7 @@ function DashboardOverview({ user, setView }) {
           </div>
           <div className="admin-stat-body">
             <strong>{display(stats.blog)}</strong>
-            <span>Blog Posts</span>
+            <span>News & Blog Posts</span>
           </div>
         </button>
 

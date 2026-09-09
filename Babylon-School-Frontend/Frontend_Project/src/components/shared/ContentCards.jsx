@@ -3,6 +3,7 @@ import { mediaUrl } from "../../lib/media";
 import { formatDateParts, itemId } from "../../lib/format";
 import { assetPath } from "../../data/content";
 import { richTextToPlainText } from "../../lib/richText";
+import { getPostTypeLabel } from "../../lib/postType";
 
 export default function ContentCards({ items = [], type = "course" }) {
   return (
@@ -36,7 +37,7 @@ export default function ContentCards({ items = [], type = "course" }) {
                 {type === "event"
                   ? item.location || "School campus"
                   : type === "post"
-                    ? item.category || "School news"
+                    ? `${getPostTypeLabel(item)}${item.category ? ` · ${item.category}` : ""}`
                     : item.level || "Academic programme"}
               </p>
               <h3>{title}</h3>

@@ -5869,6 +5869,35 @@ article:has(.notice-title-link) {
   min-width: 0;
 }
 
+.blog-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.blog-filters button {
+  border: 1px solid #cbd5e1;
+  border-radius: 24px;
+  padding: 9px 22px;
+  background: white;
+  color: #062b59;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.blog-filters button[aria-pressed="true"] {
+  background: #c53030;
+  border-color: #c53030;
+  color: white;
+}
+
+.blog-filters button:focus-visible {
+  outline: 2px solid #062b59;
+  outline-offset: 3px;
+}
+
 /* =========================
    FEATURED POST
    ========================= */

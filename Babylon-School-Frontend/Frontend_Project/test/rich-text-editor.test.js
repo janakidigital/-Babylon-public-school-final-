@@ -16,7 +16,7 @@ dom.window.Range.prototype.getClientRects = () => [];
 let vite, Editor, RichText, TestimonialsSection, publicApi, Quill, root;
 
 before(async () => {
-  vite = await createServer({ server: { middlewareMode: true }, appType: "custom", optimizeDeps: { noDiscovery: true, include: [] } });
+  vite = await createServer({ server: { middlewareMode: true, ws: false }, appType: "custom", optimizeDeps: { noDiscovery: true, include: [] } });
   Editor = (await vite.ssrLoadModule("/src/admin/RichTextEditor.jsx")).default;
   RichText = (await vite.ssrLoadModule("/src/components/shared/RichText.jsx")).default;
   TestimonialsSection = (await vite.ssrLoadModule("/src/components/home/TestimonialsSection.jsx")).default;

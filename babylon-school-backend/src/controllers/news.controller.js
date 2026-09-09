@@ -3,6 +3,15 @@ const News = require("../models/news.model");
 const { uploadToLocal } = require("../services/storage.service");
 const { parseCalendarDate } = require("../utils/calendarDate");
 
+function validatePostType(value) {
+  if (value !== undefined && !["news", "blog"].includes(value)) {
+    const error = new Error("Post type must be News or Blog");
+    error.statusCode = 400;
+    throw error;
+  }
+  return value;
+}
+
 // ======================================================
 // GET ALL NEWS
 // GET /api/v1/news
@@ -51,7 +60,7 @@ const getSingleNews = async (req, res) => {
     if (!news) {
       return res.status(404).json({
         success: false,
-        message: "News not found",
+        message: "Post not found",
       });
     }
 
@@ -65,7 +74,7 @@ const getSingleNews = async (req, res) => {
     if (error.name === "CastError") {
       return res.status(400).json({
         success: false,
-        message: "Invalid news ID",
+        message: "Invalid post ID",
       });
     }
 
@@ -84,6 +93,7 @@ const getSingleNews = async (req, res) => {
 // ======================================================
 const createNews = async (req, res) => {
   try {
+    const postType = validatePostType(req.body.postType) || "news";
     const publicationDate = parseCalendarDate(req.body.publishedAt, "Published date");
     const {
       title,
@@ -120,12 +130,13 @@ const createNews = async (req, res) => {
     if (existingNews) {
       return res.status(400).json({
         success: false,
-        message: "News with this slug already exists",
+        message: "Post with this slug already exists",
       });
     }
 
     const news = await News.create({
       title,
+      postType,
       slug,
       shortDescription,
       content,
@@ -141,7 +152,7 @@ const createNews = async (req, res) => {
 
     res.status(201).json({
       success: true,
-      message: "News created successfully",
+      message: "Post created successfully",
       data: news,
     });
   } catch (error) {
@@ -163,7 +174,7 @@ const createNews = async (req, res) => {
     if (error.code === 11000) {
       return res.status(400).json({
         success: false,
-        message: "News with this slug already exists",
+        message: "Post with this slug already exists",
       });
     }
 
@@ -182,12 +193,13 @@ const createNews = async (req, res) => {
 // ======================================================
 const updateNews = async (req, res) => {
   try {
+    validatePostType(req.body.postType);
     const news = await News.findById(req.params.id);
 
     if (!news) {
       return res.status(404).json({
         success: false,
-        message: "News not found",
+        message: "Post not found",
       });
     }
 
@@ -201,7 +213,7 @@ const updateNews = async (req, res) => {
       if (existingNews) {
         return res.status(400).json({
           success: false,
-          message: "News with this slug already exists",
+          message: "Post with this slug already exists",
         });
       }
     }
@@ -232,7 +244,7 @@ const updateNews = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: "News updated successfully",
+      message: "Post updated successfully",
       data: updatedNews,
     });
   } catch (error) {
@@ -244,7 +256,7 @@ const updateNews = async (req, res) => {
     if (error.name === "CastError") {
       return res.status(400).json({
         success: false,
-        message: "Invalid news ID",
+        message: "Invalid post ID",
       });
     }
 
@@ -261,7 +273,7 @@ const updateNews = async (req, res) => {
     if (error.code === 11000) {
       return res.status(400).json({
         success: false,
-        message: "News with this slug already exists",
+        message: "Post with this slug already exists",
       });
     }
 
@@ -285,7 +297,7 @@ const deleteNews = async (req, res) => {
     if (!news) {
       return res.status(404).json({
         success: false,
-        message: "News not found",
+        message: "Post not found",
       });
     }
 
@@ -293,7 +305,7 @@ const deleteNews = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: "News deleted successfully",
+      message: "Post deleted successfully",
     });
   } catch (error) {
     console.error("Delete news error:", error);
@@ -301,7 +313,7 @@ const deleteNews = async (req, res) => {
     if (error.name === "CastError") {
       return res.status(400).json({
         success: false,
-        message: "Invalid news ID",
+        message: "Invalid post ID",
       });
     }
 
@@ -325,7 +337,7 @@ const toggleNewsStatus = async (req, res) => {
     if (!news) {
       return res.status(404).json({
         success: false,
-        message: "News not found",
+        message: "Post not found",
       });
     }
 
@@ -335,7 +347,7 @@ const toggleNewsStatus = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: `News ${
+      message: `Post ${
         news.isActive ? "activated" : "deactivated"
       } successfully`,
       data: news,
@@ -346,7 +358,7 @@ const toggleNewsStatus = async (req, res) => {
     if (error.name === "CastError") {
       return res.status(400).json({
         success: false,
-        message: "Invalid news ID",
+        message: "Invalid post ID",
       });
     }
 
@@ -370,7 +382,7 @@ const toggleFeaturedStatus = async (req, res) => {
     if (!news) {
       return res.status(404).json({
         success: false,
-        message: "News not found",
+        message: "Post not found",
       });
     }
 
@@ -380,7 +392,7 @@ const toggleFeaturedStatus = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: `News ${
+      message: `Post ${
         news.isFeatured
           ? "marked as featured"
           : "removed from featured"
@@ -393,7 +405,7 @@ const toggleFeaturedStatus = async (req, res) => {
     if (error.name === "CastError") {
       return res.status(400).json({
         success: false,
-        message: "Invalid news ID",
+        message: "Invalid post ID",
       });
     }
 
@@ -417,7 +429,7 @@ const togglePublishStatus = async (req, res) => {
     if (!news) {
       return res.status(404).json({
         success: false,
-        message: "News not found",
+        message: "Post not found",
       });
     }
 
@@ -437,7 +449,7 @@ const togglePublishStatus = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: `News ${
+      message: `Post ${
         news.isPublished ? "published" : "unpublished"
       } successfully`,
       data: news,
@@ -448,7 +460,7 @@ const togglePublishStatus = async (req, res) => {
     if (error.name === "CastError") {
       return res.status(400).json({
         success: false,
-        message: "Invalid news ID",
+        message: "Invalid post ID",
       });
     }
 
