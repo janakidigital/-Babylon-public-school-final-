@@ -128,7 +128,7 @@ export default function NoticesSection({ limit = 4, showEvents = true }) {
           ) : notices.length === 0 ? (
             <EmptyState
               title="No notices yet"
-              text="School notices published from the admin panel will appear here."
+              
             />
           ) : (
             <div

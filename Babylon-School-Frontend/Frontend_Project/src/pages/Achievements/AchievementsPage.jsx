@@ -104,7 +104,7 @@ export default function AchievementsPage() {
               ) : items.length === 0 ? (
                 <EmptyState
                   title="No achievements published"
-                  text="Add awards and milestones from the admin dashboard."
+                  description="Check back later for updates on our students' and faculty's accomplishments."
                 />
               ) : (
                 <div className="achievements-grid-modern">

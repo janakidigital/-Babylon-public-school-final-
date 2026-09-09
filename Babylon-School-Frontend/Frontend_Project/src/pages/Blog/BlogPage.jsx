@@ -128,7 +128,7 @@ export default function BlogPage() {
               ) : filteredData.length === 0 ? (
                 <EmptyState
                   title={postType === "blog" ? "No blog posts yet" : postType === "news" ? "No news yet" : "No news or blog posts yet"}
-                  text="Stories published from the admin panel will appear here."
+                  
                 />
               ) : (
                 <>

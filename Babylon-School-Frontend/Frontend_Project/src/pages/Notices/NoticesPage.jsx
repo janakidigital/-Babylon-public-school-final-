@@ -156,7 +156,7 @@ function NoticesListAll() {
                   text={
                     searchQuery || selectedCategory !== "ALL"
                       ? "Try resetting your search query or category filter."
-                      : "Notices published from the admin panel will appear here."
+                      : "Notices published will appear here."
                   }
                 />
               ) : (

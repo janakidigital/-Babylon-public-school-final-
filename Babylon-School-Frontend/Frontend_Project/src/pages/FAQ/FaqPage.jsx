@@ -29,7 +29,7 @@ export default function FaqPage() {
               ) : items.length === 0 ? (
                 <EmptyState
                   title="No FAQs yet"
-                  text="Questions added in the admin panel will appear here."
+                  
                 />
               ) : (
                 <div className="faq-grid">
