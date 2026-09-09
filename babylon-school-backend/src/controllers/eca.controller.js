@@ -1,6 +1,7 @@
 const { deleteWithMediaCleanup, collectLocalFiles, updateWithMediaCleanup } = require("../services/mediaCleanup.service");
 const ECA = require("../models/eca.model");
 const { uploadToLocal } = require("../services/storage.service");
+const { parseCalendarDate } = require("../utils/calendarDate");
 
 function normalizeImageList(images) {
   if (!Array.isArray(images)) return [];
@@ -103,6 +104,7 @@ const getEcaItem = async (req, res) => {
 // ======================================================
 const createEcaItem = async (req, res) => {
   try {
+    const activityDate = parseCalendarDate(req.body.activityDate, "Activity date");
     const {
       title,
       category,
@@ -140,6 +142,7 @@ const createEcaItem = async (req, res) => {
 
     const ecaDoc = new ECA({
       title: title.trim(),
+      activityDate,
       category: category || "Enhancing ECA",
       shortDescription: shortDescription ? shortDescription.trim() : "",
       description: description != null ? String(description) : "",
@@ -160,7 +163,7 @@ const createEcaItem = async (req, res) => {
     });
   } catch (error) {
     console.error("Create ECA error:", error);
-    res.status(500).json({
+    res.status(error.statusCode || 500).json({
       success: false,
       message: error.message || "Failed to create ECA item",
     });
@@ -181,6 +184,7 @@ const updateEcaItem = async (req, res) => {
       });
     }
 
+    const activityDate = parseCalendarDate(req.body.activityDate, "Activity date");
     const previousFiles = collectLocalFiles(item);
     const {
       title,
@@ -215,6 +219,7 @@ const updateEcaItem = async (req, res) => {
     const allImages = [...preservedImages, ...newImages];
 
     if (title) item.title = title.trim();
+    if (activityDate !== undefined) item.activityDate = activityDate;
     if (category) item.category = category;
     if (shortDescription !== undefined) item.shortDescription = shortDescription.trim();
     if (description !== undefined) item.description = String(description);
@@ -242,7 +247,7 @@ const updateEcaItem = async (req, res) => {
     });
   } catch (error) {
     console.error("Update ECA error:", error);
-    res.status(500).json({
+    res.status(error.statusCode || 500).json({
       success: false,
       message: error.message || "Failed to update ECA item",
     });

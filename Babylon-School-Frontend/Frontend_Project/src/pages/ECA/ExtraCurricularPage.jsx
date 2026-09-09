@@ -4,6 +4,7 @@ import EcaSidebar from "../../components/shared/EcaSidebar";
 import usePublicData from "../../hooks/usePublicData";
 import { publicApi } from "../../services/api";
 import { mediaUrl } from "../../lib/media";
+import ContentDate from "../../components/shared/ContentDate";
 import { ZoomIn, X, ImageOff } from "lucide-react";
 import "../About/SidebarsCommon.css";
 import "../About/PartnersPage.css";
@@ -67,6 +68,8 @@ export default function ExtraCurricularPage() {
                     {item.title && (
                       <h2 className="eca-entry-title">{item.title}</h2>
                     )}
+
+                    <ContentDate value={item.activityDate} />
 
                     {/* Short Description */}
                     {item.shortDescription && (

@@ -21,6 +21,9 @@ const ecaSchema = new mongoose.Schema(
     description: {
       type: String,
     },
+    activityDate: {
+      type: Date,
+    },
     coverImage: {
       type: String,
       trim: true,

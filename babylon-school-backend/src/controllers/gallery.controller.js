@@ -1,6 +1,7 @@
 const { updateWithMediaCleanup, deleteWithMediaCleanup } = require("../services/mediaCleanup.service");
 const Gallery = require("../models/gallery.model");
 const { uploadToLocal } = require("../services/storage.service");
+const { parseCalendarDate } = require("../utils/calendarDate");
 
 // ======================================================
 // GET ALL ALBUMS
@@ -69,6 +70,7 @@ const getGalleryItem = async (req, res) => {
 // ======================================================
 const createGalleryItem = async (req, res) => {
   try {
+    const albumDate = parseCalendarDate(req.body.albumDate, "Album date");
     const {
       title,
       description,
@@ -179,6 +181,7 @@ const createGalleryItem = async (req, res) => {
     const album = await Gallery.create({
       title,
       description,
+      albumDate,
       coverImage:
         images.length > 0
           ? images[0].url
@@ -204,6 +207,9 @@ const createGalleryItem = async (req, res) => {
     });
   } catch (error) {
     console.error("❌ Create gallery error:", error);
+    if (error.statusCode === 400) {
+      return res.status(400).json({ success: false, message: error.message });
+    }
     res.status(500).json({
       success: false,
       message: "Server error",
@@ -227,6 +233,9 @@ const updateGalleryItem = async (req, res) => {
     }
 
     const payload = { ...req.body };
+    if (req.body.albumDate !== undefined) {
+      payload.albumDate = parseCalendarDate(req.body.albumDate, "Album date");
+    }
     const files = req.files || [];
 
     console.log("📝 Updating gallery item:");
@@ -367,6 +376,9 @@ const updateGalleryItem = async (req, res) => {
     });
   } catch (error) {
     console.error("❌ Update gallery error:", error);
+    if (error.statusCode === 400) {
+      return res.status(400).json({ success: false, message: error.message });
+    }
     res.status(500).json({
       success: false,
       message: "Server error",

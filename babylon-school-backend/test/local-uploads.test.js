@@ -123,6 +123,133 @@ for (const [model, route, field, savedField] of [
   });
 }
 
+test("downloads: document dates persist through upload, edit and file replacement", async t => {
+  const writes = mockWrites(t, "download");
+  const Download = require("../src/models/download.model");
+  const file = { field: "file", name: "document.pdf", type: "application/pdf", bytes: pdf };
+  const created = await submit("downloads", "POST", { ...fields, documentDate: "2024-02-29" }, [file]);
+  assert.equal(created.status, 201);
+  assert.equal(created.body.data.documentDate, "2024-02-29T00:00:00.000Z");
+  const record = new Download(writes[0]);
+  await record.validate();
+  assert.equal(record.toJSON().documentDate.toISOString(), created.body.data.documentDate);
+
+  const updated = await submit("downloads/test-id", "PUT", { documentDate: "2026-09-09" }, []);
+  assert.equal(updated.status, 200);
+  assert.equal(updated.body.data.documentDate, "2026-09-09T00:00:00.000Z");
+  assert.equal(updated.body.data.file, created.body.data.file);
+  await verifyFile(updated.body.data.file, "downloads", ".pdf", pdf);
+
+  const replaced = await submit("downloads/test-id", "PUT", { title: "Replacement" }, [file]);
+  assert.equal(replaced.status, 200);
+  assert.equal(replaced.body.data.documentDate, updated.body.data.documentDate);
+  assert.notEqual(replaced.body.data.file, created.body.data.file);
+
+  const cleared = await submit("downloads/test-id", "PUT", { documentDate: "" }, []);
+  assert.equal(cleared.status, 200);
+  assert.equal(cleared.body.data.documentDate, null);
+  assert.equal(cleared.body.data.file, replaced.body.data.file);
+});
+
+test("downloads: invalid document dates are rejected before saving files or records", async t => {
+  const writes = mockWrites(t, "download");
+  const folder = path.join(UPLOAD_ROOT, "downloads");
+  const existingFiles = fs.existsSync(folder) ? fs.readdirSync(folder) : [];
+  for (const documentDate of ["2025-02-29", "2026-04-31", "2026-13-01", "not-a-date"]) {
+    for (const method of ["POST", "PUT"]) {
+      const result = await submit(`downloads${method === "PUT" ? "/test-id" : ""}`, method,
+        { ...fields, documentDate }, [{ field: "file", name: "invalid.pdf", type: "application/pdf", bytes: pdf }]);
+      assert.equal(result.status, 400, JSON.stringify(result.body));
+      assert.match(result.body.message, /Document date/);
+    }
+  }
+  assert.equal(writes.length, 0);
+  assert.deepEqual(fs.existsSync(folder) ? fs.readdirSync(folder) : [], existingFiles);
+});
+
+function mockContentDateWrites(t, modelName) {
+  if (modelName !== "eca") return mockWrites(t, modelName);
+  const ECA = require("../src/models/eca.model");
+  const writes = [];
+  let saved = new ECA({ title: "Existing activity" });
+  t.mock.method(ECA.prototype, "save", async function () {
+    await this.validate();
+    saved = this;
+    writes.push(this.toObject());
+    return this;
+  });
+  t.mock.method(ECA, "findById", async () => saved);
+  return writes;
+}
+
+for (const [model, route, dateField, fileField] of [
+  ["news", "news", "publishedAt", "image"],
+  ["event", "events", "eventDate", "image"],
+  ["notice", "notices", "publishedAt", "attachment"],
+  ["gallery", "gallery", "albumDate", "image"],
+  ["eca", "eca", "activityDate", "image"],
+]) {
+  test(`${route}: selected dates survive uploads, public reads, edits and media replacement`, async t => {
+    const writes = mockContentDateWrites(t, model);
+    const Model = require(`../src/models/${model}.model`);
+    const created = await submit(route, "POST", { ...fields, [dateField]: "2024-02-29" }, [{ field: fileField }]);
+    assert.equal(created.status, 201, JSON.stringify(created.body));
+    assert.equal(created.body.data[dateField], "2024-02-29T00:00:00.000Z");
+    const record = new Model(writes[0]);
+    await record.validate();
+    assert.equal(record[dateField].toISOString(), created.body.data[dateField]);
+
+    t.mock.method(Model, "find", () => ({ sort: async () => [record] }));
+    const response = await fetch(`${origin}/api/v1/${route}`);
+    assert.equal(response.status, 200);
+    assert.equal((await response.json()).data[0][dateField], created.body.data[dateField]);
+
+    const edited = await submit(`${route}/test-id`, "PUT", { [dateField]: "2026-09-09" }, []);
+    assert.equal(edited.status, 200, JSON.stringify(edited.body));
+    assert.equal(edited.body.data[dateField], "2026-09-09T00:00:00.000Z");
+    for (const field of ["image", "file", "attachment", "images", "videos"]) {
+      const mediaUrls = value => Array.isArray(value) ? value.map(item => item.url) : value;
+      assert.deepEqual(mediaUrls(edited.body.data[field]), mediaUrls(created.body.data[field]));
+    }
+
+    const replaced = await submit(`${route}/test-id`, "PUT", { title: "Updated content" }, [{ field: fileField }]);
+    assert.equal(replaced.status, 200, JSON.stringify(replaced.body));
+    assert.equal(replaced.body.data[dateField], edited.body.data[dateField]);
+
+    const cleared = await submit(`${route}/test-id`, "PUT", { [dateField]: "" }, []);
+    assert.equal(cleared.status, model === "event" ? 400 : 200, JSON.stringify(cleared.body));
+    if (model === "event") assert.match(cleared.body.message, /Event date is required/);
+    else assert.equal(cleared.body.data[dateField], null);
+  });
+
+  test(`${route}: invalid dates reject the request before saving media or content`, async t => {
+    const writes = mockContentDateWrites(t, model);
+    t.mock.method(console, "error", () => {});
+    const folder = path.join(UPLOAD_ROOT, route);
+    const beforeFiles = fs.existsSync(folder) ? fs.readdirSync(folder) : [];
+    for (const date of ["2025-02-29", "2026-02-30", "2026-13-01", "invalid"]) {
+      for (const method of ["POST", "PUT"]) {
+        const result = await submit(route + (method === "PUT" ? "/test-id" : ""), method,
+          { ...fields, [dateField]: date }, [{ field: fileField }]);
+        assert.equal(result.status, 400, JSON.stringify(result.body));
+        assert.match(result.body.message, /date must be a valid date/);
+      }
+    }
+    assert.equal(writes.length, 0);
+    assert.deepEqual(fs.existsSync(folder) ? fs.readdirSync(folder) : [], beforeFiles);
+  });
+}
+
+test("events: creating an event requires a date", async t => {
+  const writes = mockWrites(t, "event");
+  t.mock.method(console, "error", () => {});
+  const { eventDate, ...withoutDate } = fields;
+  const result = await submit("events", "POST", withoutDate, [{}]);
+  assert.equal(result.status, 400);
+  assert.match(result.body.message, /Event date is required/);
+  assert.equal(writes.length, 0);
+});
+
 test("both public career application routes save local resume URLs", async t => {
   const writes = mockWrites(t, "careerApplication");
   mockWrites(t, "career");

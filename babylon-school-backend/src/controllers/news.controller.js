@@ -1,6 +1,7 @@
 const { updateWithMediaCleanup, deleteWithMediaCleanup } = require("../services/mediaCleanup.service");
 const News = require("../models/news.model");
 const { uploadToLocal } = require("../services/storage.service");
+const { parseCalendarDate } = require("../utils/calendarDate");
 
 // ======================================================
 // GET ALL NEWS
@@ -83,6 +84,7 @@ const getSingleNews = async (req, res) => {
 // ======================================================
 const createNews = async (req, res) => {
   try {
+    const publicationDate = parseCalendarDate(req.body.publishedAt, "Published date");
     const {
       title,
       slug,
@@ -91,7 +93,6 @@ const createNews = async (req, res) => {
       author,
       category,
       tags,
-      publishedAt,
       isPublished,
       isFeatured,
       isActive,
@@ -132,7 +133,7 @@ const createNews = async (req, res) => {
       author,
       category,
       tags,
-      publishedAt: publishedAt || new Date(),
+      publishedAt: publicationDate || new Date(),
       isPublished: isPublished === undefined || isPublished === "" ? true : isPublished === true || isPublished === "true",
       isFeatured,
       isActive,
@@ -145,6 +146,9 @@ const createNews = async (req, res) => {
     });
   } catch (error) {
     console.error("Create news error:", error);
+    if (error.statusCode === 400) {
+      return res.status(400).json({ success: false, message: error.message });
+    }
 
     if (error.name === "ValidationError") {
       return res.status(400).json({
@@ -207,6 +211,9 @@ const updateNews = async (req, res) => {
     };
 
     delete payload.image;
+    if (req.body.publishedAt !== undefined) {
+      payload.publishedAt = parseCalendarDate(req.body.publishedAt, "Published date");
+    }
 
     if (req.file) {
       const uploadedImage = await uploadToLocal(req.file, "babylon-school/news");
@@ -230,6 +237,9 @@ const updateNews = async (req, res) => {
     });
   } catch (error) {
     console.error("Update news error:", error);
+    if (error.statusCode === 400) {
+      return res.status(400).json({ success: false, message: error.message });
+    }
 
     if (error.name === "CastError") {
       return res.status(400).json({

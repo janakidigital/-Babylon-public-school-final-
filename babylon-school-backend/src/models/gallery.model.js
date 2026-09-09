@@ -11,6 +11,9 @@ const gallerySchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
+    albumDate: {
+      type: Date,
+    },
     coverImage: {
       type: String,
       trim: true,

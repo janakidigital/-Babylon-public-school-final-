@@ -31,7 +31,8 @@ export default function BlogPage() {
     return date.toLocaleDateString('en-US', { 
       month: 'long', 
       day: 'numeric', 
-      year: 'numeric' 
+      year: 'numeric',
+      timeZone: 'UTC',
     });
   };
 

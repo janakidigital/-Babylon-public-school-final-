@@ -1,6 +1,7 @@
 const { updateWithMediaCleanup, deleteWithMediaCleanup } = require("../services/mediaCleanup.service");
 const Event = require("../models/event.model");
 const { uploadToLocal } = require("../services/storage.service");
+const { parseCalendarDate } = require("../utils/calendarDate");
 
 // ======================================================
 // GET ALL EVENTS
@@ -83,6 +84,7 @@ const getEvent = async (req, res) => {
 // ======================================================
 const createEvent = async (req, res) => {
   try {
+    const parsedEventDate = parseCalendarDate(req.body.eventDate, "Event date", true);
     const {
       title,
       slug,
@@ -128,7 +130,7 @@ const createEvent = async (req, res) => {
       shortDescription,
       description,
       image: imageUrl,
-      eventDate,
+      eventDate: parsedEventDate,
       startTime,
       endTime,
       location,
@@ -144,6 +146,9 @@ const createEvent = async (req, res) => {
     });
   } catch (error) {
     console.error("Create event error:", error);
+    if (error.statusCode === 400) {
+      return res.status(400).json({ success: false, message: error.message });
+    }
 
     if (error.name === "ValidationError") {
       return res.status(400).json({
@@ -205,6 +210,9 @@ const updateEvent = async (req, res) => {
     };
 
     delete payload.image;
+    if (req.body.eventDate !== undefined) {
+      payload.eventDate = parseCalendarDate(req.body.eventDate, "Event date", true);
+    }
 
     if (req.file) {
       const uploadedImage = await uploadToLocal(req.file, "babylon-school/events");
@@ -228,6 +236,9 @@ const updateEvent = async (req, res) => {
     });
   } catch (error) {
     console.error("Update event error:", error);
+    if (error.statusCode === 400) {
+      return res.status(400).json({ success: false, message: error.message });
+    }
 
     if (error.name === "CastError") {
       return res.status(400).json({

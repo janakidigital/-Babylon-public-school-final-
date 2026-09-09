@@ -4,6 +4,7 @@ import EmptyState from "../../components/common/EmptyState";
 import { publicApi } from "../../services/api";
 import usePublicData from "../../hooks/usePublicData";
 import { mediaUrl } from "../../lib/media";
+import ContentDate from "../../components/shared/ContentDate";
 
 /** Make plain URLs clickable */
 function linkify(text) {
@@ -461,6 +462,7 @@ export default function GalleryPage() {
                           {/* Description intentionally hidden on All cards */}
                           <div className="gallery-album-info">
                             <h3>{album.title}</h3>
+                            <ContentDate value={album.albumDate} />
 
                             <span className="gallery-photo-count">
                               {count}{" "}
@@ -511,6 +513,7 @@ export default function GalleryPage() {
                       </div>
 
                       <h3>{activeAlbum?.title}</h3>
+                      <ContentDate value={activeAlbum?.albumDate} />
 
                       {/* Description remains visible inside opened album */}
                       {activeAlbum?.description && (
@@ -613,6 +616,7 @@ export default function GalleryPage() {
 
                             <div className="gallery-album-info">
                               <h3>{album.title}</h3>
+                              <ContentDate value={album.albumDate} />
 
                               <span className="gallery-photo-count">
                                 {count}{" "}
@@ -664,6 +668,7 @@ export default function GalleryPage() {
                       </div>
 
                       <h3>{activeAlbum?.title}</h3>
+                      <ContentDate value={activeAlbum?.albumDate} />
 
                       {activeAlbum?.description && (
                         <p>{linkify(activeAlbum.description)}</p>

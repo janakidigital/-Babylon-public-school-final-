@@ -10,6 +10,9 @@ const downloadSchema = new mongoose.Schema({
     type: String,
     trim: true,
   },
+  documentDate: {
+    type: Date,
+  },
   file: {
     type: String,
     required: false,

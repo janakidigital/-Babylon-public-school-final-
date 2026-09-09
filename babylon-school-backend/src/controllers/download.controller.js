@@ -2,6 +2,8 @@ const { updateWithMediaCleanup, deleteWithMediaCleanup } = require("../services/
 const Download = require("../models/download.model");
 const { uploadToLocal } = require("../services/storage.service");
 
+const { parseCalendarDate } = require("../utils/calendarDate");
+
 // ======================================================
 // GET ALL DOWNLOADS
 // GET /api/v1/downloads
@@ -40,6 +42,7 @@ const getDownloads = async (req, res) => {
 const createDownload = async (req, res) => {
   try {
     const { title, description, category, isActive } = req.body;
+    const documentDate = parseCalendarDate(req.body.documentDate, "Document date");
 
     let fileUrl = req.body.file || "";
 
@@ -58,6 +61,7 @@ const createDownload = async (req, res) => {
     const download = await Download.create({
       title,
       description,
+      documentDate,
       file: fileUrl,
       category,
       isActive: isActive === undefined || isActive === "" ? true : isActive === true || isActive === "true",
@@ -70,9 +74,9 @@ const createDownload = async (req, res) => {
     });
   } catch (error) {
     console.error("Create download error:", error);
-    res.status(500).json({
+    res.status(error.statusCode || 500).json({
       success: false,
-      message: "Server error",
+      message: error.statusCode === 400 ? error.message : "Server error",
       error: error.message,
     });
   }
@@ -96,6 +100,9 @@ const updateDownload = async (req, res) => {
 
     const payload = { ...req.body };
     delete payload.file;
+    if (req.body.documentDate !== undefined) {
+      payload.documentDate = parseCalendarDate(req.body.documentDate, "Document date");
+    }
 
     if (req.file) {
       const uploadedFile = await uploadToLocal(req.file, "babylon-school/downloads");
@@ -115,9 +122,9 @@ const updateDownload = async (req, res) => {
     });
   } catch (error) {
     console.error("Update download error:", error);
-    res.status(500).json({
+    res.status(error.statusCode || 500).json({
       success: false,
-      message: "Server error",
+      message: error.statusCode === 400 ? error.message : "Server error",
       error: error.message,
     });
   }

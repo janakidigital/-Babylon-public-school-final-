@@ -1,6 +1,7 @@
 const { updateWithMediaCleanup, deleteWithMediaCleanup } = require("../services/mediaCleanup.service");
 const Notice = require("../models/notice.model");
 const { uploadToLocal } = require("../services/storage.service");
+const { parseCalendarDate } = require("../utils/calendarDate");
 
 // ======================================================
 // ALLOWED ATTACHMENT TYPES
@@ -115,13 +116,13 @@ const getNotice = async (req, res) => {
 
 const createNotice = async (req, res) => {
   try {
+    const publicationDate = parseCalendarDate(req.body.publishedAt, "Published date");
     const {
       title,
       slug,
       shortDescription,
       content,
       category,
-      publishedAt,
       isPublished,
       isFeatured,
       isActive,
@@ -209,7 +210,7 @@ const createNotice = async (req, res) => {
       attachmentType,
       attachmentName,
 
-      publishedAt: publishedAt || new Date(),
+      publishedAt: publicationDate || new Date(),
 
       isPublished:
         isPublished === undefined || isPublished === ""
@@ -238,6 +239,9 @@ const createNotice = async (req, res) => {
     });
   } catch (error) {
     console.error("Create notice error:", error);
+    if (error.statusCode === 400) {
+      return res.status(400).json({ success: false, message: error.message });
+    }
 
     if (error.name === "ValidationError") {
       return res.status(400).json({
@@ -305,6 +309,9 @@ const updateNotice = async (req, res) => {
     // --------------------------------------------------
 
     const payload = { ...req.body };
+    if (req.body.publishedAt !== undefined) {
+      payload.publishedAt = parseCalendarDate(req.body.publishedAt, "Published date");
+    }
 
     // --------------------------------------------------
     // BOOLEAN VALUES
@@ -388,6 +395,9 @@ const updateNotice = async (req, res) => {
     });
   } catch (error) {
     console.error("Update notice error:", error);
+    if (error.statusCode === 400) {
+      return res.status(400).json({ success: false, message: error.message });
+    }
 
     if (error.name === "CastError") {
       return res.status(400).json({

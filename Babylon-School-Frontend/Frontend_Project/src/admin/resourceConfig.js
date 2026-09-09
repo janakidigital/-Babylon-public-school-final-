@@ -17,9 +17,11 @@ export const resources = {
   news: {
     label: "News/Blog",
     endpoint: "/news",
+    dateField: "publishedAt",
     image: true,
     fields: [
       ["title", "Title"],
+      ["publishedAt", "Published date", "date"],
       ["slug", "Slug (optional)"],
       ["shortDescription", "Short description"],
       ["content", "Content", "textarea"],
@@ -31,13 +33,15 @@ export const resources = {
   events: {
     label: "Events",
     endpoint: "/events",
+    dateField: "eventDate",
+    requiredFields: ["eventDate"],
     image: true,
     fields: [
       ["title", "Event Name"],
+      ["eventDate", "Event date", "date"],
       ["slug", "Slug (optional)"],
       ["shortDescription", "Short description"],
       ["description", "Description", "textarea"],
-      ["eventDate", "Event date", "date"],
       ["startTime", "Start time"],
       ["endTime", "End time"],
       ["location", "Location"],
@@ -48,17 +52,18 @@ export const resources = {
   notices: {
     label: "Notices",
     endpoint: "/notices",
+    dateField: "publishedAt",
     file: true,
     fileField: "attachment",
     fileAccept: ".pdf,application/pdf,image/*",
     fileLabel: "Attachment (PDF / Image)",
     fields: [
       ["title", "Title"],
+      ["publishedAt", "Published date", "date"],
       ["slug", "Slug (optional)"],
       ["shortDescription", "Short description"],
       ["content", "Content", "textarea"],
       ["category", "Category"],
-      ["publishedAt", "Published date", "date"],
       ["isPublished", "Published", "checkbox"],
       ["isFeatured", "Featured", "checkbox"],
     ],
@@ -67,10 +72,12 @@ export const resources = {
   gallery: {
     label: "Gallery",
     endpoint: "/gallery",
+    dateField: "albumDate",
     image: true,
     multiple: true,
     fields: [
       ["title", "Title"],
+      ["albumDate", "Album date", "date"],
       [
         "type",
         "Type",
@@ -85,10 +92,12 @@ export const resources = {
   eca: {
     label: "ECA (Activities & Clubs)",
     endpoint: "/eca",
+    dateField: "activityDate",
     image: true,
     multiple: true,
     fields: [
       ["title", "Title / Activity Name"],
+      ["activityDate", "Activity date", "date"],
       [
         "category",
         "Category",
@@ -198,6 +207,7 @@ export const resources = {
   // In resources.downloads (or whatever the key is)
   downloads: {
     label: "Downloads",
+    dateField: "documentDate",
     endpoint: "/downloads", // adjust if different
     file: true,
     fileField: "file", // or "attachment" — match what your API expects
@@ -205,6 +215,7 @@ export const resources = {
     fileAccept: ".pdf,application/pdf",
     fields: [
       ["title", "Title", "text"],
+      ["documentDate", "Document date", "date"],
       [
         "category",
         "Category",

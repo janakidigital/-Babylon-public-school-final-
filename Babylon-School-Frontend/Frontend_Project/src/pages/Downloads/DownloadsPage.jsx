@@ -4,6 +4,7 @@ import PageBanner from "../../components/common/PageBanner";
 import EmptyState from "../../components/common/EmptyState";
 import { publicApi } from "../../services/api";
 import usePublicData from "../../hooks/usePublicData";
+import { formatCalendarDate } from "../../lib/format";
 
 const CATEGORIES = [
   "Babylon_Buds",
@@ -201,6 +202,7 @@ export default function DownloadsPage() {
                 }}
               >
                 {filtered.map((item) => {
+                  const documentDate = formatCalendarDate(item.documentDate);
                   const fileOrLink =
                     item.file ||
                     (item.description &&
@@ -263,6 +265,15 @@ export default function DownloadsPage() {
                         >
                           {item.category}
                         </span>
+                      )}
+
+                      {documentDate && (
+                        <time
+                          dateTime={String(item.documentDate).slice(0, 10)}
+                          style={{ fontSize: "13px", color: "var(--muted, #718096)" }}
+                        >
+                          {documentDate}
+                        </time>
                       )}
 
                       {/* Description */}

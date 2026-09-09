@@ -35,6 +35,7 @@ import {
 } from "lucide-react";
 import { api } from "../services/api";
 import { slugify, mediaUrl } from "../lib/media";
+import { formatCalendarDate } from "../lib/format";
 import { assetPath } from "../data/content";
 import { resources, singletons } from "./resourceConfig";
 import "./Admin.css";
@@ -128,6 +129,7 @@ function Login({ onLogin }) {
 
 function ResourceEditor({ resourceKey, onBack }) {
   const config = resources[resourceKey];
+  const dateLabel = config.fields.find(([key]) => key === config.dateField)?.[1];
 
   const [items, setItems] = useState([]);
   const [editing, setEditing] = useState(null);
@@ -424,6 +426,7 @@ function ResourceEditor({ resourceKey, onBack }) {
 
       {editing !== null && (
         <form
+          key={`${resourceKey}-${editing._id || "new"}`}
           className="admin-form"
           onSubmit={save}
         >
@@ -539,7 +542,7 @@ function ResourceEditor({ resourceKey, onBack }) {
                           ? { whiteSpace: "pre-wrap" }
                           : undefined
                       }
-                      required={[
+                      required={config.requiredFields?.includes(key) || [
                         "title",
                         "name",
                         "question",
@@ -559,7 +562,7 @@ function ResourceEditor({ resourceKey, onBack }) {
                             ).slice(0, 10)
                           : formValues[key] || ""
                       }
-                      required={[
+                      required={config.requiredFields?.includes(key) || [
                         "title",
                         "name",
                         "question",
@@ -1015,6 +1018,12 @@ function ResourceEditor({ resourceKey, onBack }) {
                             ? `${item.images.length} photos`
                             : "No description")}
                     </p>
+
+                    {config.dateField && formatCalendarDate(item[config.dateField]) && (
+                      <p>
+                        {dateLabel}: {formatCalendarDate(item[config.dateField])}
+                      </p>
+                    )}
 
                     {item.attachment && (
                       <p style={{ marginTop: 6 }}>
