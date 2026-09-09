@@ -46,6 +46,7 @@ const getEcaItems = async (req, res) => {
     }
 
     const items = await ECA.find(filter).sort({
+      activityDate: -1,
       displayOrder: 1,
       createdAt: -1,
     });

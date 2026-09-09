@@ -9,6 +9,7 @@ const { parseCalendarDate } = require("../utils/calendarDate");
 const getGalleryItems = async (req, res) => {
   try {
     const gallery = await Gallery.find({ isActive: true }).sort({
+      albumDate: -1,
       displayOrder: 1,
       createdAt: -1,
     });

@@ -13,7 +13,8 @@ const getEvents = async (req, res) => {
     const events = await Event.find({
       isActive: true,
     }).sort({
-      eventDate: 1,
+      eventDate: -1,
+      createdAt: -1,
     });
 
     res.status(200).json({

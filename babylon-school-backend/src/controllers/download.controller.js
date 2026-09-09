@@ -15,6 +15,7 @@ const getDownloads = async (req, res) => {
     const downloads = await Download.find(isAdmin ? {} : {
       isActive: true,
     }).sort({
+      documentDate: -1,
       createdAt: -1,
     });
 
