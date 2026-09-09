@@ -5,6 +5,7 @@ import { publicApi } from "../../services/api";
 import usePublicData from "../../hooks/usePublicData";
 import { mediaUrl } from "../../lib/media";
 import ContentDate from "../../components/shared/ContentDate";
+import RichText from "../../components/shared/RichText";
 
 /** Make plain URLs clickable */
 function linkify(text) {
@@ -517,7 +518,7 @@ export default function GalleryPage() {
 
                       {/* Description remains visible inside opened album */}
                       {activeAlbum?.description && (
-                        <p>{linkify(activeAlbum.description)}</p>
+                        <RichText value={activeAlbum.description} />
                       )}
                     </div>
 
@@ -671,7 +672,7 @@ export default function GalleryPage() {
                       <ContentDate value={activeAlbum?.albumDate} />
 
                       {activeAlbum?.description && (
-                        <p>{linkify(activeAlbum.description)}</p>
+                        <RichText value={activeAlbum.description} />
                       )}
                     </div>
 

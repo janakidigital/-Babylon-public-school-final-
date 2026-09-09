@@ -36,6 +36,8 @@ import {
 import { api } from "../services/api";
 import { slugify, mediaUrl } from "../lib/media";
 import { formatCalendarDate } from "../lib/format";
+import { richTextToPlainText } from "../lib/richText";
+import RichTextEditor from "./RichTextEditor";
 import { assetPath } from "../data/content";
 import { resources, singletons } from "./resourceConfig";
 import "./Admin.css";
@@ -524,6 +526,10 @@ function ResourceEditor({ resourceKey, onBack }) {
                 );
               }
 
+              if (type === "textarea" && ["description", "content"].includes(key)) {
+                return <RichTextEditor key={key} name={key} label={label} defaultValue={formValues[key] || ""} required />;
+              }
+
               return (
                 <label key={key}>
                   {label}
@@ -1007,7 +1013,7 @@ function ResourceEditor({ resourceKey, onBack }) {
                     </h3>
 
                     <p>
-                      {item.shortDescription ||
+                      {richTextToPlainText(item.shortDescription ||
                         item.description ||
                         item.designation ||
                         item.category ||
@@ -1016,7 +1022,7 @@ function ResourceEditor({ resourceKey, onBack }) {
                           ? `${item.videos.length} videos`
                           : item.images
                             ? `${item.images.length} photos`
-                            : "No description")}
+                            : "No description"))}
                     </p>
 
                     {config.dateField && formatCalendarDate(item[config.dateField]) && (
@@ -1545,17 +1551,14 @@ function SiteSettingsEditor({ onBack }) {
                   />
                 </label>
 
-                <label className="admin-field">
-                  <span className="admin-field-label">Section Description</span>
-                  <textarea
+                <RichTextEditor
+                    label="Section Description"
                     name="studentLife[description]"
-                    rows={3}
                     defaultValue={
                       studentLife.description ??
                       "Beyond the classroom, students grow through sport, arts, scouting, music, dance and service — a home away from home in Shantinagar."
                     }
                   />
-                </label>
 
                 <label className="admin-field">
                   <span className="admin-field-label">

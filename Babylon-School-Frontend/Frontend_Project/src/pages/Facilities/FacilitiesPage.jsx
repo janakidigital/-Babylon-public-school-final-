@@ -32,6 +32,8 @@ import { publicApi } from "../../services/api";
 import usePublicData from "../../hooks/usePublicData";
 import { mediaUrl } from "../../lib/media";
 import { assetPath } from "../../data/content";
+import RichText from "../../components/shared/RichText";
+import { richTextToPlainText } from "../../lib/richText";
 import "../About/SidebarsCommon.css";
 
 export default function FacilitiesPage() {
@@ -57,11 +59,12 @@ export default function FacilitiesPage() {
   const fullDescription =
     selectedFacility?.description ||
     "Thoughtfully equipped spaces that support meaningful learning and wellbeing.";
-  const isLong = fullDescription.length > DESCRIPTION_LIMIT;
+  const plainDescription = richTextToPlainText(fullDescription);
+  const isLong = plainDescription.length > DESCRIPTION_LIMIT;
   const displayDescription =
     isExpanded || !isLong
       ? fullDescription
-      : fullDescription.slice(0, DESCRIPTION_LIMIT).trim() + "...";
+      : plainDescription.slice(0, DESCRIPTION_LIMIT).trim() + "...";
 
   // Get icon based on facility type
   const getFacilityIcon = (title) => {
@@ -151,9 +154,7 @@ export default function FacilitiesPage() {
                         </div>
 
                         <div className="facility-detail-body">
-                          <p className="facility-detail-description">
-                            {displayDescription}
-                          </p>
+                          <RichText className="facility-detail-description" value={displayDescription} />
 
                           {isLong && (
                             <button
@@ -252,7 +253,7 @@ export default function FacilitiesPage() {
                       {items.map((item, index) => {
                         const Icon = getFacilityIcon(item.title);
                         const shortDesc =
-                          item.description ||
+                          richTextToPlainText(item.description) ||
                           "Thoughtfully equipped spaces that support meaningful learning and wellbeing.";
                         const truncated =
                           shortDesc.length > 100

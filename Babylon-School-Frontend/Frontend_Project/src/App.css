@@ -918,7 +918,8 @@ h2 {
   margin: 0 0 22px;
 }
 
-.life-copy > p:not(.eyebrow) {
+.life-copy > p:not(.eyebrow),
+.life-copy > .rich-text {
   max-width: 440px;
   line-height: 1.8;
   color: #cad9e7;
@@ -2855,7 +2856,8 @@ footer {
   font-family: var(--serif);
 }
 
-.gallery-album-header p {
+.gallery-album-header p,
+.gallery-album-header > .rich-text {
   color: var(--muted);
   margin: 0 0 0.5rem;
   max-width: 40rem;

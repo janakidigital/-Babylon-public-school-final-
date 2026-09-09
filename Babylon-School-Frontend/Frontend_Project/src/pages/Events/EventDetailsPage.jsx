@@ -1,6 +1,7 @@
 import { Link, useParams } from "react-router-dom";
 import PageBanner from "../../components/common/PageBanner";
 import ArticleLayout from "../../components/shared/ArticleLayout";
+import RichText from "../../components/shared/RichText";
 import EmptyState from "../../components/common/EmptyState";
 import { publicApi } from "../../services/api";
 import usePublicData from "../../hooks/usePublicData";
@@ -60,9 +61,7 @@ export default function EventDetailsPage() {
         </p>
 
         {event.shortDescription && <p style={{ fontSize: "1.1rem", fontWeight: 500, color: "#334155" }}>{event.shortDescription}</p>}
-        {(event.description || "").split("\n").map((para, index) =>
-          para.trim() ? <p key={index}>{para}</p> : null,
-        )}
+        <RichText value={event.description} />
         {(event.startTime || event.endTime) && (
           <div style={{ marginTop: "24px", padding: "16px 20px", background: "#f8fafc", borderRadius: "10px", border: "1px solid #e2e8f0" }}>
             <h3 style={{ margin: "0 0 6px 0", fontSize: "1rem", color: "#1e293b" }}>Event Timing</h3>

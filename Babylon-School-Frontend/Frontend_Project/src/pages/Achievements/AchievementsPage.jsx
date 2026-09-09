@@ -17,6 +17,8 @@ import { publicApi } from "../../services/api";
 import usePublicData from "../../hooks/usePublicData";
 import { mediaUrl } from "../../lib/media";
 import { assetPath } from "../../data/content";
+import RichText from "../../components/shared/RichText";
+import { richTextToPlainText } from "../../lib/richText";
 import "../About/SidebarsCommon.css";
 
 export default function AchievementsPage() {
@@ -109,11 +111,12 @@ export default function AchievementsPage() {
                   {items.map((item, index) => {
                     const key = item._id || index;
                     const fullText = item.description || item.category || "";
-                    const isLong = fullText.length > DESCRIPTION_LIMIT;
+                    const plainText = richTextToPlainText(fullText);
+                    const isLong = plainText.length > DESCRIPTION_LIMIT;
                     const isExpanded = !!expanded[key];
                     const displayText = isExpanded || !isLong
                       ? fullText
-                      : fullText.slice(0, DESCRIPTION_LIMIT).trim() + "...";
+                      : plainText.slice(0, DESCRIPTION_LIMIT).trim() + "...";
                     
                     const Icon = getAchievementIcon(item.title, item.category);
                     const iconColor = getAchievementColor(item.title, item.category);
@@ -162,9 +165,7 @@ export default function AchievementsPage() {
 
                           {fullText && (
                             <>
-                              <p className="achievement-card-description-bold">
-                                {displayText}
-                              </p>
+                              <RichText className="achievement-card-description-bold" value={displayText} />
 
                               {isLong && (
                                 <button

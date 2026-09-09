@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { mediaUrl } from "../../lib/media";
 import { formatDateParts, itemId } from "../../lib/format";
 import { assetPath } from "../../data/content";
+import { richTextToPlainText } from "../../lib/richText";
 
 export default function ContentCards({ items = [], type = "course" }) {
   return (
@@ -14,7 +15,7 @@ export default function ContentCards({ items = [], type = "course" }) {
           `${assetPath}${type === "event" ? "events/event_1.jpg" : type === "post" ? "blog/blog_1.jpg" : "courses/courses_1.jpg"}`,
         );
         const title = item.title;
-        const text = item.shortDescription || item.description || item.content || "";
+        const text = richTextToPlainText(item.shortDescription || item.description || item.content || "");
         const href =
           type === "course"
             ? `/course-details/${id}`

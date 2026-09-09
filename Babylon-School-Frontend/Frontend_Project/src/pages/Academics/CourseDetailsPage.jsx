@@ -1,6 +1,7 @@
 import { Link, useParams } from "react-router-dom";
 import PageBanner from "../../components/common/PageBanner";
 import ArticleLayout from "../../components/shared/ArticleLayout";
+import RichText from "../../components/shared/RichText";
 import EmptyState from "../../components/common/EmptyState";
 import { publicApi } from "../../services/api";
 import usePublicData from "../../hooks/usePublicData";
@@ -55,9 +56,7 @@ export default function CourseDetailsPage() {
         title={program.title}
       >
         {program.shortDescription && <p>{program.shortDescription}</p>}
-        {(program.description || "").split("\n").map((para, index) =>
-          para.trim() ? <p key={index}>{para}</p> : null,
-        )}
+        <RichText value={program.description} />
         {program.duration && (
           <>
             <h3>Duration</h3>

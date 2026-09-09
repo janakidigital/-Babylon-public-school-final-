@@ -13,6 +13,7 @@ import { publicApi } from "../../services/api";
 import { mediaUrl } from "../../lib/media";
 import usePublicData from "../../hooks/usePublicData";
 import { assetPath } from "../../data/content";
+import { richTextToPlainText } from "../../lib/richText";
 import EmptyState from "../common/EmptyState";
 
 export default function ProgramsSection() {
@@ -45,7 +46,7 @@ export default function ProgramsSection() {
 
   const items = preview.map((program, index) => ({
     ...program,
-    text: program.shortDescription || program.description || "",
+    text: richTextToPlainText(program.shortDescription || program.description || ""),
     image: mediaUrl(
       program.image,
       `${assetPath}courses/courses_${(index % 3) + 1}.jpg`

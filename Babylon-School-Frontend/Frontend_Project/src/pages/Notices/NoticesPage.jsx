@@ -2,6 +2,8 @@ import { useState, useMemo } from "react";
 import { Link, useParams } from "react-router-dom";
 import PageBanner from "../../components/common/PageBanner";
 import ArticleLayout from "../../components/shared/ArticleLayout";
+import RichText from "../../components/shared/RichText";
+import { richTextToPlainText } from "../../lib/richText";
 import NoticesSidebar from "../../components/shared/NoticesSidebar";
 import EmptyState from "../../components/common/EmptyState";
 import { publicApi } from "../../services/api";
@@ -46,7 +48,7 @@ function NoticesListAll() {
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
         const matchesTitle = (notice.title || "").toLowerCase().includes(q);
-        const matchesDesc = (notice.shortDescription || notice.content || "")
+        const matchesDesc = richTextToPlainText(notice.shortDescription || notice.content || "")
           .toLowerCase()
           .includes(q);
         if (!matchesTitle && !matchesDesc) return false;
@@ -469,11 +471,7 @@ export default function NoticesPage() {
               {notice.shortDescription && <p>{notice.shortDescription}</p>}
 
               {/* Main content */}
-              {(notice.content || "")
-                .split("\n")
-                .map((para, index) =>
-                  para.trim() ? <p key={index}>{para}</p> : null,
-                )}
+              <RichText value={notice.content} />
 
               {/* ========== ATTACHMENT ========== */}
               {attachment && (

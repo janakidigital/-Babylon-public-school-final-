@@ -1,6 +1,7 @@
 import { Link, useParams } from "react-router-dom";
 import PageBanner from "../../components/common/PageBanner";
 import ArticleLayout from "../../components/shared/ArticleLayout";
+import RichText from "../../components/shared/RichText";
 import EmptyState from "../../components/common/EmptyState";
 import { publicApi } from "../../services/api";
 import usePublicData from "../../hooks/usePublicData";
@@ -53,9 +54,7 @@ export default function BlogDetailsPage() {
         title={post.title}
       >
         {post.shortDescription && <p>{post.shortDescription}</p>}
-        {(post.content || "").split("\n").map((para, index) =>
-          para.trim() ? <p key={index}>{para}</p> : null,
-        )}
+        <RichText value={post.content} />
       </ArticleLayout>
     </>
   );

@@ -1,0 +1,13 @@
+.admin-rich-field { grid-column: 1 / -1; min-width: 0; position: relative; }
+.admin-rich-label { display: block; font-weight: 600; font-size: 14px; margin-bottom: 8px; color: var(--admin-ink, #0f172a); }
+.admin-rich-editor { background: #fff; border-radius: 8px; }
+.admin-rich-editor .ql-toolbar.ql-snow { border-color: #cbd5e1; border-radius: 8px 8px 0 0; background: #f8fafc; }
+.admin-rich-editor .ql-container.ql-snow { border-color: #cbd5e1; border-radius: 0 0 8px 8px; }
+.admin-rich-editor .ql-editor { min-height: 200px; max-height: 500px; overflow-y: auto; font-family: var(--admin-sans, sans-serif); font-size: 15px; line-height: 1.7; font-weight: 400; color: #1e293b; }
+.admin-rich-editor .ql-editor h2 { font-size: 1.5em; }
+.admin-rich-editor .ql-editor h3 { font-size: 1.25em; }
+.admin-rich-editor .ql-editor h4 { font-size: 1.1em; }
+.admin-rich-editor:focus-within { box-shadow: 0 0 0 2px #bfdbfe; }
+.admin-rich-history { display: flex; gap: 8px; margin-top: 8px; }
+.admin-rich-history button { border: 1px solid #cbd5e1; border-radius: 5px; padding: 4px 10px; background: #f8fafc; color: #334155; cursor: pointer; font: inherit; font-size: 13px; }
+.admin-rich-field textarea.admin-rich-value { position: absolute; width: 1px; height: 1px; min-height: 0; padding: 0; border: 0; opacity: 0; pointer-events: none; bottom: 0; }

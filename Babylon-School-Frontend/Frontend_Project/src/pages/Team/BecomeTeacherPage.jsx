@@ -1,5 +1,6 @@
 import { useState } from "react";
 import PageBanner from "../../components/common/PageBanner";
+import RichText from "../../components/shared/RichText";
 import AdmissionsSidebar from "../../components/shared/AdmissionsSidebar"; // adjust path if needed
 import { publicApi } from "../../services/api";
 import usePublicData from "../../hooks/usePublicData";
@@ -132,14 +133,7 @@ export default function BecomeTeacherPage() {
                         </span>
                       </div>
 
-                      <div className="job-description">
-                        {(v.description || "")
-                          .split("\n")
-                          .filter((para) => para.trim() !== "")
-                          .map((para, index) => (
-                            <p key={index}>{para}</p>
-                          ))}
-                      </div>
+                      <RichText className="job-description" value={v.description} />
 
                       {v.closingDate && (
                         <p

@@ -16,6 +16,7 @@ import { publicApi } from "../../services/api";
 import usePublicData from "../../hooks/usePublicData";
 import { mediaUrl } from "../../lib/media";
 import { assetPath } from "../../data/content";
+import { richTextToPlainText } from "../../lib/richText";
 
 export default function BlogPage() {
   const { data, loading } = usePublicData(publicApi.news, []);
@@ -38,6 +39,7 @@ export default function BlogPage() {
 
   // Get reading time
   const getReadingTime = (text) => {
+    text = richTextToPlainText(text);
     if (!text) return "2 min read";
     const wordsPerMinute = 200;
     const words = text.split(/\s/g).length;
@@ -47,6 +49,7 @@ export default function BlogPage() {
 
   // Truncate text
   const truncateText = (text, limit = 120) => {
+    text = richTextToPlainText(text);
     if (!text) return "";
     return text.length > limit ? text.slice(0, limit).trim() + "..." : text;
   };

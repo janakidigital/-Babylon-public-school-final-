@@ -1,10 +1,12 @@
-import React, { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import PageBanner from "../../components/common/PageBanner";
 import EmptyState from "../../components/common/EmptyState";
 import { publicApi } from "../../services/api";
 import usePublicData from "../../hooks/usePublicData";
 import { formatCalendarDate } from "../../lib/format";
+import RichText from "../../components/shared/RichText";
+import { firstContentLink } from "../../lib/richText";
 
 const CATEGORIES = [
   "Babylon_Buds",
@@ -14,33 +16,6 @@ const CATEGORIES = [
   "Administrative",
   "Others",
 ];
-
-/** Turn plain URLs in text into clickable <a> tags */
-function linkify(text) {
-  if (!text) return null;
-  const urlRegex = /(https?:\/\/[^\s]+)/g;
-  const parts = String(text).split(urlRegex);
-  return parts.map((part, i) =>
-    urlRegex.test(part) ? (
-      <a
-        key={i}
-        href={part}
-        target="_blank"
-        rel="noopener noreferrer"
-        style={{
-          color: "var(--red)",
-          textDecoration: "underline",
-          wordBreak: "break-all",
-          overflowWrap: "anywhere",
-        }}
-      >
-        {part}
-      </a>
-    ) : (
-      <React.Fragment key={i}>{part}</React.Fragment>
-    )
-  );
-}
 
 export default function DownloadsPage() {
   const { data: downloads, loading, error } = usePublicData(
@@ -205,9 +180,7 @@ export default function DownloadsPage() {
                   const documentDate = formatCalendarDate(item.documentDate);
                   const fileOrLink =
                     item.file ||
-                    (item.description &&
-                      (item.description.match(/https?:\/\/[^\s]+/) ||
-                        [])[0]) ||
+                    firstContentLink(item.description) ||
                     null;
 
                   return (
@@ -278,7 +251,8 @@ export default function DownloadsPage() {
 
                       {/* Description */}
                       {item.description && (
-                        <p
+                        <RichText
+                          value={item.description}
                           style={{
                             margin: 0,
                             fontSize: "14px",
@@ -288,9 +262,7 @@ export default function DownloadsPage() {
                             wordBreak: "break-word",
                             overflowWrap: "anywhere",
                           }}
-                        >
-                          {linkify(item.description)}
-                        </p>
+                        />
                       )}
 
                       {/* View button */}

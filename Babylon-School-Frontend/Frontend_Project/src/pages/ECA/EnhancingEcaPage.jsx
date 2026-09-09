@@ -5,6 +5,7 @@ import usePublicData from "../../hooks/usePublicData";
 import { publicApi } from "../../services/api";
 import { mediaUrl } from "../../lib/media";
 import ContentDate from "../../components/shared/ContentDate";
+import RichText from "../../components/shared/RichText";
 import { ZoomIn, X, ImageOff } from "lucide-react";
 import "../About/SidebarsCommon.css";
 import "../About/PartnersPage.css";
@@ -78,7 +79,7 @@ export default function EnhancingEcaPage() {
 
                     {/* Description */}
                     {item.description && (
-                      <div className="eca-entry-desc">{item.description}</div>
+                      <RichText className="eca-entry-desc" value={item.description} />
                     )}
 
                     {/* Image Gallery */}

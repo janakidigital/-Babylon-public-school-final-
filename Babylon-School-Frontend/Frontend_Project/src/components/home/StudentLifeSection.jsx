@@ -1,6 +1,7 @@
 import { assetPath } from "../../data/content";
 import { useSite } from "../../context/SiteContext";
 import { mediaUrl } from "../../lib/media";
+import RichText from "../shared/RichText";
 
 export default function StudentLifeSection() {
   const { settings, home } = useSite();
@@ -81,7 +82,7 @@ export default function StudentLifeSection() {
                 title
               )}
             </h2>
-            <p>{description}</p>
+            <RichText value={description} />
           </div>
 
           <div className="life-photo">
