@@ -526,7 +526,10 @@ function ResourceEditor({ resourceKey, onBack }) {
                 );
               }
 
-              if (type === "textarea" && ["description", "content"].includes(key)) {
+              if (type === "textarea" && (
+                ["description", "content"].includes(key) ||
+                (resourceKey === "testimonials" && key === "message")
+              )) {
                 return <RichTextEditor key={key} name={key} label={label} defaultValue={formValues[key] || ""} required />;
               }
 

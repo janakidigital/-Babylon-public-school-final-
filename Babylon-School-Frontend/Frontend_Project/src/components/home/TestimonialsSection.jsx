@@ -1,16 +1,23 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useId } from "react";
 import { publicApi } from "../../services/api";
 import { mediaUrl } from "../../lib/media";
 import usePublicData from "../../hooks/usePublicData";
 import EmptyState from "../common/EmptyState";
+import RichText from "../shared/RichText";
+import { richTextToPlainText } from "../../lib/richText";
+
+const PREVIEW_LENGTH = 280;
 
 export default function TestimonialsSection() {
   const { data, loading } = usePublicData(publicApi.testimonials, []);
   const [current, setCurrent] = useState(0);
+  const [expanded, setExpanded] = useState(false);
+  const messageId = useId();
 
   // Reset to first slide when data changes
   useEffect(() => {
     setCurrent(0);
+    setExpanded(false);
   }, [data]);
 
   const total = data.length;
@@ -19,6 +26,7 @@ export default function TestimonialsSection() {
     (index) => {
       if (total === 0) return;
       setCurrent((index + total) % total);
+      setExpanded(false);
     },
     [total],
   );
@@ -26,12 +34,19 @@ export default function TestimonialsSection() {
   const prev = () => goTo(current - 1);
   const next = useCallback(() => goTo(current + 1), [current, goTo]);
 
-  // Auto-scroll every 4 seconds
+  // Pause auto-scroll while the full testimonial is being read.
   useEffect(() => {
-    if (total <= 1) return;
+    if (total <= 1 || expanded) return;
     const timer = setInterval(next, 4000);
     return () => clearInterval(timer);
-  }, [next, total]);
+  }, [next, total, expanded]);
+
+  const testimonial = data[current] || data[0];
+  const plainMessage = richTextToPlainText(testimonial?.message).replace(/\s+/g, " ").trim();
+  const isLong = plainMessage.length > PREVIEW_LENGTH;
+  const preview = isLong
+    ? `${plainMessage.slice(0, PREVIEW_LENGTH).replace(/\s+\S*$/, "").trimEnd()}…`
+    : plainMessage;
 
   return (
     <section className="testimonials shell">
@@ -54,18 +69,31 @@ export default function TestimonialsSection() {
               </div>
 
               <h3 className="testimonial-question">
-                {data[current].question }
+                {testimonial.question}
               </h3>
 
-              <p className="testimonial-message">
-                {data[current].message}
-              </p>
+              <RichText
+                id={messageId}
+                className="testimonial-message"
+                value={isLong && !expanded ? preview : testimonial.message}
+              />
+              {isLong && (
+                <button
+                  type="button"
+                  className="testimonial-toggle"
+                  aria-expanded={expanded}
+                  aria-controls={messageId}
+                  onClick={() => setExpanded(value => !value)}
+                >
+                  {expanded ? "See less" : "See more"}
+                </button>
+              )}
 
               <div className="testimonial-meta">
-                <span className="testimonial-name">{data[current].name}</span>
-                {data[current].designation && (
+                <span className="testimonial-name">{testimonial.name}</span>
+                {testimonial.designation && (
                   <span className="testimonial-role">
-                    {data[current].designation}
+                    {testimonial.designation}
                   </span>
                 )}
               </div>
@@ -79,11 +107,11 @@ export default function TestimonialsSection() {
               {/* Image is always rendered */}
               <img
                 src={
-                  data[current].image
-                    ? mediaUrl(data[current].image)
+                  testimonial.image
+                    ? mediaUrl(testimonial.image)
                     : "/images/default-avatar.png"
                 }
-                alt={data[current].name || "Parent"}
+                alt={testimonial.name || "Parent"}
                 className="testimonial-avatar-large"
                 onError={(e) => {
                   e.currentTarget.src = "/images/default-avatar.png";

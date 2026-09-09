@@ -4918,6 +4918,7 @@ article:has(.notice-title-link) {
 /* Left Content */
 .testimonial-content {
   flex: 1;
+  min-width: 0;
   position: relative;
 }
 
@@ -4945,8 +4946,32 @@ article:has(.notice-title-link) {
   font-size: 15px;
   color: #555;
   line-height: 1.8;
-  margin: 0 0 25px 0;
+  margin: 0 0 16px;
   white-space: pre-line;
+}
+
+.testimonial-message:not(.rich-text-plain) {
+  white-space: normal;
+}
+
+.testimonial-toggle {
+  display: block;
+  padding: 0;
+  margin: 0 0 25px;
+  border: 0;
+  background: transparent;
+  color: var(--red, #c53030);
+  font: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.testimonial-toggle:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 4px;
+  border-radius: 2px;
 }
 
 .testimonial-message br {
