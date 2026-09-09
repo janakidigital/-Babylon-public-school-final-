@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import principalImg from "../../assets/principal.png";
-import chairmanImg from "../../assets/chairperson.png";
+import chairmanImg from "../../assets/image.png";
 
 const MESSAGES = [
   {
