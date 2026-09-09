@@ -19,7 +19,7 @@ const MESSAGES = [
     quote: `"Education is the most powerful weapon which you can use to change the world." – Nelson Mandela`,
     content:
       "At Babylon School, we believe that quality education is the foundation of a better future. Our commitment is to nurture young minds with knowledge, character, and compassion so they can become responsible global citizens.",
-    name: "Mr. Chairman",
+    name: "Tej Bahadhur Rai",
     designation: "Chairman",
     image: chairmanImg,
   },
