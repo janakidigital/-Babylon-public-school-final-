@@ -1604,6 +1604,15 @@ footer {
   margin: 0 0 16px;
 }
 
+.content-cards.event h3,
+.content-cards.event article > div:last-child > p:not(.eyebrow) {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+
 .event-date-card {
   position: absolute;
   top: 0;
@@ -6879,4 +6888,3 @@ article:has(.notice-title-link) {
   line-height: 1.7;
   white-space: pre-line;
 }
-
