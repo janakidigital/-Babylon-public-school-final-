@@ -6071,21 +6071,25 @@ article:has(.notice-title-link) {
   width: 100%;
   height: 220px;
   overflow: hidden;
-  background: #f0f0f0;
+  background: #f3f3f3;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .blog-card-image img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  object-position: center 30%; /* keeps upper/important area more visible */
+  object-fit: contain;
+  object-position: center;
   display: block;
   transition: transform 0.5s ease;
 }
 
 .blog-card-home:hover .blog-card-image img,
 .blog-card-modern:hover .blog-card-image img {
-  transform: scale(1.05);
+  transform: scale(1.03);
 }
 
 .blog-card-badge {
