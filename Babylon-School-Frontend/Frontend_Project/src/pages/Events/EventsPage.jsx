@@ -25,7 +25,7 @@ export default function EventsPage() {
             <section className="listing-page">
               <div className="center-heading">
                 <p className="eyebrow">WHAT'S HAPPENING</p>
-                <h2>Upcoming events</h2>
+                <h2>All Events</h2>
               </div>
 
               {loading ? (

@@ -104,7 +104,7 @@ export default function AboutPossibilities() {
         </div>
 
         {/* Quick Stats Bar */}
-        <div className="about-stats-bar">
+        {/* <div className="about-stats-bar">
           <div className="about-stat-item">
             <span className="about-stat-number">{yearsLegacy}+</span>
             <span className="about-stat-label">Years of Excellence</span>
@@ -121,7 +121,7 @@ export default function AboutPossibilities() {
             <span className="about-stat-number">100%</span>
             <span className="about-stat-label">Board Pass Rate</span>
           </div>
-        </div>
+        </div> */}
       </section>
 
       {/* 2. Vision & Mission Cards */}
@@ -160,10 +160,10 @@ export default function AboutPossibilities() {
         </div>
 
         {/* Motto Callout Banner */}
-        <div className="about-motto-banner">
+        {/* <div className="about-motto-banner">
           <span className="motto-tag">OUR GUIDING DICTUM</span>
           <span className="motto-quote">“Knowledge, Wisdom and Education Par Excellence”</span>
-        </div>
+        </div> */}
       </section>
 
       {/* 3. Thematic Goals Grid */}
