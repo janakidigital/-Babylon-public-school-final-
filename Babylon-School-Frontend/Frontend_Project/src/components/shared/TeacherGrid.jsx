@@ -35,7 +35,7 @@ export default function TeacherGrid({ teachers = [], onSelect }) {
             <h3
               style={{
                 fontFamily: "var(--serif)",
-                fontSize: "22px",
+                fontSize: "18px",
                 lineHeight: 1.2,
                 fontWeight: 600,
                 color: "var(--blue)",
