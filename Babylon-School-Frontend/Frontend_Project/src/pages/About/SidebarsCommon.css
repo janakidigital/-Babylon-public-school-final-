@@ -25,7 +25,55 @@
   display: flex;
   flex-direction: column;
   gap: 40px;
+  min-width: 0;
+  width: 100%;
 }
+
+.about-main-content p,
+.notices-main-content p {
+  text-align: justify;
+  text-justify: inter-word;
+  hyphens: auto;
+  -webkit-hyphens: auto;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+.about-main-content .center-heading p,
+.about-main-content .eyebrow,
+.about-main-content .text-link,
+.about-main-content p:has(.text-link),
+.about-main-content h1,
+.about-main-content h2,
+.about-main-content h3,
+.about-main-content .about-stat-label,
+.notices-main-content .center-heading p,
+.notices-main-content .eyebrow,
+.notices-main-content .text-link,
+.notices-main-content p:has(.text-link),
+.notices-main-content h1,
+.notices-main-content h2,
+.notices-main-content h3 {
+  text-align: left;
+}
+
+/* Ensure notice detail view uses full main-content width cleanly on all devices without double sidebar */
+.notices-main-content .article-layout {
+  padding: 0;
+  width: 100%;
+  max-width: 100%;
+  display: block;
+}
+
+.notices-main-content .article-layout article {
+  width: 100%;
+  max-width: 100%;
+}
+
+.notices-main-content .article-layout aside {
+  display: none;
+}
+
 
 /* About, Admissions & Notices Sidebar */
 .about-sidebar,

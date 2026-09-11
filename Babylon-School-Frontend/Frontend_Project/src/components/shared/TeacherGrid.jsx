@@ -32,8 +32,28 @@ export default function TeacherGrid({ teachers = [], onSelect }) {
             style={{ borderRadius: "10px" }}
           />
           <div>
-            <h3>{teacher.name}</h3>
-            <p>{teacher.designation || teacher.department}</p>
+            <h3
+              style={{
+                fontFamily: "var(--serif)",
+                fontSize: "22px",
+                lineHeight: 1.2,
+                fontWeight: 600,
+                color: "var(--blue)",
+                margin: "0 0 4px",
+              }}
+            >
+              {teacher.name}
+            </h3>
+            <p
+              style={{
+                fontSize: "11px",
+                fontWeight: 700,
+                color: "var(--red)",
+                margin: 0,
+              }}
+            >
+              {teacher.designation || teacher.department}
+            </p>
             {teacher.qualification && (
               <small
                 style={{

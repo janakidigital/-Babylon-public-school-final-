@@ -206,17 +206,29 @@ export default function AboutSection() {
 
         .home-about-lead {
           font-size: 1.08rem;
-          line-height: 1.65;
+          line-height: 1.7;
           color: #2c3e50;
           font-weight: 500;
           margin-bottom: 0.75rem;
+          text-align: justify;
+          text-justify: inter-word;
+          hyphens: auto;
+          -webkit-hyphens: auto;
+          word-break: break-word;
+          overflow-wrap: break-word;
         }
 
         .home-about-desc {
           font-size: 0.96rem;
-          line-height: 1.65;
+          line-height: 1.7;
           color: var(--muted, #596780);
           margin-bottom: 1.75rem;
+          text-align: justify;
+          text-justify: inter-word;
+          hyphens: auto;
+          -webkit-hyphens: auto;
+          word-break: break-word;
+          overflow-wrap: break-word;
         }
 
         /* Pillars Grid */
@@ -267,6 +279,12 @@ export default function AboutSection() {
           line-height: 1.45;
           color: #64748b;
           margin: 0;
+          text-align: justify;
+          text-justify: inter-word;
+          hyphens: auto;
+          -webkit-hyphens: auto;
+          word-break: break-word;
+          overflow-wrap: break-word;
         }
 
         /* Button */

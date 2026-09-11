@@ -1,4 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
+import "../../pages/About/SidebarsCommon.css";
 
 export default function NoticesSidebar({ currentPage = "notices" }) {
   const location = useLocation();

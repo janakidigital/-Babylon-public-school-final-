@@ -10,6 +10,7 @@ import { publicApi } from "../../services/api";
 import usePublicData from "../../hooks/usePublicData";
 import { formatDateParts } from "../../lib/format";
 import { mediaUrl } from "../../lib/media";
+import "../About/SidebarsCommon.css";
 
 function formatFullDate(value) {
   if (!value) return "";
@@ -295,7 +296,13 @@ function NoticesListAll() {
                                   margin: 0,
                                   fontSize: "0.9rem",
                                   color: "#475569",
-                                  lineHeight: 1.5,
+                                  lineHeight: 1.6,
+                                  textAlign: "justify",
+                                  textJustify: "inter-word",
+                                  hyphens: "auto",
+                                  WebkitHyphens: "auto",
+                                  wordBreak: "break-word",
+                                  overflowWrap: "break-word",
                                 }}
                               >
                                 {notice.shortDescription}
@@ -468,7 +475,24 @@ export default function NoticesPage() {
               </p>
 
               {/* Short description */}
-              {notice.shortDescription && <p>{notice.shortDescription}</p>}
+              {notice.shortDescription && (
+                <p
+                  style={{
+                    fontSize: "1.05rem",
+                    lineHeight: 1.8,
+                    color: "#334155",
+                    textAlign: "justify",
+                    textJustify: "inter-word",
+                    hyphens: "auto",
+                    WebkitHyphens: "auto",
+                    wordBreak: "break-word",
+                    overflowWrap: "break-word",
+                    marginBottom: "20px",
+                  }}
+                >
+                  {notice.shortDescription}
+                </p>
+              )}
 
               {/* Main content */}
               <RichText value={notice.content} />

@@ -10,6 +10,7 @@ import { firstContentLink } from "../../lib/richText";
 
 const CATEGORIES = [
   "Babylon_Buds",
+  "Hanging Garden",
   "Parents Portal",
   "Calendar",
   "Syllabus",
@@ -115,7 +116,7 @@ export default function DownloadsPage() {
               {["All", ...CATEGORIES].map((cat) => {
                 const isActive = activeCategory === cat;
                 const count = counts[cat] ?? 0;
-                if (cat !== "All" && count === 0) return null;
+                if (cat !== "All" && count === 0 && !isActive && cat !== "Hanging Garden") return null;
 
                 return (
                   <button
@@ -142,7 +143,7 @@ export default function DownloadsPage() {
                       transition: "all 0.15s ease",
                     }}
                   >
-                    {cat}
+                    {cat === "Babylon_Buds" ? "Babylon Buds" : cat}
                     <span
                       style={{
                         background: isActive

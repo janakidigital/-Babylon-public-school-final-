@@ -226,6 +226,7 @@ export const resources = {
         "select",
         [
           "Babylon_Buds",
+          "Hanging Garden",
           "Parents Portal",
           "Calendar",
           "Syllabus",

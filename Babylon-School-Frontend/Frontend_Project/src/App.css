@@ -1665,6 +1665,29 @@ footer {
   color: var(--muted);
   line-height: 1.85;
   font-size: 16px;
+  text-align: justify;
+  text-justify: inter-word;
+  hyphens: auto;
+  -webkit-hyphens: auto;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+.article-copy p {
+  text-align: justify;
+  text-justify: inter-word;
+  hyphens: auto;
+  -webkit-hyphens: auto;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+.article-copy h2,
+.article-copy h3,
+.article-copy h4,
+.article-copy .text-link,
+.article-copy p:has(.text-link) {
+  text-align: left;
 }
 
 .article-copy h3 {
@@ -1730,15 +1753,15 @@ footer {
 
 .teacher-grid h3 {
   color: var(--blue);
-  font: 600 24px var(--serif);
-  margin: 0 0 6px;
+  font: 600 22px/1.2 var(--serif);
+  margin: 0 0 4px;
 }
 
 .teacher-grid p {
   margin: 0;
   color: var(--red);
   font-weight: 700;
-  font-size: 13px;
+  font-size: 11px;
 }
 
 /* =========================================

@@ -236,9 +236,15 @@ export default function TeacherModal({ teacher, onClose }) {
                 style={{
                   margin: 0,
                   fontSize: "0.95rem",
-                  lineHeight: 1.65,
+                  lineHeight: 1.7,
                   color: "#475569",
                   whiteSpace: "pre-line",
+                  textAlign: "justify",
+                  textJustify: "inter-word",
+                  hyphens: "auto",
+                  WebkitHyphens: "auto",
+                  wordBreak: "break-word",
+                  overflowWrap: "break-word",
                 }}
               >
                 {teacher.bio}

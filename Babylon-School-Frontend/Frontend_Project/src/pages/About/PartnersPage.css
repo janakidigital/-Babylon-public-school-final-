@@ -100,6 +100,12 @@
   line-height: 1.7;
   margin: 0;
   max-width: 700px;
+  text-align: justify;
+  text-justify: inter-word;
+  hyphens: auto;
+  -webkit-hyphens: auto;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 /* Partners List */
@@ -153,6 +159,12 @@
   color: #475569;
   line-height: 1.7;
   margin: 0;
+  text-align: justify;
+  text-justify: inter-word;
+  hyphens: auto;
+  -webkit-hyphens: auto;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 /* Mobile Responsive */
