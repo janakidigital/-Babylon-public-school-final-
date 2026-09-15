@@ -39,6 +39,7 @@ import { formatCalendarDate } from "../lib/format";
 import { richTextToPlainText } from "../lib/richText";
 import { getPostType, getPostTypeLabel } from "../lib/postType";
 import RichTextEditor from "./RichTextEditor";
+import InboxExportButton from "./InboxExportButton";
 import { assetPath } from "../data/content";
 import { resources, singletons } from "./resourceConfig";
 import "./Admin.css";
@@ -2056,13 +2057,14 @@ function ContactsInbox({ onBack }) {
   return (
     <section className="admin-resource">
       <div className="admin-resource-head">
-        <button type="button" className="admin-back" onClick={onBack}>
-          ← Dashboard
-        </button>
         <div>
+          <button type="button" className="admin-back" onClick={onBack}>
+            ← Dashboard
+          </button>
           <p className="eyebrow">INBOX</p>
           <h2>Contact Messages</h2>
         </div>
+        <InboxExportButton kind="contacts" loading={loading} />
       </div>
 
       {message && <p className="admin-message">{message}</p>}
@@ -2224,13 +2226,14 @@ function CareerAppsInbox({ onBack }) {
   return (
     <section className="admin-resource">
       <div className="admin-resource-head">
-        <button type="button" className="admin-back" onClick={onBack}>
-          ← Dashboard
-        </button>
         <div>
+          <button type="button" className="admin-back" onClick={onBack}>
+            ← Dashboard
+          </button>
           <p className="eyebrow">INBOX</p>
           <h2>Career Applications</h2>
         </div>
+        <InboxExportButton kind="career-applications" loading={loading} />
       </div>
 
       {message && <p className="admin-message">{message}</p>}
@@ -2540,13 +2543,14 @@ function AdmissionsInbox({ onBack }) {
   return (
     <section className="admin-resource">
       <div className="admin-resource-head">
-        <button type="button" className="admin-back" onClick={onBack}>
-          ← Dashboard
-        </button>
         <div>
+          <button type="button" className="admin-back" onClick={onBack}>
+            ← Dashboard
+          </button>
           <p className="eyebrow">INBOX</p>
           <h2>Admission Applications</h2>
         </div>
+        <InboxExportButton kind="admissions" loading={loading} />
       </div>
 
       {message && <p className="admin-message">{message}</p>}
