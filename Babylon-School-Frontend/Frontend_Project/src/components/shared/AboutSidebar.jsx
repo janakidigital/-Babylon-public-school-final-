@@ -40,7 +40,7 @@ export default function AboutSidebar({ currentPage = "about" }) {
           to="/team"
           className={`sidebar-link ${activePage === "team" ? "active" : ""}`}
         >
-          Members
+          TEAMS
         </Link>
         <Link
           to="/achievements"

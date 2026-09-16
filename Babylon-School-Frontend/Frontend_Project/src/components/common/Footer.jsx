@@ -57,7 +57,7 @@ export default function Footer() {
             <Link to="/notices">Notices</Link>
             <Link to="/blog">News &amp; Blog</Link>
             <Link to="/events">Events</Link>
-            <Link to="/team">Our Members</Link>
+            <Link to="/team">Our Teams</Link>
             <Link to="/become-a-teacher">Careers</Link>
             <Link to="/achievements">Achievements</Link>
             <Link to="/faq">FAQ</Link>

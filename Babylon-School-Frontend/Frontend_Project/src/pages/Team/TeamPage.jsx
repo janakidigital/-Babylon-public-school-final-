@@ -8,6 +8,10 @@ import usePublicData from "../../hooks/usePublicData";
 import { publicApi } from "../../services/api";
 import "../About/SidebarsCommon.css";
 
+const DEFAULT_CATEGORY = "BOARD OF DIRECTORS";
+const isChairman = (teacher) =>
+  String(teacher.designation || "").trim().toLowerCase() === "chairman";
+
 const TEAM_CATEGORIES = [
   "ALL",
   "BOARD OF DIRECTORS",
@@ -54,7 +58,7 @@ const ALPHABETS = [
 export default function TeamPage() {
   const { data: teachers, loading } = usePublicData(publicApi.faculty, []);
 
-  const [selectedCategory, setSelectedCategory] = useState("ALL");
+  const [selectedCategory, setSelectedCategory] = useState(DEFAULT_CATEGORY);
   const [selectedLetter, setSelectedLetter] = useState("ALL");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTeacher, setSelectedTeacher] = useState(null);
@@ -69,7 +73,7 @@ export default function TeamPage() {
     return letters;
   }, [teachers]);
 
-  // Keep every category and filtered view in alphabetical name order.
+  // Put the Chairman first on the board; keep the remaining profiles A–Z.
   const filteredTeachers = useMemo(() => {
     return (teachers || []).filter((teacher) => {
       // 1. Category Filter
@@ -105,17 +109,21 @@ export default function TeamPage() {
       }
 
       return true;
-    }).sort((a, b) =>
-      (a.name || "").trim().localeCompare((b.name || "").trim(), "en", {
+    }).sort((a, b) => {
+      if (selectedCategory === DEFAULT_CATEGORY) {
+        const chairmanOrder = Number(isChairman(b)) - Number(isChairman(a));
+        if (chairmanOrder) return chairmanOrder;
+      }
+      return (a.name || "").trim().localeCompare((b.name || "").trim(), "en", {
         sensitivity: "base",
-      }),
-    );
+      });
+    });
   }, [teachers, selectedCategory, selectedLetter, searchQuery]);
 
   return (
     <>
       <PageBanner
-        eyebrow="OUR MEMBERS"
+        eyebrow="OUR TEAMS"
         title="Meet the people behind Babylon."
         image="banner/inner_banner_2.jpg"
         pageKey="team"
@@ -127,7 +135,7 @@ export default function TeamPage() {
           <div className="about-main-content">
             <section className="listing-page team-page-section">
               <div className="center-heading">
-                <p className="eyebrow">OUR MEMBERS</p>
+                <p className="eyebrow">OUR TEAMS</p>
                 <h2>Guiding every learner forward.</h2>
               </div>
 
@@ -148,7 +156,11 @@ export default function TeamPage() {
                     <button
                       key={cat}
                       type="button"
-                      onClick={() => setSelectedCategory(cat)}
+                      onClick={() => {
+                        setSelectedCategory(cat);
+                        setSelectedLetter("ALL");
+                      }}
+                      aria-pressed={isActive}
                       style={{
                         background: isActive ? "#1a365d" : "#ffffff",
                         color: isActive ? "#ffffff" : "#2d3748",
@@ -277,7 +289,7 @@ export default function TeamPage() {
                       <button
                         type="button"
                         onClick={() => {
-                          setSelectedCategory("ALL");
+                          setSelectedCategory(DEFAULT_CATEGORY);
                           setSelectedLetter("ALL");
                           setSearchQuery("");
                         }}

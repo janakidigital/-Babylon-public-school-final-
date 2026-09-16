@@ -15,7 +15,7 @@ export default function AboutFaculty() {
   return (
     <section className="about-faculty shell">
       <div className="center-heading">
-        <p className="eyebrow">OUR MEMBERS</p>
+        <p className="eyebrow">OUR TEAMS</p>
         <h2>Meet our educators</h2>
         <p>
           Passionate mentors who guide students with knowledge, care and

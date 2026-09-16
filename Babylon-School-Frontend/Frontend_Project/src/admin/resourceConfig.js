@@ -117,7 +117,7 @@ export const resources = {
   },
 
   faculty: {
-    label: "Our Members",
+    label: "Our Team",
     endpoint: "/faculty",
     image: true,
     fields: [

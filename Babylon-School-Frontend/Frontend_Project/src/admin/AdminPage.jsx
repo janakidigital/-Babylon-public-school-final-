@@ -1166,8 +1166,8 @@ const PAGE_BANNER_DEFINITIONS = [
   },
   {
     key: "team",
-    title: "Our Members",
-    eyebrow: "OUR MEMBERS",
+    title: "Our Team",
+    eyebrow: "OUR TEAM",
     defaultImg: "banner/inner_banner_2.jpg",
     heading: "Meet the people behind Babylon.",
     description: "Header background banner for Our Team page",

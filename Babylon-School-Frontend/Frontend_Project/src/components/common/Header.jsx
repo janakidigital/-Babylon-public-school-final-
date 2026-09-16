@@ -10,7 +10,7 @@ const primaryNav = [
     link: "/about",
     children: [
       { label: "About Babylon", link: "/about" },
-      { label: " Members", link: "/team" },
+      { label: " Teams", link: "/team" },
       { label: "Achievements", link: "/achievements" },
       { label: "Facilities", link: "/facilities" },
       { label: "FAQ", link: "/faq" },
