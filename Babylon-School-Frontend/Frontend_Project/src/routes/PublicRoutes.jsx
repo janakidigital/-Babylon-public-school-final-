@@ -36,6 +36,7 @@ import ExtraCurricularPage from "../pages/ECA/ExtraCurricularPage";
 // import SignupPage from '../pages/Auth/SignupPage';
 // import DashboardPage from '../pages/Dashboard/DashboardPage';
 import NotFoundPage from "../pages/NotFound/NotFoundPage";
+import "../styles/typography.css";
 
 function PublicLayout({ children }) {
   const location = useLocation();
@@ -44,7 +45,7 @@ function PublicLayout({ children }) {
   }, [location.pathname]);
 
   return (
-    <main>
+    <main className="public-site">
       <Header />
       {children}
       <Footer />

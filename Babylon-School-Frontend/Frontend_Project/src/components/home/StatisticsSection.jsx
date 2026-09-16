@@ -67,7 +67,7 @@ export default function LeadershipMessageSection() {
           <p className="eyebrow">Leadership</p>
 
           <h2>
-            Message from the <em>{message.title}</em>
+            Message from the {message.title}
           </h2>
 
           <blockquote>{message.quote}</blockquote>

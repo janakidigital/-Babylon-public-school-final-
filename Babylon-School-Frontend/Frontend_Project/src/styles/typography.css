@@ -1,0 +1,161 @@
+/* Shared public-site type scale. Keep fonts and colours in their components;
+   use the same proportions on the homepage, listings and detail pages.
+   Size overrides are intentional: older page CSS and mobile rules use both
+   inline sizes and !important. Admin screens are outside .public-site. */
+.public-site {
+  --type-hero: clamp(1.75rem, 1.5rem + 0.75vw, 2rem);
+  --type-page: clamp(1.75rem, 1.5rem + 1vw, 2.25rem);
+  --type-section: clamp(1.5rem, 1.3rem + 0.8vw, 1.75rem);
+  --type-subheading: clamp(1.25rem, 1.125rem + 0.35vw, 1.375rem);
+  --type-card: clamp(1.125rem, 1.05rem + 0.3vw, 1.25rem);
+  --type-label: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+  --type-body: 1rem;
+  --type-small: 0.875rem;
+  font-size: var(--type-body);
+  line-height: 1.7;
+}
+
+.public-site h1 {
+  font-size: var(--type-page) !important;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+.public-site .hero h1 {
+  font-size: var(--type-hero) !important;
+  line-height: 1.25;
+}
+
+.public-site h2 {
+  font-size: var(--type-section) !important;
+  line-height: 1.3;
+  letter-spacing: -0.015em;
+}
+
+.public-site h3 {
+  font-size: var(--type-card) !important;
+  line-height: 1.4;
+}
+
+.public-site :is(h4, h5, h6) {
+  font-size: 1.125rem !important;
+  line-height: 1.4;
+}
+
+.public-site :is(h1, h2, h3, h4, h5, h6) {
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+}
+
+/* Section labels in each of the existing heading treatments. */
+.public-site :is(
+  .eyebrow,
+  .section-badge,
+  .hero-badge,
+  .achievements-badge,
+  .facility-detail-eyebrow
+) {
+  font-size: var(--type-label) !important;
+  font-weight: 700;
+  line-height: 1.5;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.75rem;
+  text-wrap: balance;
+}
+
+/* Content subheadings sit between a section title and its body copy. */
+.public-site :is(.article-copy, .rich-text) h2,
+.public-site :is(.blog-featured-title, .eca-entry-title, .testimonial-question) {
+  font-size: var(--type-subheading) !important;
+  line-height: 1.35;
+}
+
+.public-site :is(p, li),
+.public-site :is(
+  .rich-text,
+  .home-about-lead,
+  .home-about-desc,
+  .section-description,
+  .section-subtitle,
+  .hero-description,
+  .hero-subtitle,
+  .achievements-subtitle,
+  .leadership-text,
+  .about-hero-lead,
+  .admissions-lead,
+  .testimonial-message
+) {
+  font-size: var(--type-body);
+  line-height: 1.7;
+}
+
+.public-site :is(.pillar-info, .program-card-content, .blog-card-content) p {
+  font-size: var(--type-body);
+  line-height: 1.65;
+}
+
+.public-site :is(.leadership-body blockquote, .testimonial-message) {
+  font-size: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+  line-height: 1.7;
+}
+
+/* Metadata remains secondary without using the tiny section-label sizes. */
+.public-site :is(
+  .content-cards .eyebrow,
+  .program-level,
+  .blog-card-category,
+  .blog-card-meta,
+  .blog-featured-meta,
+  .testimonial-role,
+  .leadership-meta span,
+  .page-banner a,
+  .page-banner .shell > span,
+  .badge-text,
+  .stat-label
+) {
+  font-size: var(--type-small) !important;
+  line-height: 1.5;
+  letter-spacing: 0.03em;
+}
+
+.public-site :is(.button, .text-link, .faq-grid summary, .about-faq summary) {
+  font-size: var(--type-body);
+  line-height: 1.5;
+}
+
+.public-site form :is(label, input, select, textarea, button) {
+  font-size: var(--type-body);
+}
+
+.public-site .admissions-fieldset legend {
+  font-size: var(--type-small);
+  line-height: 1.5;
+  letter-spacing: 0.06em;
+}
+
+/* Allow the larger, readable label to wrap without clipping the hero's
+   content or call-to-action buttons on narrow screens or at browser zoom. */
+.public-site .hero {
+  height: auto;
+  min-height: 580px;
+}
+
+.public-site .hero-content {
+  padding-bottom: 3rem;
+}
+
+.public-site .page-banner {
+  padding-block: 3rem;
+}
+
+@media (max-width: 768px) {
+  .public-site .hero {
+    min-height: 480px;
+  }
+}
+
+@media (max-width: 600px) {
+  .public-site .hero {
+    min-height: 460px;
+  }
+}

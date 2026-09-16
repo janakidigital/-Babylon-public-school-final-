@@ -7,7 +7,7 @@ import { assetPath } from "../../data/content";
 export default function AboutSection() {
   const { settings } = useSite();
   const currentYear = new Date().getFullYear();
-  const yearsOfExcellence = currentYear >= 1996 ? currentYear - 1996 : 30;
+  const yearsOfExcellence = currentYear >= 1995 ? currentYear - 1995 : 30;
 
   return (
     <section className="home-about-section" id="about-overview">
@@ -25,7 +25,7 @@ export default function AboutSection() {
                 }}
               />
               <div className="home-about-badge">
-                <span className="badge-years">{yearsOfExcellence}+</span>
+                <span className="badge-years">{yearsOfExcellence}</span>
                 <span className="badge-text">
                   Years of Academic <br /> Excellence
                 </span>
