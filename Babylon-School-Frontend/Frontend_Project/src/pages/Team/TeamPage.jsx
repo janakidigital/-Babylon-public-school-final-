@@ -73,7 +73,7 @@ export default function TeamPage() {
     return letters;
   }, [teachers]);
 
-  // Put the Chairman first on the board; keep the remaining profiles A–Z.
+  // Keep the saved profile order, with the Chairman first on the board.
   const filteredTeachers = useMemo(() => {
     return (teachers || []).filter((teacher) => {
       // 1. Category Filter
@@ -109,15 +109,11 @@ export default function TeamPage() {
       }
 
       return true;
-    }).sort((a, b) => {
-      if (selectedCategory === DEFAULT_CATEGORY) {
-        const chairmanOrder = Number(isChairman(b)) - Number(isChairman(a));
-        if (chairmanOrder) return chairmanOrder;
-      }
-      return (a.name || "").trim().localeCompare((b.name || "").trim(), "en", {
-        sensitivity: "base",
-      });
-    });
+    }).sort((a, b) =>
+      selectedCategory === DEFAULT_CATEGORY
+        ? Number(isChairman(b)) - Number(isChairman(a))
+        : 0,
+    );
   }, [teachers, selectedCategory, selectedLetter, searchQuery]);
 
   return (
