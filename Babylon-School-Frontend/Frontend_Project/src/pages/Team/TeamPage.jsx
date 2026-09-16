@@ -69,7 +69,7 @@ export default function TeamPage() {
     return letters;
   }, [teachers]);
 
-  // Filtered teachers based on Category, Alphabet, and Search Query
+  // Keep every category and filtered view in alphabetical name order.
   const filteredTeachers = useMemo(() => {
     return (teachers || []).filter((teacher) => {
       // 1. Category Filter
@@ -105,7 +105,11 @@ export default function TeamPage() {
       }
 
       return true;
-    });
+    }).sort((a, b) =>
+      (a.name || "").trim().localeCompare((b.name || "").trim(), "en", {
+        sensitivity: "base",
+      }),
+    );
   }, [teachers, selectedCategory, selectedLetter, searchQuery]);
 
   return (
