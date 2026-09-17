@@ -35,6 +35,29 @@ test("HTML entities are decoded for previews without becoming executable markup"
   assert.doesNotMatch(value, /<img/);
 });
 
+test("existing and newly saved rich text use breakable spaces from every nonbreaking-space encoding", () => {
+  const paragraph = "This is to inform you that the Mid-Terminal Assessment 2083 will commence soon.";
+  for (const space of ["&nbsp;", "&#160;", "&#xA0;", "\u00a0"]) {
+    const html = `<p>${paragraph.replaceAll(" ", space)}</p>`;
+    const stored = `<div data-rich-text="true">${html}</div>`;
+    for (const clean of [sanitizeRichText(stored), serializeRichText(html)]) {
+      const container = document.createElement("div");
+      container.innerHTML = clean;
+      assert.equal(container.textContent, paragraph, `Space encoding: ${JSON.stringify(space)}`);
+      assert.doesNotMatch(clean, /&nbsp;|\u00a0/);
+    }
+  }
+});
+
+test("space normalization preserves link attributes and escaped literal entities", () => {
+  const clean = sanitizeRichText('<p><a href="https://school.example/?label=Grade&nbsp;One">Grade&nbsp;One</a> &amp;nbsp; &amp;#160; &lt;img src=x onerror=alert(1)&gt;</p>');
+  const container = document.createElement("div");
+  container.innerHTML = clean;
+  assert.equal(container.querySelector("a").getAttribute("href"), "https://school.example/?label=Grade\u00a0One");
+  assert.equal(container.textContent, "Grade One &nbsp; &#160; <img src=x onerror=alert(1)>");
+  assert.equal(container.querySelector("img"), null);
+});
+
 test("download links work for both older text and formatted descriptions", () => {
   assert.equal(firstContentLink("Download https://school.example/file.pdf here"), "https://school.example/file.pdf");
   assert.equal(firstContentLink(serializeRichText('<p><a href="https://school.example/file.pdf">Download</a></p>')), "https://school.example/file.pdf");

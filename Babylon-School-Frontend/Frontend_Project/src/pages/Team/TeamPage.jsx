@@ -119,7 +119,7 @@ export default function TeamPage() {
   return (
     <>
       <PageBanner
-        eyebrow="OUR TEAMS"
+        eyebrow="OUR TEAM"
         title="Meet the people behind Babylon."
         image="banner/inner_banner_2.jpg"
         pageKey="team"
@@ -131,7 +131,7 @@ export default function TeamPage() {
           <div className="about-main-content">
             <section className="listing-page team-page-section">
               <div className="center-heading">
-                <p className="eyebrow">OUR TEAMS</p>
+                <p className="eyebrow">OUR TEAM</p>
                 <h2>Guiding every learner forward.</h2>
               </div>
 

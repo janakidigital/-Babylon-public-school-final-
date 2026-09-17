@@ -10,6 +10,14 @@ export function isRichText(value) {
 export function sanitizeRichText(html) {
   if (!purifier) {
     purifier = createDOMPurify(window);
+    purifier.addHook("afterSanitizeElements", node => {
+      // Quill's semantic HTML turns every ordinary space into &nbsp;.
+      // Restore word wrapping on both saved content and existing public text,
+      // without changing link attributes or decoding escaped markup.
+      if (node.nodeType === 3) {
+        node.nodeValue = node.nodeValue.replace(/\u00a0/g, " ");
+      }
+    });
     purifier.addHook("uponSanitizeAttribute", (_node, data) => {
       if (data.attrName === "class") {
         data.attrValue = data.attrValue.split(/\s+/)

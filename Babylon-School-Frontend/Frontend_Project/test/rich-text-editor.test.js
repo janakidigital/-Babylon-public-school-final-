@@ -60,6 +60,39 @@ test(`${label} toolbar formatting saves in FormData and survives reopening in th
 });
 }
 
+test("notice paragraphs save and render with ordinary word spaces while retaining formatting on reopen", async () => {
+  const paragraph = "This is to inform you that the Mid-Terminal Assessment 2083 for students from Grade Nursery to Grade U. Kg. will commence from 18 Ashoj 2083 and conclude on 22 Ashoj 2083.";
+  const linkStart = paragraph.indexOf("Assessment");
+  const link = "https://school.example/assessment";
+  await act(async () => root.render(React.createElement("form", null,
+    React.createElement(Editor, { key: "notice-spacing", name: "content", label: "Content", defaultValue: paragraph, required: true }))));
+  const quill = Quill.find(document.querySelector(".ql-container"));
+  await act(async () => {
+    quill.formatText(0, 4, "bold", true, "user");
+    quill.formatText(linkStart, "Assessment".length, "link", link, "user");
+    quill.formatLine(0, 1, "align", "justify", "user");
+  });
+  const saved = new dom.window.FormData(document.querySelector("form")).get("content");
+  assert.doesNotMatch(saved, /&nbsp;|\u00a0/);
+
+  await act(async () => root.render(React.createElement("form", null,
+    React.createElement(Editor, { key: "notice-spacing-reopened", name: "content", label: "Content", defaultValue: saved, required: true }))));
+  const reopened = Quill.find(document.querySelector(".ql-container"));
+  assert.equal(reopened.getText(), `${paragraph}\n`);
+  assert.equal(reopened.getFormat(0, 4).bold, true);
+  assert.equal(reopened.getFormat(0, 1).align, "justify");
+  assert.equal(reopened.getFormat(linkStart, "Assessment".length).link, link);
+
+  await act(async () => root.render(React.createElement(RichText, { value: saved })));
+  assert.equal(document.querySelector(".rich-text").textContent, paragraph);
+  assert.equal(document.querySelector(".rich-text .ql-align-justify strong").textContent, "This");
+  assert.equal(document.querySelector(".rich-text a").getAttribute("href"), link);
+
+  const legacyValue = `<div data-rich-text="true"><p>${paragraph.replaceAll(" ", "&nbsp;")}</p></div>`;
+  await act(async () => root.render(React.createElement(RichText, { value: legacyValue })));
+  assert.equal(document.querySelector(".rich-text").textContent, paragraph);
+});
+
 test("list formatting, undo, redo and empty-content validation work without submitting toolbar buttons", async () => {
   await act(async () => root.render(React.createElement("form", null,
     React.createElement(Editor, { key: "list", name: "description", label: "Description", defaultValue: "One\nTwo", required: true }))));
