@@ -37,6 +37,11 @@
   line-height: 1.4;
 }
 
+/* Keep team member names compact within their cards. */
+.public-site .teacher-grid h3 {
+  font-size: 1rem !important;
+}
+
 .public-site :is(h4, h5, h6) {
   font-size: 1.125rem !important;
   line-height: 1.4;
