@@ -14,7 +14,6 @@ COPY package.json package-lock.json ./
 
 
 
-
 #########################################################################
 #  Stage 2 — deps: full install (used only by the test stage)           #
 #########################################################################
@@ -23,7 +22,6 @@ FROM base AS deps
 # Install prod + dev dependencies from the lockfile, reusing the npm cache
 RUN --mount=type=cache,target=/root/.npm \
     npm ci --no-audit --no-fund
-
 
 
 
@@ -40,7 +38,6 @@ RUN --mount=type=cache,target=/root/.npm \
 
 
 
-
 #########################################################################
 #  Stage 4 — test: optional CI gate, fails the build if tests fail      #
 #########################################################################
@@ -49,7 +46,6 @@ FROM deps AS test
 ENV NODE_ENV=test
 COPY . .
 RUN npm test
-
 
 
 
