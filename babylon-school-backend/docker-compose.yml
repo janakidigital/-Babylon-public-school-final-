@@ -1,0 +1,51 @@
+name: babylon-school-backend
+services:
+  babylon-school-backend-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: babylon-school-backend
+    image: babylon-public-school-backend:${IMAGE_TAG:?set IMAGE_TAG}
+    restart: unless-stopped
+    init: true
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=production
+      - PORT=${PORT:-5000}
+    ports:
+      - "${PORT:-5000}:${PORT:-5000}"
+    volumes:
+      - uploads-data:/app/src/babylon_image_File
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    deploy:
+      resources:
+        # limits:
+        #   cpus: "1.0"
+        #   memory: 2G
+        reservations:
+          memory: 1G
+    healthcheck:
+      test: ["CMD", "node", "-e", "const s=require('net').connect(5000,'127.0.0.1');s.on('connect',()=>process.exit(0));s.on('error',()=>process.exit(1));setTimeout(()=>process.exit(1),4000)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+    networks:
+      - babylon-public-school-network
+
+volumes:
+  uploads-data:
+
+networks:
+  babylon-public-school-network:
+    external: true
+    name: babylon-public-school-network

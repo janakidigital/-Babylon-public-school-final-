@@ -1,0 +1,64 @@
+# Dependencies & build artifacts (reinstalled inside the image)
+**/node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+dist
+build
+coverage
+.nyc_output
+
+# Secrets & environment (never bake into an image layer)
+**/.env
+**/.env.*
+!**/.env.example
+!**/example.env
+**/*.pem
+**/*.key
+**/*.crt
+
+# Local uploaded media (persisted via a Docker volume, not the image)
+src/babylon_image_File/
+uploads/
+backups/
+*.tar
+*.tar.gz
+*.zip
+
+# Version control & CI
+.git
+.gitignore
+.gitattributes
+.github
+.gitlab-ci.yml
+
+# Docker files themselves
+Dockerfile
+Dockerfile.*
+example.Dockerfile
+.dockerignore
+docker-compose*.yml
+compose*.yml
+example.docker-compose.yml
+
+# Editor / OS cruft
+.vscode
+.idea
+**/*.swp
+**/*.swo
+**/.DS_Store
+**/Thumbs.db
+
+# Logs & temp files
+**/*.log
+logs
+tmp
+temp
+.cache
+
+# Docs & tooling config (tests in test/ are kept for the test stage)
+.eslintcache
+.prettierrc*
+**/*.md
+LICENSE
