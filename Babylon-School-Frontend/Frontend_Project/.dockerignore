@@ -1,0 +1,39 @@
+
+# Dependencies & build output (rebuilt inside the image)
+node_modules
+dist
+build
+.vite
+ 
+# Secrets / env (VITE_* values are passed as build args instead)
+.env
+.env.*
+!.env.example
+ 
+# Version control & CI
+.git
+.gitignore
+.gitattributes
+.github
+ 
+# Docker files themselves
+Dockerfile*
+docker-compose*.yml
+compose*.yml
+.dockerignore
+ 
+# Tests, scratch work, docs
+test
+tests
+coverage
+scratch
+*.md
+ 
+# Editor / OS / logs
+.vscode
+.idea
+.DS_Store
+Thumbs.db
+*.log
+npm-debug.log*
+*.tsbuildinfo
