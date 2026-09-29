@@ -21,7 +21,7 @@ concurrency:
 
 env:
   SERVICE_NAME: babylon-school-backend-service
-  APP_DIR: /root/babylon-public-school-final/babylon-school-backend
+  APP_DIR: /root/babylon-public-school/-Babylon-public-school-final-/babylon-school-backend
   IMAGE_NAME: babylon-public-school-backend
   PROJECT_NAME: Babylon-School-Backend
   COMPOSE_FILE_NAME: docker-compose.yml
