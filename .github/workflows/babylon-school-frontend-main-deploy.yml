@@ -1,0 +1,351 @@
+name: Build & Deploy Babylon-Public-School-Frontend
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'Babylon-School-Frontend/Frontend_Project/**'
+      - '.github/workflows/babylon-school-frontend-main-deploy.yml'
+  workflow_dispatch:
+    inputs:
+      deploy_sha:
+        description: "Existing commit SHA to (re)deploy. Empty = deploy branch HEAD."
+        required: false
+        default: ""
+
+permissions: {}
+concurrency:
+  group: babylon-frontend-deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  SERVICE_NAME: babylon-school-frontend-service
+  APP_DIR: /root/babylon-public-school/-Babylon-public-school-final-/Babylon-School-Frontend/Frontend_Project
+  IMAGE_NAME: babylon-public-school-frontend
+  PROJECT_NAME: Babylon-School-Frontend
+  COMPOSE_FILE_NAME: docker-compose.yml
+  HEALTH_URL: http://127.0.0.1:3000/healthz
+  HEALTH_RETRIES: "15"
+  HEALTH_INTERVAL: "3"
+  WAIT_TIMEOUT: "120"
+  # Where the .last_good_sha_* rollback marker is stored
+  STATE_DIR: /root/babylon-public-school
+  STATE_FILE: ""
+  PRE_DEPLOY_CMD: ""
+  POST_DEPLOY_CMD: ""
+#   NOTIFY_ON_SUCCESS: "true"
+#   MAIL_FROM_NAME: Dome Infosys Pvt. Ltd.
+  DEPLOY_SHA: ${{ inputs.deploy_sha != '' && inputs.deploy_sha || github.sha }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Network Connectivity Check
+        env:
+          HOST: ${{ secrets.SSH_IP }}
+        run: |
+          if [ -z "$HOST" ]; then
+            echo "::error::SSH_IP secret is empty"
+            exit 1
+          fi
+          if timeout 5 bash -c 'exec 3<>/dev/tcp/$1/22' _ "$HOST" 2>/dev/null; then
+            echo "Port 22 reachable on $HOST"
+          else
+            echo "::error::Port 22 unreachable on $HOST"
+            exit 1
+          fi
+
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@dc588b651fe13675774614f8e6a936a468676387
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Add server to known_hosts
+        env:
+          KNOWN_HOSTS: ${{ secrets.SSH_KNOWN_HOSTS }}
+          HOST: ${{ secrets.SSH_IP }}
+        run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          if [ -n "${KNOWN_HOSTS:-}" ]; then
+            printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+          else
+            ssh-keyscan -H -t ed25519,rsa,ecdsa "$HOST" >> ~/.ssh/known_hosts
+          fi
+          chmod 600 ~/.ssh/known_hosts
+
+      - name: SSH into server and deploy the service
+        id: ssh_deploy
+        env:
+          CFG_BRANCH: ${{ github.ref_name }}
+        run: |
+          set +e
+
+          MISSING=""
+          [ -n "$SERVICE_NAME" ] || MISSING="$MISSING SERVICE_NAME"
+          [ -n "$APP_DIR" ]      || MISSING="$MISSING APP_DIR"
+          [ -n "$IMAGE_NAME" ]   || MISSING="$MISSING IMAGE_NAME"
+          if [ -n "$MISSING" ]; then
+            echo "::error::Empty settings in the workflow env block:$MISSING"
+            exit 1
+          fi
+
+          _esc() { printf %q "$1"; }
+
+          SF="$STATE_FILE"
+          if [ -z "$SF" ]; then
+            SD="${STATE_DIR:-$(dirname "$APP_DIR")}"
+            SF="$SD/.last_good_sha_$SERVICE_NAME"
+          fi
+
+          CMD="DEPLOY_BRANCH=$(_esc "$CFG_BRANCH")"
+          CMD="$CMD DEPLOY_SHA=$(_esc "$DEPLOY_SHA")"
+          CMD="$CMD APP_DIR=$(_esc "$APP_DIR")"
+          CMD="$CMD SERVICE=$(_esc "$SERVICE_NAME")"
+          CMD="$CMD IMAGE_NAME=$(_esc "$IMAGE_NAME")"
+          CMD="$CMD HEALTH_URL=$(_esc "${HEALTH_URL:-}")"
+          CMD="$CMD HEALTH_RETRIES=$(_esc "${HEALTH_RETRIES:-20}")"
+          CMD="$CMD HEALTH_INTERVAL=$(_esc "${HEALTH_INTERVAL:-3}")"
+          CMD="$CMD WAIT_TIMEOUT=$(_esc "${WAIT_TIMEOUT:-90}")"
+          CMD="$CMD STATE_FILE=$(_esc "$SF")"
+          CMD="$CMD COMPOSE_FILE_NAME=$(_esc "${COMPOSE_FILE_NAME:-docker-compose.yml}")"
+          CMD="$CMD PRE_DEPLOY_CMD=$(_esc "${PRE_DEPLOY_CMD:-}")"
+          CMD="$CMD POST_DEPLOY_CMD=$(_esc "${POST_DEPLOY_CMD:-}")"
+
+          cat > "${RUNNER_TEMP:-/tmp}/deploy.sh" << 'REMOTE_SCRIPT'
+          set -euo pipefail
+
+          APP_DIR="${APP_DIR:?}"
+          SERVICE="${SERVICE:?}"
+          IMAGE_NAME="${IMAGE_NAME:?}"
+          HEALTH_URL="${HEALTH_URL-}"
+          HEALTH_RETRIES="${HEALTH_RETRIES:-20}"
+          HEALTH_INTERVAL="${HEALTH_INTERVAL:-3}"
+          WAIT_TIMEOUT="${WAIT_TIMEOUT:-90}"
+          STATE_FILE="${STATE_FILE:?}"
+          COMPOSE_FILE_NAME="${COMPOSE_FILE_NAME:-docker-compose.yml}"
+
+          for bin in docker python3; do
+            command -v "$bin" >/dev/null || { echo "::error::'$bin' not installed on host"; exit 1; }
+          done
+          docker compose version >/dev/null 2>&1 || { echo "::error::docker compose v2 missing on host"; exit 1; }
+          [ -d "$APP_DIR" ] || { echo "::error::APP_DIR '$APP_DIR' does not exist"; exit 1; }
+          cd "$APP_DIR"
+          [ -f "$COMPOSE_FILE_NAME" ] || { echo "::error::$COMPOSE_FILE_NAME not found in $APP_DIR"; exit 1; }
+          export COMPOSE_FILE="$COMPOSE_FILE_NAME"
+
+          PREV_GOOD_SHA=""
+          if [ -f "$STATE_FILE" ]; then
+            PREV_GOOD_SHA=$(cat "$STATE_FILE")
+          fi
+          echo "== $SERVICE : deploying $DEPLOY_SHA (previous good: ${PREV_GOOD_SHA:-none})"
+
+          set_env() {
+            touch .env
+            if [ -s .env ] && [ -n "$(tail -c1 .env)" ]; then
+              echo >> .env
+            fi
+            if grep -q "^$1=" .env; then
+              sed -i "s|^$1=.*|$1=$2|" .env
+            else
+              echo "$1=$2" >> .env
+            fi
+          }
+
+          compose_up() {
+            docker compose up -d --no-deps --force-recreate --remove-orphans \
+              --wait --wait-timeout "$WAIT_TIMEOUT" "$SERVICE"
+          }
+
+          probe_url() {
+            if [ -z "$HEALTH_URL" ]; then
+              return 0
+            fi
+            for i in $(seq 1 "$HEALTH_RETRIES"); do
+              if python3 -c "import sys,http.client as c;from urllib.parse import urlparse as p;u=p(sys.argv[1]);x=c.HTTPConnection(u.hostname,u.port or 80,timeout=4);x.request('GET',u.path or '/');assert x.getresponse().status==200" "$HEALTH_URL" 2>/dev/null; then
+                echo "HEALTH_URL ok (attempt $i)."
+                return 0
+              fi
+              sleep "$HEALTH_INTERVAL"
+            done
+            echo "HEALTH_URL $HEALTH_URL never answered 200"
+            return 1
+          }
+
+          dump_logs() {
+            echo "::group::Container logs ($SERVICE) before rollback"
+            docker compose logs --no-color --tail 200 "$SERVICE" 2>&1 || echo "Could not fetch container logs"
+            echo "::endgroup::"
+            echo "::group::Compose status"
+            docker compose ps 2>&1 || true
+            echo "::endgroup::"
+          }
+
+          echo "Deploying branch: $DEPLOY_BRANCH (sha: $DEPLOY_SHA)"
+          git fetch origin "$DEPLOY_BRANCH"
+          if ! git cat-file -e "$DEPLOY_SHA^{commit}" 2>/dev/null; then
+            git fetch origin "$DEPLOY_SHA" || { echo "::error::cannot fetch commit $DEPLOY_SHA"; exit 1; }
+          fi
+          git reset --hard "$DEPLOY_SHA"
+          echo "Code updated to $DEPLOY_SHA."
+
+          set_env IMAGE_TAG "$DEPLOY_SHA"
+
+          if ! docker compose config -q; then
+            echo "CONFIG_FAILED"
+            echo "::error::docker compose config is invalid — nothing was deployed"
+            exit 1
+          fi
+          if ! docker compose config | grep -Fq "image: $IMAGE_NAME:$DEPLOY_SHA"; then
+            echo "TAG_CHECK_FAILED"
+            echo "::error::compose file does not resolve to '$IMAGE_NAME:$DEPLOY_SHA'. Ensure it uses: image: $IMAGE_NAME:\${IMAGE_TAG:-latest}"
+            echo "Resolved image lines:"
+            docker compose config | grep -E 'image:' || true
+            exit 1
+          fi
+          if ! docker compose config | grep -q 'healthcheck:' && [ -z "$HEALTH_URL" ]; then
+            echo "::warning::No compose healthcheck and no HEALTH_URL — a crash-looping container may pass as healthy"
+          fi
+
+          # Create external networks if missing, skip if already exists
+          while read -r NET; do
+            [ -z "$NET" ] && continue
+            if docker network inspect "$NET" >/dev/null 2>&1; then
+              echo "Network $NET already exists, skipping"
+            else
+              echo "Creating external network $NET"
+              docker network create "$NET"
+            fi
+          done < <(docker compose config --format json 2>/dev/null | python3 -c "import json,sys;[print(v.get('name') or n) for n,v in (json.load(sys.stdin).get('networks') or {}).items() if isinstance(v,dict) and v.get('external')]")
+
+          echo "Building image $IMAGE_NAME:$DEPLOY_SHA..."
+          export DOCKER_BUILDKIT=1
+          if ! docker compose build --pull "$SERVICE"; then
+            echo "BUILD_FAILED"
+            exit 1
+          fi
+
+          rollback() {
+            local TARGET="$1"
+            echo "::error::Rolling back to $TARGET"
+            git fetch origin "$TARGET" >/dev/null 2>&1 || true
+            if ! git reset --hard "$TARGET" >/dev/null 2>&1; then
+              echo "::warning::Could not reset working tree to $TARGET — container-only rollback"
+            fi
+            set_env IMAGE_TAG "$TARGET"
+            if compose_up && probe_url; then
+              echo "ROLLBACK_PERFORMED sha=$TARGET"
+            else
+              echo "ROLLBACK_FAILED sha=$TARGET"
+            fi
+          }
+
+          if [ -n "$PRE_DEPLOY_CMD" ]; then
+            echo "Running PRE_DEPLOY_CMD"
+            bash -c "$PRE_DEPLOY_CMD"
+          fi
+
+          if compose_up && probe_url; then
+            mkdir -p "$(dirname "$STATE_FILE")"
+            echo "$DEPLOY_SHA" > "$STATE_FILE"
+            if [ -n "$POST_DEPLOY_CMD" ]; then
+              echo "Running POST_DEPLOY_CMD"
+              bash -c "$POST_DEPLOY_CMD" || echo "::warning::POST_DEPLOY_CMD failed"
+            fi
+            { docker images "$IMAGE_NAME" --format '{{.Tag}}' | grep -v '<none>' || true; } | while read -r TAG; do
+              case "$TAG" in
+                "$DEPLOY_SHA"|"$PREV_GOOD_SHA"|latest) ;;
+                *) docker rmi "$IMAGE_NAME:$TAG" >/dev/null 2>&1 || true ;;
+              esac
+            done
+            echo "Deployment Successful ($DEPLOY_SHA)"
+            exit 0
+          fi
+
+          echo "::error::$SERVICE is unhealthy on $DEPLOY_SHA"
+          dump_logs
+          if [ -z "$PREV_GOOD_SHA" ] || [ "$PREV_GOOD_SHA" = "$DEPLOY_SHA" ]; then
+            echo "::error::No previous good SHA recorded (or it equals this SHA) — manual intervention needed"
+            echo "ROLLBACK_UNAVAILABLE"
+            exit 1
+          fi
+          rollback "$PREV_GOOD_SHA"
+          exit 1
+          REMOTE_SCRIPT
+
+          OUTPUT=$(ssh -T -o ConnectTimeout=10 \
+              -o ServerAliveInterval=60 \
+              -o ServerAliveCountMax=10 \
+              "${{ secrets.SSH_USER }}@${{ secrets.SSH_IP }}" \
+              "$CMD flock -w 600 /var/lock/babylon-school-deploy.lock bash -s" < "${RUNNER_TEMP:-/tmp}/deploy.sh" 2>&1)
+          SSH_EXIT=$?
+
+          echo "$OUTPUT"
+
+          if echo "$OUTPUT" | grep -q "ROLLBACK_PERFORMED"; then
+            ROLLBACK_SHA=$(echo "$OUTPUT" | sed -n 's/.*ROLLBACK_PERFORMED sha=\([^ ]*\).*/\1/p' | head -1)
+            echo "rollback=true" >> "$GITHUB_OUTPUT"
+            echo "rollback_sha=$ROLLBACK_SHA" >> "$GITHUB_OUTPUT"
+          elif echo "$OUTPUT" | grep -q "ROLLBACK_FAILED"; then
+            echo "rollback=failed" >> "$GITHUB_OUTPUT"
+          elif echo "$OUTPUT" | grep -q "ROLLBACK_UNAVAILABLE"; then
+            echo "rollback=unavailable" >> "$GITHUB_OUTPUT"
+          elif echo "$OUTPUT" | grep -q "BUILD_FAILED"; then
+            echo "rollback=n/a (build failed — previous deployment untouched)" >> "$GITHUB_OUTPUT"
+          elif echo "$OUTPUT" | grep -q "CONFIG_FAILED"; then
+            echo "rollback=n/a (compose config invalid — nothing deployed)" >> "$GITHUB_OUTPUT"
+          elif echo "$OUTPUT" | grep -q "TAG_CHECK_FAILED"; then
+            echo "rollback=n/a (image tag not wired to IMAGE_TAG — nothing deployed)" >> "$GITHUB_OUTPUT"
+          elif [ "$SSH_EXIT" -ne 0 ]; then
+            echo "rollback=unknown (ssh/remote error, exit $SSH_EXIT)" >> "$GITHUB_OUTPUT"
+          else
+            echo "rollback=false" >> "$GITHUB_OUTPUT"
+          fi
+
+          exit "$SSH_EXIT"
+
+    #   - name: Notify on failure
+    #     if: failure() && vars.MAIL_TO != ''
+    #     uses: dawidd6/action-send-mail@2cea9617b09d79a095af21254fbcb7ae95903dde
+    #     with:
+    #       server_address: smtp.gmail.com
+    #       server_port: 465
+    #       username: ${{ secrets.GMAIL_USERNAME }}
+    #       password: ${{ secrets.GMAIL_PASSWORD }}
+    #       subject: "❌ Deploy Failed: ${{ env.PROJECT_NAME || github.event.repository.name }} (${{ env.DEPLOY_SHA }}) — rollback: ${{ steps.ssh_deploy.outputs.rollback || 'n/a (failed before deploy ran)' }}"
+    #       to: ${{ vars.MAIL_TO }}
+    #       from: ${{ env.MAIL_FROM_NAME }} <${{ secrets.GMAIL_USERNAME }}>
+    #       body: |
+    #         Deployment failed for ${{ env.PROJECT_NAME || github.event.repository.name }}
+    #         (${{ github.ref_name }} branch), commit ${{ env.DEPLOY_SHA }}.
+
+    #         Triggered by: ${{ github.actor }}
+    #         Workflow run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+    #         Deploy status: ${{ steps.ssh_deploy.outputs.rollback }}
+    #         ${{ steps.ssh_deploy.outputs.rollback == 'true' && format('Rolled back to previous good commit: {0}', steps.ssh_deploy.outputs.rollback_sha) || '' }}
+
+    #         The failing container's logs (before rollback) are in the workflow
+    #         run under the "Container logs" group — check the run logs for details.
+
+    #   - name: Notify on success
+    #     if: success() && vars.MAIL_TO != '' && env.NOTIFY_ON_SUCCESS == 'true'
+    #     uses: dawidd6/action-send-mail@2cea9617b09d79a095af21254fbcb7ae95903dde
+    #     with:
+    #       server_address: smtp.gmail.com
+    #       server_port: 465
+    #       username: ${{ secrets.GMAIL_USERNAME }}
+    #       password: ${{ secrets.GMAIL_PASSWORD }}
+    #       subject: "✅ Deploy Succeeded: ${{ env.PROJECT_NAME || github.event.repository.name }} (${{ env.DEPLOY_SHA }})"
+    #       to: ${{ vars.MAIL_TO }}
+    #       from: ${{ env.MAIL_FROM_NAME }} <${{ secrets.GMAIL_USERNAME }}>
+    #       body: |
+    #         Deployment succeeded for ${{ env.PROJECT_NAME || github.event.repository.name }}
+    #         (${{ github.ref_name }} branch), commit ${{ env.DEPLOY_SHA }}.
+
+    #         Triggered by: ${{ github.actor }}
+    #         Workflow run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
